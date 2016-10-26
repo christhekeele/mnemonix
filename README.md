@@ -1,13 +1,30 @@
 Mnemonix
 ========
 
-> *A generic, swappable interface to key-value stores.*
+> *A wrapper around key-value stores with a generalized interface.*
+
+Features
+--------
+
+- Supports many different types of runtime and external stores
+- Extends all key-value stores with expiry mechanism if they lack one
+- Fits cleanly into any supervision tree
+- Comes with a `Map`-compatible API
 
 API
 ---
 
+
+
+Usage
+-----
+
+
+
 Architecture
 ------------
+
+Mnemonix wraps all your favorite key-value stores in a GenServer called `Mnemonix.Store` with a standardized interface.
 
 Mnemonix models key-value stores as GenServers with a Map-inspired client interface. This allows them to easily fit into both OTP supervision trees and replace existing Map operations.
 
@@ -15,7 +32,7 @@ A `Mnemonix.Server` can be started with `Mnemonix.Server.start_link(adapter, opt
 
 Each server keeps a `Mnemonix.Store` struct as its state. This struct contains:
 
-- `Mnemonix.Store.adapter` - A module that implements the `Mnemonix.Adapter` behaviour that can handle the 4 core functions.
+- `Mnemonix.Store.adapter` - The module that implements the `Mnemonix.Adapter` behaviour that can handle the 4 core functions.
 - `Mnemonix.Store.config` -  The list of configuration options passed into `Mnemonix.start_link` that adapter can use to customize the behaviour of core functions.
 - `Mnemonix.Store.state` - An optional internal state the adapter may use during its operations to keep track of things like connection pools, ports, and the like.
 
@@ -26,7 +43,7 @@ The `Mnemonix` module implements many of the high-level conveniences found in th
 - `Mnemonix.fetch(store, key)` - Retrieves value at key
 - `Mnemonix.delete(store, key)` - Removes value at key
 
-These core functions make `Mnemonix.Server` calls and casts to the `store` process returned by `Mnemonix.start_link`. 
+These core functions make `Mnemonix.Server` calls and casts to the `store` process returned by `Mnemonix.start_link`. All other `Mnemonix` functions are implemented in terms of them.
 
 When a core function is invoked on the server, it passes the arguments and server state to the corresponding adapter implementation. The adapter returns the new state (modified if necessary) and the value for the server to return (if any).
 

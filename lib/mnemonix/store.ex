@@ -3,79 +3,203 @@ defmodule Mnemonix.Store do
   Container for store state that defers core store operations to an adapter.
   """
   
-  defmacro __using__([]) do
-    raise ArgumentError, "a `Mnemonix.Store` must supply an `:adapter`"
-  end
+  @enforce_keys [:adapter]
+  defstruct adapter: nil, opts: [], state: nil
+  @type t :: %__MODULE__{adapter: adapter, opts: opts, state: state}
   
-  defmacro __using__(adapter: adapter) do
-    
+  defmacro __using__(_) do
     quote location: :keep do
-      def start_link(opts \\ []) do
-        Mnemonix.start_link unquote(adapter), Keyword.put(opts, :name, __MODULE__)
-      end
-      use Mnemonix.Interface
+      use Mnemonix.Store.Behaviour
     end
   end
   
-  defstruct adapter: nil, config: [], state: nil
-  @enforce_keys [:adapter]
-  
   @type adapter :: Atom.t
-  @type config  :: Keyword.t
+  @type opts    :: Keyword.t
   @type state   :: any
   
   @type key   :: any
   @type value :: any
   
-  @type t :: %__MODULE__{adapter: adapter, config: config, state: state}
+  @type keys   :: [key] | []
+  @type values :: [value] | []
   
-  @doc """
-  Prepares a `store` by doing any setup, normalizing its `config`, and setting initial `state`.
-  """
-  @spec init(t) :: t
-  def init(adapter, config \\ []) do
-    {config, state} = adapter.init(config)
-    %__MODULE__{adapter: adapter, config: config, state: state}
+  @spec start_link(adapter)                            :: GenServer.on_start
+  @spec start_link(adapter, GenServer.options)         :: GenServer.on_start
+  @spec start_link({adapter, opts})                    :: GenServer.on_start
+  @spec start_link({adapter, opts}, GenServer.options) :: GenServer.on_start
+  def start_link(init, opts \\ [])
+  def start_link(adapter, opts) when not is_tuple adapter do
+    start_link {adapter, []}, opts
+  end
+  def start_link(init, opts) do
+    GenServer.start_link(__MODULE__, init, opts)
   end
   
-  @doc """
-  Returns all keys found in store and an updated `store`.
-  """
-  @spec keys(t) :: {[key] | [], t}
-  def keys(store = %__MODULE__{adapter: adapter}) do
-    adapter.keys(store)
+  use GenServer
+
+  # GenServer.init_callback
+  @spec init({adapter, opts}) ::
+    {:ok, state} |
+    {:ok, state, timeout | :hibernate} |
+    :ignore |
+    {:stop, reason :: any}
+    
+  def init({adapter, opts}) do
+    case adapter.init(opts) do
+      {:ok, state}          -> {:ok, %__MODULE__{adapter: adapter, opts: opts, state: state} }
+      {:ok, state, timeout} -> {:ok, %__MODULE__{adapter: adapter, opts: opts, state: state}, timeout }
+      other                 -> other
+    end
   end
   
-  @doc """
-  Returns whether or not store contains `key` and an updated `store`.
-  """
-  @spec has_key?(t, key) :: {boolean, t}
-  def has_key?(store = %__MODULE__{adapter: adapter}, key) do
-    adapter.has_key?(store, key)
+  # GenServer.handle_call_callback
+  @spec init({adapter, opts})  ::
+    {:reply, reply, new_state} |
+    {:reply, reply, new_state, timeout | :hibernate} |
+    {:noreply, new_state} |
+    {:noreply, new_state, timeout | :hibernate} |
+    {:stop, reason, reply, new_state} |
+    {:stop, reason, new_state} when reply: term, new_state: state, reason: term
+    
+####  
+# CORE
+##
+  
+  def handle_call({:delete, key}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.delete(store, key) do
+      {:ok, store}         -> {:reply, :ok, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
   end
   
-  @doc """
-  Returns value in store of `key` and an updated `store`.
-  """
-  @spec fetch(t, key) :: { {:ok, value} | nil, t}
-  def fetch(store = %__MODULE__{adapter: adapter}, key) do
-    adapter.fetch(store, key)
+  def handle_call({:fetch, key}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.fetch(store, key) do
+      {:ok, store, value}  -> {:reply, {:ok, value}, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
+  end
+    
+  def handle_call({:keys}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.keys(store) do
+      {:ok, store, keys}   -> {:reply, {:ok, keys}, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
+  end
+
+  def handle_call({:put, key, value}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.put(store, key, value) do
+      {:ok, store}         -> {:reply, :ok, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
+  end
+
+####  
+# OPTIONAL
+##
+  
+  def handle_call({:drop, keys}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.drop(store, keys) do
+      {:ok, store}         -> {:reply, :ok, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
   end
   
-  @doc """
-  Puts `value` in `key` of store and returns an updated `store`.
-  """
-  @spec put(t, key, value) :: t
-  def put(store = %__MODULE__{adapter: adapter}, key, value) do
-    adapter.put(store, key, value)
+  def handle_call({:fetch!, key}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.fetch!(store, key) do
+      {:ok, store, value}  -> {:reply, {:ok, value}, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
   end
   
-  
-  @doc """
-  Removes value at `key` of store and returns an updated `store`.
-  """
-  @spec delete(t, key) :: t
-  def delete(store = %__MODULE__{adapter: adapter}, key) do
-    adapter.delete(store, key)
+  def handle_call({:get, key}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.get(store, key) do
+      {:ok, store, value}  -> {:reply, {:ok, value}, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
   end
+  
+  def handle_call({:get, key, default}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.get(store, key, default) do
+      {:ok, store, value}  -> {:reply, {:ok, value}, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
+  end
+  
+  def handle_call({:get_and_update, key, fun}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.get_and_update(store, key, fun) do
+      {:ok, store, value}  -> {:reply, {:ok, value}, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
+  end
+  
+  def handle_call({:get_and_update!, key, fun}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.get_and_update!(store, key, fun) do
+      {:ok, store, value}  -> {:reply, {:ok, value}, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
+  end
+  
+  def handle_call({:get_lazy, key, fun}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.get_lazy(store, key, fun) do
+      {:ok, store, value}  -> {:reply, {:ok, value}, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
+  end
+  
+  def handle_call({:has_key?, key}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.has_key?(store, key) do
+      {:ok, store, value}  -> {:reply, {:ok, value}, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
+  end
+  
+  def handle_call({:pop, key}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.pop(store, key) do
+      {:ok, store, value}  -> {:reply, {:ok, value}, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
+  end
+  
+  def handle_call({:pop, key, default}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.pop(store, key, default) do
+      {:ok, store, value}  -> {:reply, {:ok, value}, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
+  end
+  
+  def handle_call({:pop_lazy, key, fun}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.pop_lazy(store, key, fun) do
+      {:ok, store, value}  -> {:reply, {:ok, value}, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
+  end
+  
+  def handle_call({:put_new, key, value}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.put_new(store, key, value) do
+      {:ok, store}         -> {:reply, :ok, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
+  end
+  
+  def handle_call({:put_new_lazy, key, fun}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.put_new_lazy(store, key, fun) do
+      {:ok, store}         -> {:reply, :ok, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
+  end
+  
+  def handle_call({:update, key, initial, fun}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.update(store, key, initial, fun) do
+      {:ok, store}         -> {:reply, :ok, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
+  end
+  
+  def handle_call({:update!, key, fun}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.update!(store, key, fun) do
+      {:ok, store}         -> {:reply, :ok, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
+  end
+  
 end

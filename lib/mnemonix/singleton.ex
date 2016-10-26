@@ -1,4 +1,4 @@
-defmodule Mnemonix.Interface do
+defmodule Mnemonix.Singleton do
   
   defmacro __using__(_) do
     quote location: :keep do
@@ -9,6 +9,9 @@ defmodule Mnemonix.Interface do
       @type store :: Atom.t
       @type key   :: Store.key
       @type value :: Store.value
+      
+      @spec start_link(atom, Keyword.t) :: GenServer.on_start
+      def start_link(adapter, opts \\ []), do: Mnemonix.start_link adapter, Keyword.put(opts, :name, @module)
 
       @doc """
       Deletes the entries in `#{@module}` for a specific `key`.

@@ -1,30 +1,92 @@
 defmodule Mnemonix do
   @moduledoc """
-  Entry point to core Mnemonix operations.
+  Interface to Memonix.Server methods.
   """
   
   alias Mnemonix.Store
   
-  @type store :: any
+  @type store :: GenServer.server
   @type key   :: Store.key
   @type value :: Store.value
   
+####  
+# CORE
+##
+
   @doc """
   Deletes the entries in `store` for a specific `key`.
 
   If the `key` does not exist, the contents of `store` will be unaffected.
-  
+
   ## Examples
       iex> Mnemonix.Store.delete(%{a: 1, b: 2}, :a)
       %{b: 2}
       iex> Mnemonix.Store.delete(%{b: 2}, :a)
       %{b: 2}
   """
-  @spec delete(store, key) :: store
+  @spec delete(store, key) :: store | no_return
   def delete(store, key) do
-    with :ok <- GenServer.cast(store, {:delete, key}), do: store
+    case GenServer.call(store, {:delete, key}) do
+      :ok -> store
+      {:raise, type, args} -> raise type, args
+    end
+  end
+   
+  @doc """
+  Fetches the value for a specific `key` and returns it in a tuple.
+ 
+  If the `key` does not exist, returns `:error`.
+ 
+  ## Examples
+      iex> Mnemonix.Store.fetch(%{a: 1}, :a)
+      {:ok, 1}
+      iex> Mnemonix.Store.fetch(%{a: 1}, :b)
+      :error
+  """
+  @spec fetch(store, key) :: {:ok, value} | :error | no_return
+  def fetch(store, key) do
+    case GenServer.call(store, {:fetch, key}) do
+      {:ok, value} -> value
+      {:raise, type, args} -> raise type, args
+    end
   end
   
+  @doc """
+  Returns all keys from `store`.
+  
+  ## Examples
+      iex> Mnemonix.Store.keys(%{a: 1, b: 2})
+      [:a, :b]
+  """
+  @spec keys(store) :: [key] | [] | no_return
+  def keys(store) do
+    case GenServer.call(store, {:keys}) do
+      {:ok, keys} -> keys
+      {:raise, type, args} -> raise type, args
+    end
+  end
+  
+  @doc """
+  Puts the given `value` under `key`.
+  
+  ## Examples
+      iex> Mnemonix.Store.put(%{a: 1}, :b, 2)
+      %{a: 1, b: 2}
+      iex> Mnemonix.Store.put(%{a: 1, b: 2}, :a, 3)
+      %{a: 3, b: 2}
+  """
+  @spec put(store, key, value) :: store | no_return
+  def put(store, key, value) do
+    case GenServer.call(store, {:put, key, value}) do
+      :ok -> store
+      {:raise, type, args} -> raise type, args
+    end
+  end
+
+####  
+# OPTIONAL
+##
+
   @doc """
   Drops the given `keys` from `store`.
   
@@ -32,58 +94,37 @@ defmodule Mnemonix do
       iex> Menmonix.Store.drop(%{a: 1, b: 2, c: 3}, [:b, :d])
       %{a: 1, c: 3}
   """
-  @spec drop(store, Enumerable.t) :: store
+  @spec drop(store, Enumerable.t) :: store | no_return
   def drop(store, keys) do
-    keys
-   |> Enum.to_list
-   |> drop_list(store)
- end
-
- defp drop_list([], store), do: store
- defp drop_list([key | rest], store) do
-   drop_list(rest, delete(store, key))
- end
-  
-  @doc """
-  Fetches the value for a specific `key` and returns it in a tuple.
-  
-  If the `key` does not exist, returns `:error`.
-  
-  ## Examples
-      iex> Mnemonix.Store.fetch(%{a: 1}, :a)
-      {:ok, 1}
-      iex> Mnemonix.Store.fetch(%{a: 1}, :b)
-      :error
-  """
-  @spec fetch(store, key) :: {:ok, value} | :error
-  def fetch(store, key) do
-    GenServer.call(store, {:fetch, key})
-  end
-  
-  @doc """
-  Fetches the value for specific `key`.
-  
-  If `key` does not exist, a `KeyError` is raised.
-  
-  ## Examples
-      iex> Mnemonix.Store.fetch!(%{a: 1}, :a)
-      1
-      iex> Mnemonix.Store.fetch!(%{a: 1}, :b)
-      ** (KeyError) key :b not found in: %{a: 1}
-  """
-  @spec fetch!(store, key) :: value | no_return
-  def fetch!(store, key) do
-    case fetch(store, key) do
-      {:ok, value} -> value
-      :error -> raise KeyError, key: key, term: store
+    case GenServer.call(store, {:drop, keys}) do
+      :ok -> store
+      {:raise, type, args} -> raise type, args
     end
-  end
+ end
+  
+ @doc """
+ Fetches the value for specific `key`.
+ 
+ If `key` does not exist, a `KeyError` is raised.
+ 
+ ## Examples
+     iex> Mnemonix.Store.fetch!(%{a: 1}, :a)
+     1
+     iex> Mnemonix.Store.fetch!(%{a: 1}, :b)
+     ** (KeyError) key :b not found in: %{a: 1}
+ """
+ @spec fetch!(store, key) :: {:ok, value} | :error | no_return
+ def fetch!(store, key) do
+   case GenServer.call(store, {:fetch!, key}) do
+     {:ok, value} -> value
+     {:raise, type, args} -> raise type, args
+   end
+ end
   
   @doc """
   Gets the value for a specific `key`.
   
-  If `key` does not exist, return the default value
-  (`nil` if no default value).
+  If `key` does not exist, returns `nil`.
   
   ## Examples
       iex> Mnemonix.Store.get(%{}, :a)
@@ -92,15 +133,33 @@ defmodule Mnemonix do
       1
       iex> Mnemonix.Store.get(%{a: 1}, :b)
       nil
+  """
+  @spec get(store, key) :: value | no_return
+  def get(store, key) do
+    case GenServer.call(store, {:get, key}) do
+      {:ok, value} -> value
+      {:raise, type, args} -> raise type, args
+    end
+  end
+  
+  @doc """
+  Gets the value for a specific `key` with `default`.
+   
+  If `key` does not exist, returns `default`.
+   
+  ## Examples
+      iex> Mnemonix.Store.get(%{}, :a)
+      nil
+      iex> Mnemonix.Store.get(%{a: 1}, :a)
+      1
       iex> Mnemonix.Store.get(%{a: 1}, :b, 3)
       3
   """
-  @spec get(store, key) :: value
-  @spec get(store, key, value) :: value
-  def get(store, key, default \\ nil) do
-    case fetch(store, key) do
+  @spec get(store, key, value) :: value | no_return
+  def get(store, key, default) do
+    case GenServer.call(store, {:get, key, default}) do
       {:ok, value} -> value
-      :error -> default
+      {:raise, type, args} -> raise type, args
     end
   end
   
@@ -131,17 +190,11 @@ defmodule Mnemonix do
       iex> Mnemonix.Store.get_and_update(%{a: 1}, :b, fn _ -> :pop end)
       {nil, %{a: 1}}
   """
-  @spec get_and_update(store, key, (value -> {get, value} | :pop)) :: {get, store} when get: term
+  @spec get_and_update(store, key, (value -> {get, value} | :pop)) :: {get, store} | no_return when get: term
   def get_and_update(store, key, fun) do
-    current =
-      case fetch(store, key) do
-        {:ok, value} -> value
-        :error -> nil
-      end
-
-    case fun.(current) do
-      {get, update} -> {get, put(store, key, update)}
-      :pop          -> {current, delete(store, key)}
+    case GenServer.call(store, {:get_and_update, key, fun}) do
+      {:ok, value} -> {value, store}
+      {:raise, type, args} -> raise type, args
     end
   end
   
@@ -172,14 +225,9 @@ defmodule Mnemonix do
   """
   @spec get_and_update!(store, key, (value -> {get, value})) :: {get, store} | no_return when get: term
   def get_and_update!(store, key, fun) do
-    case fetch(store, key) do
-      {:ok, value} ->
-        case fun.(value) do
-          {get, update} -> {get, put(store, key, update)}
-          :pop          -> {value, pop(store, key)}
-        end
-      :error ->
-        :erlang.error({:badkey, key})
+    case GenServer.call(store, {:get_and_update!, key, fun}) do
+      {:ok, value} -> {value, store}
+      {:raise, type, args} -> raise type, args
     end
   end
   
@@ -202,11 +250,11 @@ defmodule Mnemonix do
       iex> Mnemonix.Store.get_lazy(map, :b, fun)
       13
   """
-  @spec get_lazy(store, key, (() -> value)) :: value
+  @spec get_lazy(store, key, (() -> value)) :: value | no_return
   def get_lazy(store, key, fun) when is_function(fun, 0) do
-    case fetch(store, key) do
+    case GenServer.call(store, {:get_lazy, key, fun}) do
       {:ok, value} -> value
-      :error -> fun.()
+      {:raise, type, args} -> raise type, args
     end
   end
   
@@ -221,23 +269,34 @@ defmodule Mnemonix do
   """
   @spec has_key?(store, key) :: boolean
   def has_key?(store, key) do
-    GenServer.call(store, {:has_key?, key})
-  end
-  
-  @doc """
-  Returns all keys from `store`.
-  
-  ## Examples
-      iex> Mnemonix.Store.keys(%{a: 1, b: 2})
-      [:a, :b]
-  """
-  @spec keys(store) :: [key] | []
-  def keys(store)do
-    GenServer.call(store, {:keys})
+    case GenServer.call(store, {:has_key?, key}) do
+      {:ok, value} -> value
+      {:raise, type, args} -> raise type, args
+    end
   end
   
   @doc """
   Returns and removes the value associated with `key` in `store`.
+  
+  If no value is associated with the `key`, `nil` is returned
+  
+  ## Examples
+      iex> Mnemonix.Store.pop(%{a: 1}, :a)
+      {1, %{}}
+      iex> Mnemonix.Store.pop(%{a: 1}, :b)
+      {nil, %{a: 1}}
+  """
+  @spec pop(store, key) :: {value, store}
+  def pop(store, key) do
+    case GenServer.call(store, {:pop, key}) do
+      {:ok, value} -> {value, store}
+      {:raise, type, args} -> raise type, args
+    end
+  end
+  
+  
+  @doc """
+  Returns and removes the value associated with `key` in `store` with `default`.
   
   If no value is associated with the `key` but `default` is given,
   that will be returned instead without touching the store.
@@ -245,17 +304,14 @@ defmodule Mnemonix do
   ## Examples
       iex> Mnemonix.Store.pop(%{a: 1}, :a)
       {1, %{}}
-      iex> Mnemonix.Store.pop(%{a: 1}, :b)
-      {nil, %{a: 1}}
       iex> Mnemonix.Store.pop(%{a: 1}, :b, 3)
       {3, %{a: 1}}
   """
-  @spec pop(store, key, value) :: {value, store}
-  def pop(store, key, default \\ nil) do
-    if has_key? store, key do
-      {get(store, key), store}
-    else
-      {default, store}
+  @spec pop(store, key, any) :: {value, store}
+  def pop(store, key, default) do
+    case GenServer.call(store, {:pop, key, default}) do
+      {:ok, value} -> {value, store}
+      {:raise, type, args} -> raise type, args
     end
   end
   
@@ -278,24 +334,10 @@ defmodule Mnemonix do
   """
   @spec pop_lazy(store, key, (() -> value)) :: {value, store}
   def pop_lazy(store, key, fun) when is_function(fun, 0) do
-    case fetch(store, key) do
-      {:ok, value} -> {value, delete(store, key)}
-      :error -> {fun.(), store}
+    case GenServer.call(store, {:pop_lazy, key, fun}) do
+      {:ok, value} -> {value, store}
+      {:raise, type, args} -> raise type, args
     end
-  end
-  
-  @doc """
-  Puts the given `value` under `key`.
-  
-  ## Examples
-      iex> Mnemonix.Store.put(%{a: 1}, :b, 2)
-      %{a: 1, b: 2}
-      iex> Mnemonix.Store.put(%{a: 1, b: 2}, :a, 3)
-      %{a: 3, b: 2}
-  """
-  @spec put(store, key, value) :: store
-  def put(store, key, value) do
-    with :ok <- GenServer.cast(store, {:put, key, value}), do: store
   end
   
   @doc """
@@ -310,9 +352,9 @@ defmodule Mnemonix do
   """
   @spec put_new(store, key, value) :: store
   def put_new(store, key, value) do
-    case has_key?(store, key) do
-      true  -> store
-      false -> put(store, key, value)
+    case GenServer.call(store, {:put_new, key, value}) do
+      :ok -> store
+      {:raise, type, args} -> raise type, args
     end
   end
   
@@ -334,11 +376,11 @@ defmodule Mnemonix do
       iex> Mnemonix.Store.put_new_lazy(store, :b, fun)
       %{a: 1, b: 3}
   """
-  @spec put_new_lazy(store, key, (() -> value)) :: store
+  @spec put_new_lazy(store, key, (() -> value)) :: store | no_return
   def put_new_lazy(store, key, fun) when is_function(fun, 0) do
-    case has_key?(store, key) do
-      true  -> store
-      false -> put(store, key, fun.())
+    case GenServer.call(store, {:put_new_lazy, key, fun}) do
+      :ok -> store
+      {:raise, type, args} -> raise type, args
     end
   end
   
@@ -351,13 +393,11 @@ defmodule Mnemonix do
       iex> Mnemonix.Store.update(%{a: 1}, :b, 11, &(&1 * 2))
       %{a: 1, b: 11}
   """
-  @spec update(store, key, value, (value -> value)) :: store
+  @spec update(store, key, value, (value -> value)) :: store | no_return
   def update(store, key, initial, fun) do
-    case fetch(store, key) do
-      {:ok, value} ->
-        put(store, key, fun.(value))
-      :error ->
-        put(store, key, initial)
+    case GenServer.call(store, {:update, key, initial, fun}) do
+      :ok -> store
+      {:raise, type, args} -> raise type, args
     end
   end
   
@@ -374,11 +414,9 @@ defmodule Mnemonix do
   """
   @spec update!(store, key, (value -> value)) :: store | no_return
   def update!(store, key, fun) do
-    case fetch(store, key) do
-      {:ok, value} ->
-        put(store, key, fun.(value))
-      :error ->
-        :erlang.error({:badkey, key})
+    case GenServer.call(store, {:update!, key, fun}) do
+      :ok -> store
+      {:raise, type, args} -> raise type, args
     end
   end
   
