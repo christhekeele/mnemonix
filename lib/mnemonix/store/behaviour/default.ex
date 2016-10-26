@@ -19,30 +19,36 @@ defmodule Mnemonix.Store.Behaviour.Default do
       end
       
       def fetch!(store, key) do
-        with {:ok, store, :error} <- fetch(store, key) do
-          {:raise, KeyError, [key: key, term: store]}
+        with {:ok, store, current} <- fetch(store, key) do
+          case current do
+            :error -> {:raise, KeyError, [key: key, term: store]}
+            {:ok, value} -> {:ok, store, value}
+          end
         end
       end
       
       def get(store, key, default \\ nil) do
-        with {:ok, store, :error} <- fetch(store, key) do
-          {:ok, store, default}
+        with {:ok, store, current} <- fetch(store, key) do
+          case current do
+            :error -> {:ok, store, default}
+            {:ok, value} -> {:ok, store, value}
+          end
         end
       end
       
       def get_and_update(store, key, fun) do
-        with {:ok, store, value} <- fetch(store, key) do
-          current = case value do
-            :error -> nil
-            value  -> value
+        with {:ok, store, current} <- fetch(store, key) do
+          value = case current do
+            :error       -> nil
+            {:ok, value} -> value
           end
           
-          case fun.(current) do
+          case fun.(value) do
             {get, update} -> with {:ok, store} <- put(store, key, update) do
               {:ok, store, get}
             end
             :pop          -> with {:ok, store} <- delete(store, key) do
-              {:ok, store, current}
+              {:ok, store, value}
             end
           end
         end
@@ -50,10 +56,9 @@ defmodule Mnemonix.Store.Behaviour.Default do
       
       def get_and_update!(store, key, fun) do
         with {:ok, store, current} <- fetch(store, key) do
-          if current == :error do
-            {:raise, KeyError, [key: key, term: store]}
-          else
-            case fun.(current) do
+          case current do 
+            :error       -> {:raise, KeyError, [key: key, term: store]}
+            {:ok, value} -> case fun.(value) do
               {get, update} -> with {:ok, store} <- put(store, key, update) do
                 {:ok, store, get}
               end
@@ -66,35 +71,40 @@ defmodule Mnemonix.Store.Behaviour.Default do
       end
       
       def get_lazy(store, key, fun) when is_function(fun, 0) do
-        with {:ok, store, :error} <- fetch(store, key) do
-          {:ok, store, fun.()}
+        with {:ok, store, current} <- fetch(store, key) do
+          value = case current do
+            :error       -> fun.()
+            {:ok, value} -> value
+          end
+          {:ok, store, value}
         end
       end
       
       def has_key?(store, key) do
-        with {:ok, store, keys} <- keys(store) do
-          {:ok, store, key in keys}
+        with {:ok, store, current} <- fetch(store, key) do
+          case current do
+            :error -> {:ok, store, false}
+            _value -> {:ok, store, true}
+          end
         end
       end
       
       def pop(store, key, default \\ nil) do
-        with {:ok, store, exists} <- has_key?(store, key) do
-          if exists do
-            with {:ok, store, value} <- get(store, key) do
+        with {:ok, store, current} <- fetch(store, key) do
+          case current do
+            :error       -> {:ok, store, default}
+            {:ok, value} -> with {:ok, store} <- delete(store, key) do
               {:ok, store, value}
             end
-          else
-            {:ok, store, default}
           end
         end
       end
       
       def pop_lazy(store, key, fun) when is_function(fun, 0) do
-        with {:ok, store, value} <- fetch(store, key) do
-          if value == :error do
-            {:ok, store, fun.()}
-          else
-            with {:ok, store} <- delete(store, key) do
+        with {:ok, store, current} <- fetch(store, key) do
+          case current do
+            :error       -> {:ok, store, fun.()}
+            {:ok, value} -> with {:ok, store} <- delete(store, key) do
               {:ok, store, value}
             end
           end
@@ -102,41 +112,37 @@ defmodule Mnemonix.Store.Behaviour.Default do
       end
       
       def put_new(store, key, value) do
-        with {:ok, store, exists} <- has_key?(store, key) do
-          if exists do
-            {:ok, store}
-          else
-            put(store, key, value)
+        with {:ok, store, current} <- fetch(store, key) do
+          case current do
+            :error -> put(store, key, value)
+            _value -> {:ok, store}
           end
         end
       end
       
       def put_new_lazy(store, key, fun) when is_function(fun, 0) do
-        with {:ok, store, exists} <- has_key?(store, key) do
-          if exists do
-            {:ok, store}
-          else
-            put(store, key, fun.())
+        with {:ok, store, current} <- fetch(store, key) do
+          case current do
+            :error -> put(store, key, fun.())
+            _value -> {:ok, store}
           end
         end
       end
       
       def update(store, key, initial, fun) do
-        with {:ok, store, value} <- fetch(store, key) do
-          if value == :error do
-            put(store, key, initial)
-          else
-            put(store, key, fun.(value))
+        with {:ok, store, current} <- fetch(store, key) do
+          case current do
+            :error       -> put(store, key, initial)
+            {:ok, value} -> put(store, key, fun.(value))
           end
         end
       end
       
       def update!(store, key, fun) do
-        with {:ok, store, value} <- fetch(store, key) do
-          if value == :error do
-            {:raise, KeyError, [key: key, term: store]}
-          else
-            put(store, key, fun.(value))
+        with {:ok, store, current} <- fetch(store, key) do
+          case current do
+            :error       -> {:raise, KeyError, [key: key, term: store]}
+            {:ok, value} -> put(store, key, fun.(value))
           end
         end
       end

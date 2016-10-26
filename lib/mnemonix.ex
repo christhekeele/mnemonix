@@ -1,6 +1,7 @@
 defmodule Mnemonix do
   @moduledoc """
-  Interface to Memonix.Server methods.
+  This module provides easy access to `Mnemonix.Store` servers with a
+  Map-like interface.
   """
   
   alias Mnemonix.Store
