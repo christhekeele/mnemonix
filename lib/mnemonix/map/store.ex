@@ -1,30 +1,57 @@
+defmodule Mnemonix.Map.State do
+  defstruct data: %{}, expiry: %{}
+end
+
 defmodule Mnemonix.Map.Store do
+  @moduledoc """
+  A Mnemonix.Store that uses a single map to store state.
+  
+  ## Options
+  
+  - `initial:` A map to start the store with.
+    *Default*: %{}
+  """
+  
   use Mnemonix.Store
   alias Mnemonix.Store
   
-  @spec init(Store.opts) :: {:ok, Store.state}
+  @typep store  :: Store.t
+  @typep opts   :: Store.opts
+  @typep state  :: Store.state
+  @typep key    :: Store.key
+  @typep value  :: Store.value
+  @typep keys   :: Store.keys
+  @typep ttl    :: Store.ttl
+  
+  @spec init(opts) :: {:ok, state}
   def init(opts) do
     {:ok, Keyword.get(opts, :initial, %{})}
   end
   
-  @spec put(Store.t, Store.key, Store.value) :: Store.t
-  def put(store = %Store{state: state}, key, value) do
-    {:ok, %{store | state: Map.put(state, key, value) }}
-  end
-  
-  @spec fetch(Store.t, Store.key) :: { {:ok, Store.value} | nil, Store.t}
-  def fetch(store = %Store{state: state}, key) do
-    {:ok, store, Map.fetch(state, key)}
-  end
-  
-  @spec delete(Store.t, Store.key) :: Store.t
+  @spec delete(store, key) :: {:ok, store}
   def delete(store = %Store{state: state}, key) do
     {:ok, %{store | state: Map.delete(state, key) }}
   end
   
-  @spec keys(Store.t) :: {[Store.key] | [], Store.t}
+  # TODO: noop
+  @spec expires(store, key, ttl) :: {:ok, store}
+  def expires(store = %Store{state: state}, key, ttl) do
+    {:ok, store}
+  end
+  
+  @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error}
+  def fetch(store = %Store{state: state}, key) do
+    {:ok, store, Map.fetch(state, key)}
+  end
+  
+  @spec keys(store) :: {:ok, store, keys}
   def keys(store = %Store{state: state}) do
     {:ok, store, Map.keys(state)}
+  end
+  
+  @spec put(store, key, Store.value) :: {:ok, store}
+  def put(store = %Store{state: state}, key, value) do
+    {:ok, %{store | state: Map.put(state, key, value) }}
   end
   
 end

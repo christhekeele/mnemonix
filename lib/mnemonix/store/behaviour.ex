@@ -8,8 +8,15 @@ defmodule Mnemonix.Store.Behaviour do
     end
   end
   
-  @type exception :: Exception.t
-  @type msg       :: String.t
+  @typep store :: Store.t
+  @typep key   :: Store.key
+  @typep keys   :: Store.keys
+  @typep values :: Store.values
+  @typep value :: Store.value
+  @typep ttl   :: Store.ttl
+  
+  @typep exception :: Exception.t
+  @typep msg       :: String.t
   
   @callback init(Store.opts) ::
     {:ok, Store.state} |
@@ -21,98 +28,107 @@ defmodule Mnemonix.Store.Behaviour do
 # CORE
 ##
     
-  @callback delete(Store.t, Store.key) ::
-    {:ok, Store.t} |
+  @callback delete(store, key) ::
+    {:ok, store} |
     {:raise, exception, msg}
     
-  @callback fetch(Store.t, Store.key) ::
-    {:ok, Store.t, Store.value} |
+  @callback expires(store, key, ttl) ::
+    {:ok, store} |
+    {:raise, exception, msg}
+    
+  @callback fetch(store, key) ::
+    {:ok, store, value} |
     {:raise, exception, msg}
   
-  @callback keys(Store.t) ::
-    {:ok, Store.t, Store.keys} |
+  @callback keys(store) ::
+    {:ok, store, keys} |
     {:raise, exception, msg}
     
-  @callback put(Store.t, Store.key, Store.value) ::
-    {:ok, Store.t} |
+  @callback put(store, key, value) ::
+    {:ok, store} |
     {:raise, exception, msg}
 
 ####    
-# OPTIONAL
+# MAP FUNCTIONS
 ##
 
   @optional_callbacks drop: 2
-  @callback drop(Store.t, Store.keys) ::
-    {:ok, Store.t} |
+  @callback drop(store, keys) ::
+    {:ok, store} |
     {:raise, exception, msg}
   
   @optional_callbacks fetch!: 2
-  @callback fetch!(Store.t, Store.key) ::
-    {:ok, Store.t, Store.value} |
+  @callback fetch!(store, key) ::
+    {:ok, store, value} |
     {:raise, exception, msg}
   
   @optional_callbacks get: 2
-  @callback get(Store.t, Store.key) ::
-    {:ok, Store.t, Store.value} |
+  @callback get(store, key) ::
+    {:ok, store, value} |
     {:raise, exception, msg}
   
   @optional_callbacks get: 3
-  @callback get(Store.t, Store.key, Store.value) ::
-    {:ok, Store.t, Store.value} |
+  @callback get(store, key, value) ::
+    {:ok, store, value} |
     {:raise, exception, msg}
   
   @optional_callbacks get_and_update: 3
-  @callback get_and_update(Store.t, Store.key, fun) ::
-    {:ok, Store.t, Store.value} |
+  @callback get_and_update(store, key, fun) ::
+    {:ok, store, value} |
     {:raise, exception, msg}
   
   @optional_callbacks get_and_update!: 3
-  @callback get_and_update!(Store.t, Store.key, fun) ::
-    {:ok, Store.t, Store.value} |
+  @callback get_and_update!(store, key, fun) ::
+    {:ok, store, value} |
     {:raise, exception, msg}
   
   @optional_callbacks get_lazy: 3
-  @callback get_lazy(Store.t, Store.key, fun) ::
-    {:ok, Store.t, Store.value} |
+  @callback get_lazy(store, key, fun) ::
+    {:ok, store, value} |
     {:raise, exception, msg}
         
   @optional_callbacks has_key?: 2
-  @callback has_key?(Store.t, Store.key) ::
-    {:ok, Store.t, boolean} |
+  @callback has_key?(store, key) ::
+    {:ok, store, boolean} |
     {:raise, exception, msg}
   
   @optional_callbacks pop: 2
-  @callback pop(Store.t, Store.key) ::
-    {:ok, Store.t, Store.value} |
+  @callback pop(store, key) ::
+    {:ok, store, value} |
     {:raise, exception, msg}
   
   @optional_callbacks pop: 3
-  @callback pop(Store.t, Store.key, Store.value) ::
-    {:ok, Store.t, Store.value} |
+  @callback pop(store, key, value) ::
+    {:ok, store, value} |
     {:raise, exception, msg}
   
   @optional_callbacks pop_lazy: 3
-  @callback pop_lazy(Store.t, Store.key, fun) ::
-    {:ok, Store.t, Store.value} |
+  @callback pop_lazy(store, key, fun) ::
+    {:ok, store, value} |
     {:raise, exception, msg}
     
   @optional_callbacks put_new: 3
-  @callback put_new(Store.t, Store.key, Store.value) ::
-    {:ok, Store.t} |
+  @callback put_new(store, key, value) ::
+    {:ok, store} |
     {:raise, exception, msg}
     
   @optional_callbacks put_new_lazy: 3
-  @callback put_new_lazy(Store.t, Store.key, fun) ::
-    {:ok, Store.t} |
+  @callback put_new_lazy(store, key, fun) ::
+    {:ok, store} |
     {:raise, exception, msg}
     
   @optional_callbacks update: 4
-  @callback update(Store.t, Store.key, Store.value, fun) ::
-    {:ok, Store.t} |
+  @callback update(store, key, value, fun) ::
+    {:ok, store} |
     {:raise, exception, msg}
   
   @optional_callbacks update!: 3
-  @callback update!(Store.t, Store.key, fun) ::
-    {:ok, Store.t} |
+  @callback update!(store, key, fun) ::
+    {:ok, store} |
+    {:raise, exception, msg}
+    
+  @optional_callbacks values: 1
+  @callback values(store) ::
+    {:ok, store, values} |
     {:raise, exception, msg}
 end

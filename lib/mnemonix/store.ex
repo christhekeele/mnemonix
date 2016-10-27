@@ -19,6 +19,7 @@ defmodule Mnemonix.Store do
   
   @type key   :: any
   @type value :: any
+  @type ttl   :: non_neg_integer
   
   @type keys   :: [key] | []
   @type values :: [value] | []
@@ -27,6 +28,7 @@ defmodule Mnemonix.Store do
   @spec start_link(adapter, GenServer.options)         :: GenServer.on_start
   @spec start_link({adapter, opts})                    :: GenServer.on_start
   @spec start_link({adapter, opts}, GenServer.options) :: GenServer.on_start
+  
   def start_link(init, opts \\ [])
   def start_link(adapter, opts) when not is_tuple adapter do
     start_link {adapter, []}, opts
@@ -37,7 +39,6 @@ defmodule Mnemonix.Store do
   
   use GenServer
 
-  # GenServer.init_callback
   @spec init({adapter, opts}) ::
     {:ok, state} |
     {:ok, state, timeout | :hibernate} |
@@ -52,7 +53,6 @@ defmodule Mnemonix.Store do
     end
   end
   
-  # GenServer.handle_call_callback
   @spec init({adapter, opts})  ::
     {:reply, reply, new_state} |
     {:reply, reply, new_state, timeout | :hibernate} |
@@ -67,6 +67,13 @@ defmodule Mnemonix.Store do
   
   def handle_call({:delete, key}, _, store = %__MODULE__{adapter: adapter}) do
     case adapter.delete(store, key) do
+      {:ok, store}         -> {:reply, :ok, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
+  end
+
+  def handle_call({:expires, key, time}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.expires(store, key, time) do
       {:ok, store}         -> {:reply, :ok, store}
       {:raise, type, args} -> {:reply, {:raise, type, args}, store}
     end
@@ -94,7 +101,7 @@ defmodule Mnemonix.Store do
   end
 
 ####  
-# OPTIONAL
+# MAP FUNCTIONS
 ##
   
   def handle_call({:drop, keys}, _, store = %__MODULE__{adapter: adapter}) do
@@ -198,6 +205,13 @@ defmodule Mnemonix.Store do
   def handle_call({:update!, key, fun}, _, store = %__MODULE__{adapter: adapter}) do
     case adapter.update!(store, key, fun) do
       {:ok, store}         -> {:reply, :ok, store}
+      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
+  end
+    
+  def handle_call({:values}, _, store = %__MODULE__{adapter: adapter}) do
+    case adapter.values(store) do
+      {:ok, store, values} -> {:reply, {:ok, values}, store}
       {:raise, type, args} -> {:reply, {:raise, type, args}, store}
     end
   end
