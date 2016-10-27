@@ -7,27 +7,11 @@ defmodule Mnemonix.Store.Behaviour.Default do
     ####
     # MAP FUNCTIONS
     ##
-    
-      def drop(store, keys) do
-        try do
-          keys |> Enum.to_list |> Enum.reduce(store, fn key, store ->
-            case delete(store, key) do
-              {:ok, store}         -> store
-              {:raise, type, args} -> throw {:raise, type, args}
-            end
-          end )
-        catch {:raise, type, args} ->
-          {:raise, type, args}
-        else store ->
-          {:ok, store}
-        end
-      end
-      defoverridable drop: 2
       
       def fetch!(store, key) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
-            :error -> {:raise, KeyError, [key: key, term: store]}
+            :error -> {:raise, KeyError, [key: key, term: store.adapter]}
             {:ok, value} -> {:ok, store, value}
           end
         end
@@ -66,7 +50,7 @@ defmodule Mnemonix.Store.Behaviour.Default do
       def get_and_update!(store, key, fun) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do 
-            :error       -> {:raise, KeyError, [key: key, term: store]}
+            :error       -> {:raise, KeyError, [key: key, term: store.adapter]}
             {:ok, value} -> case fun.(value) do
               {get, update} -> with {:ok, store} <- put(store, key, update) do
                 {:ok, store, get}
@@ -158,33 +142,12 @@ defmodule Mnemonix.Store.Behaviour.Default do
       def update!(store, key, fun) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
-            :error       -> {:raise, KeyError, [key: key, term: store]}
+            :error       -> {:raise, KeyError, [key: key, term: store.adapter]}
             {:ok, value} -> put(store, key, fun.(value))
           end
         end
       end
       defoverridable update!: 3
-      
-      def values(store) do
-        try do
-          with {:ok, store, keys} <- keys(store) do
-            Enum.reduce(keys, {store, []}, fn key, {store, values} ->
-              case fetch(store, key) do
-                {:ok, store, current} -> case current do
-                  :error       -> {store, values}
-                  {:ok, value} -> {store, [value | values]}
-                end
-                {:raise, type, args}  -> throw {:raise, type, args}
-              end
-            end )
-          end
-        catch {:raise, type, args} ->
-          {:raise, type, args}
-        else {store, values} ->
-          {:ok, store, Enum.reverse(values)}
-        end
-      end
-      defoverridable values: 1
       
     end
   end

@@ -21,9 +21,6 @@ defmodule Mnemonix.Store do
   @type value :: any
   @type ttl   :: non_neg_integer
   
-  @type keys   :: [key] | []
-  @type values :: [value] | []
-  
   @spec start_link(adapter)                            :: GenServer.on_start
   @spec start_link(adapter, GenServer.options)         :: GenServer.on_start
   @spec start_link({adapter, opts})                    :: GenServer.on_start
@@ -71,24 +68,18 @@ defmodule Mnemonix.Store do
       {:raise, type, args} -> {:reply, {:raise, type, args}, store}
     end
   end
-
-  def handle_call({:expires, key, time}, _, store = %__MODULE__{adapter: adapter}) do
-    case adapter.expires(store, key, time) do
-      {:ok, store}         -> {:reply, :ok, store}
-      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
-    end
-  end
+  
+  # TODO: expiry
+  # def handle_call({:expires, key, time}, _, store = %__MODULE__{adapter: adapter}) do
+  #   case adapter.expires(store, key, time) do
+  #     {:ok, store}         -> {:reply, :ok, store}
+  #     {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+  #   end
+  # end
   
   def handle_call({:fetch, key}, _, store = %__MODULE__{adapter: adapter}) do
     case adapter.fetch(store, key) do
       {:ok, store, value}  -> {:reply, {:ok, value}, store}
-      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
-    end
-  end
-    
-  def handle_call({:keys}, _, store = %__MODULE__{adapter: adapter}) do
-    case adapter.keys(store) do
-      {:ok, store, keys}   -> {:reply, {:ok, keys}, store}
       {:raise, type, args} -> {:reply, {:raise, type, args}, store}
     end
   end
@@ -103,13 +94,6 @@ defmodule Mnemonix.Store do
 ####  
 # MAP FUNCTIONS
 ##
-  
-  def handle_call({:drop, keys}, _, store = %__MODULE__{adapter: adapter}) do
-    case adapter.drop(store, keys) do
-      {:ok, store}         -> {:reply, :ok, store}
-      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
-    end
-  end
   
   def handle_call({:fetch!, key}, _, store = %__MODULE__{adapter: adapter}) do
     case adapter.fetch!(store, key) do
@@ -205,13 +189,6 @@ defmodule Mnemonix.Store do
   def handle_call({:update!, key, fun}, _, store = %__MODULE__{adapter: adapter}) do
     case adapter.update!(store, key, fun) do
       {:ok, store}         -> {:reply, :ok, store}
-      {:raise, type, args} -> {:reply, {:raise, type, args}, store}
-    end
-  end
-    
-  def handle_call({:values}, _, store = %__MODULE__{adapter: adapter}) do
-    case adapter.values(store) do
-      {:ok, store, values} -> {:reply, {:ok, values}, store}
       {:raise, type, args} -> {:reply, {:raise, type, args}, store}
     end
   end

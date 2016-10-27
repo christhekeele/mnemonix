@@ -20,8 +20,7 @@ defmodule Mnemonix.Map.Store do
   @typep state  :: Store.state
   @typep key    :: Store.key
   @typep value  :: Store.value
-  @typep keys   :: Store.keys
-  @typep ttl    :: Store.ttl
+  # @typep ttl    :: Store.ttl # TODO: expiry
   
   @spec init(opts) :: {:ok, state}
   def init(opts) do
@@ -33,20 +32,15 @@ defmodule Mnemonix.Map.Store do
     {:ok, %{store | state: Map.delete(state, key) }}
   end
   
-  # TODO: noop
-  @spec expires(store, key, ttl) :: {:ok, store}
-  def expires(store = %Store{state: state}, key, ttl) do
-    {:ok, store}
-  end
+  # TODO: expiry
+  # @spec expires(store, key, ttl) :: {:ok, store}
+  # def expires(store = %Store{state: state}, key, ttl) do
+  #   {:ok, store}
+  # end
   
   @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error}
   def fetch(store = %Store{state: state}, key) do
     {:ok, store, Map.fetch(state, key)}
-  end
-  
-  @spec keys(store) :: {:ok, store, keys}
-  def keys(store = %Store{state: state}) do
-    {:ok, store, Map.keys(state)}
   end
   
   @spec put(store, key, Store.value) :: {:ok, store}

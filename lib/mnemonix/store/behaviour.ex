@@ -5,15 +5,20 @@ defmodule Mnemonix.Store.Behaviour do
     quote location: :keep do
       @behaviour unquote __MODULE__
       use Mnemonix.Store.Behaviour.Default
+      
+      def start_link(opts) do
+        Mnemonix.Store.start_link(__MODULE__, opts)
+      end
+      def start_link(init, opts) do
+        Mnemonix.Store.start_link({__MODULE__, init}, opts)
+      end
     end
   end
   
   @typep store :: Store.t
   @typep key   :: Store.key
-  @typep keys   :: Store.keys
-  @typep values :: Store.values
   @typep value :: Store.value
-  @typep ttl   :: Store.ttl
+  # @typep ttl   :: Store.ttl # TODO: expiry
   
   @typep exception :: Exception.t
   @typep msg       :: String.t
@@ -32,16 +37,13 @@ defmodule Mnemonix.Store.Behaviour do
     {:ok, store} |
     {:raise, exception, msg}
     
-  @callback expires(store, key, ttl) ::
-    {:ok, store} |
-    {:raise, exception, msg}
+  # TODO: expiry
+  # @callback expires(store, key, ttl) ::
+  #   {:ok, store} |
+  #   {:raise, exception, msg}
     
   @callback fetch(store, key) ::
     {:ok, store, value} |
-    {:raise, exception, msg}
-  
-  @callback keys(store) ::
-    {:ok, store, keys} |
     {:raise, exception, msg}
     
   @callback put(store, key, value) ::
@@ -51,11 +53,6 @@ defmodule Mnemonix.Store.Behaviour do
 ####    
 # MAP FUNCTIONS
 ##
-
-  @optional_callbacks drop: 2
-  @callback drop(store, keys) ::
-    {:ok, store} |
-    {:raise, exception, msg}
   
   @optional_callbacks fetch!: 2
   @callback fetch!(store, key) ::
@@ -127,8 +124,4 @@ defmodule Mnemonix.Store.Behaviour do
     {:ok, store} |
     {:raise, exception, msg}
     
-  @optional_callbacks values: 1
-  @callback values(store) ::
-    {:ok, store, values} |
-    {:raise, exception, msg}
 end
