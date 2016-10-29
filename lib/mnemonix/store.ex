@@ -1,6 +1,13 @@
 defmodule Mnemonix.Store do
   @moduledoc """
   Normalizes access to different key-value stores behind a `GenServer`.
+  
+  Once a store has been started, you can use `Mnemonix` methods to manipulate it:
+  
+      iex> Mnemonix.Store.start_link(Mnemonix.Map.Store, name: Data)
+      iex> Mnemonix.put_new(Data, :foo, "bar")
+      iex> Mnemonix.get(Data, :foo)
+      "bar"
   """
   
   @typedoc """

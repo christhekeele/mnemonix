@@ -9,6 +9,16 @@ end
 defmodule Mnemonix.Mnesia.Store do
   @moduledoc """
   A `Mnemonix.Store` adapter that uses a Mnesia table to store state.
+  
+  Before using, you must have started Mnesia:
+  
+      iex> :mnesia.create_schema([node])
+      iex> :mnesia.start()
+      :ok
+      iex> Mnemonix.Mnesia.Store.start_link(name: Data)
+      iex> Mnemonix.put_new(Data, :foo, "bar")
+      iex> Mnemonix.get(Data, :foo)
+      "bar"
   """
   
   use Mnemonix.Store

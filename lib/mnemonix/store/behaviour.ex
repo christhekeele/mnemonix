@@ -1,6 +1,6 @@
 defmodule Mnemonix.Store.Behaviour do
   @moduledoc """
-  Required and optional functions adapters must implement.
+  Required and optional functions `Mnemonix.Store` adapters must implement.
   
   Optional callbacks have default implementations in terms of the required ones,
   but are overridable so that adapters can offer optimized versions where possible.
