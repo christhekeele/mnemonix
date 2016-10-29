@@ -8,7 +8,23 @@ end
 
 defmodule Mnemonix.Mnesia.Store do
   @moduledoc """
-  A Mnemonix.Store that uses an Mnesia table to store state.
+  A `Mnemonix.Store` adapter that uses a Mnesia table to store state.
+  """
+  
+  use Mnemonix.Store
+  alias Mnemonix.Store
+  
+  @typep store  :: Store.t
+  @typep opts   :: Store.opts
+  @typep state  :: Store.state
+  @typep key    :: Store.key
+  @typep value  :: Store.value
+  # @typep ttl    :: Store.ttl # TODO: expiry
+  
+  @doc """
+  Creates a Mnesia table to store state in.
+  
+  If the table specified already exists, it will use that instead.
   
   ## Options
   
@@ -22,17 +38,6 @@ defmodule Mnemonix.Mnesia.Store do
   The rest of the options are passed into `:dets.open_file/2` verbaitm, except
   for `type:`, which will always be `:set`.
   """
-  
-  use Mnemonix.Store
-  alias Mnemonix.Store
-  
-  @typep store  :: Store.t
-  @typep opts   :: Store.opts
-  @typep state  :: Store.state
-  @typep key    :: Store.key
-  @typep value  :: Store.value
-  # @typep ttl    :: Store.ttl # TODO: expiry
-  
   @spec init(opts) :: {:ok, state} | {:stop, reason :: any}
   def init(opts) do
     {table, opts} = Keyword.get_and_update(opts, :table, fn _ -> :pop end)
@@ -65,9 +70,9 @@ defmodule Mnemonix.Mnesia.Store do
   @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error}
   def fetch(store = %Store{state: table}, key) do
     case :mnesia.dirty_read(table, key) do
-      [{table, ^key, value} | []] -> {:ok, store, {:ok, value}}
-      []                          -> {:ok, store, :error}
-      _                           -> {:raise, Mnemonix.Mnesia.Exception, "Mnesia operation failed: `:mnesia.dirty_read(#{table}, #{key})`"}
+      [{^table, ^key, value} | []] -> {:ok, store, {:ok, value}}
+      []                           -> {:ok, store, :error}
+      _                            -> {:raise, Mnemonix.Mnesia.Exception, "Mnesia operation failed: `:mnesia.dirty_read(#{table}, #{key})`"}
     end
   end
   

@@ -8,15 +8,7 @@ end
 
 defmodule Mnemonix.DETS.Store do
   @moduledoc """
-  A Mnemonix.Store that uses an DETS table to store state.
-  
-  ## Options
-  
-  - `table:` Name of the table to connect to.
-    *Default:* `#{__MODULE__}.Table`
-    
-  The rest of the options are passed into `:dets.open_file/2` verbaitm, except
-  for `type:`, which will always be `:set`.
+  A `Mnemonix.Store` adapter that uses a DETS table to store state.
   """
   
   use Mnemonix.Store
@@ -29,6 +21,19 @@ defmodule Mnemonix.DETS.Store do
   @typep value  :: Store.value
   # @typep ttl    :: Store.ttl # TODO: expiry
   
+  @doc """
+  Creates a new DETS table to store state.
+  
+  If the DETS file already exists, will use the contents of that table.
+  
+  ## Options
+  
+  - `table:` Name of the table to connect to.
+    *Default:* `#{__MODULE__}.Table`
+    
+  The rest of the options are passed into `:dets.open_file/2` verbaitm, except
+  for `type:`, which will always be `:set`.
+  """
   @spec init(opts) :: {:ok, state} | {:stop, reason :: any}
   def init(opts) do
     {table, opts} = Keyword.get_and_update(opts, :table, fn _ -> :pop end)

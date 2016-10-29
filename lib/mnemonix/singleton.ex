@@ -1,5 +1,7 @@
 defmodule Mnemonix.Singleton do
+  @moduledoc false
   
+  @doc false
   defmacro __using__(_) do
     quote location: :keep do
       alias Mnemonix.Store

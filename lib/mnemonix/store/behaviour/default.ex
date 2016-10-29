@@ -1,6 +1,7 @@
 defmodule Mnemonix.Store.Behaviour.Default do
   @moduledoc false
   
+  @doc false
   defmacro __using__(_) do
     quote location: :keep do
 
@@ -8,6 +9,7 @@ defmodule Mnemonix.Store.Behaviour.Default do
     # LIFECYCLE
     ##
     
+    @doc false
     def teardown(reason, _store) do
       {:ok, reason}
     end
@@ -17,6 +19,7 @@ defmodule Mnemonix.Store.Behaviour.Default do
     # MAP FUNCTIONS
     ##
       
+      @doc false
       def fetch!(store, key) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -27,6 +30,7 @@ defmodule Mnemonix.Store.Behaviour.Default do
       end
       defoverridable fetch!: 2
       
+      @doc false
       def get(store, key, default \\ nil) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -37,6 +41,7 @@ defmodule Mnemonix.Store.Behaviour.Default do
       end
       defoverridable get: 2, get: 3
       
+      @doc false
       def get_and_update(store, key, fun) do
         with {:ok, store, current} <- fetch(store, key) do
           value = case current do
@@ -56,6 +61,7 @@ defmodule Mnemonix.Store.Behaviour.Default do
       end
       defoverridable get_and_update: 3
       
+      @doc false
       def get_and_update!(store, key, fun) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do 
@@ -73,6 +79,7 @@ defmodule Mnemonix.Store.Behaviour.Default do
       end
       defoverridable get_and_update!: 3
       
+      @doc false
       def get_lazy(store, key, fun) when is_function(fun, 0) do
         with {:ok, store, current} <- fetch(store, key) do
           value = case current do
@@ -84,6 +91,7 @@ defmodule Mnemonix.Store.Behaviour.Default do
       end
       defoverridable get_lazy: 3
       
+      @doc false
       def has_key?(store, key) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -94,6 +102,7 @@ defmodule Mnemonix.Store.Behaviour.Default do
       end
       defoverridable has_key?: 2
       
+      @doc false
       def pop(store, key, default \\ nil) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -106,6 +115,7 @@ defmodule Mnemonix.Store.Behaviour.Default do
       end
       defoverridable pop: 2, pop: 3
       
+      @doc false
       def pop_lazy(store, key, fun) when is_function(fun, 0) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -118,6 +128,7 @@ defmodule Mnemonix.Store.Behaviour.Default do
       end
       defoverridable pop_lazy: 3
       
+      @doc false
       def put_new(store, key, value) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -128,6 +139,7 @@ defmodule Mnemonix.Store.Behaviour.Default do
       end
       defoverridable put_new: 3
       
+      @doc false
       def put_new_lazy(store, key, fun) when is_function(fun, 0) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -138,6 +150,7 @@ defmodule Mnemonix.Store.Behaviour.Default do
       end
       defoverridable put_new_lazy: 3
       
+      @doc false
       def update(store, key, initial, fun) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -148,6 +161,7 @@ defmodule Mnemonix.Store.Behaviour.Default do
       end
       defoverridable update: 4
       
+      @doc false
       def update!(store, key, fun) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do

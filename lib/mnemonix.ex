@@ -30,7 +30,7 @@ defmodule Mnemonix do
 ##
 
   @doc """
-  Deletes the entries in `store` for a specific `key`.
+  Removes the entry under `key` in `store`.
 
   If the `key` does not exist, the contents of `store` will be unaffected.
 
@@ -47,7 +47,6 @@ defmodule Mnemonix do
   def delete(store, key) do
     case GenServer.call(store, {:delete, key}) do
       :ok                  -> store
-      {:warn, msg}         -> IO.warn msg, System.stacktrace
       {:raise, type, args} -> raise type, args
     end
   end
@@ -70,15 +69,14 @@ defmodule Mnemonix do
   # def expires(store, key, ttl) do
   #   case GenServer.call(store, {:expire, key, ttl}) do
   #     :ok                  -> store
-  #     {:warn, msg}         -> IO.warn msg, System.stacktrace
   #     {:raise, type, args} -> raise type, args
   #   end
   # end
    
   @doc """
-  Fetches the value for a specific `key` and returns it in a tuple.
+  Retrievs the value of the entry under `key` in `store`.
  
-  If the `key` does not exist, returns `:error`.
+  If the `key` does not exist, returns `:error`, otherwise returns `{:ok, value}`.
  
   ## Examples
   
@@ -92,13 +90,12 @@ defmodule Mnemonix do
   def fetch(store, key) do
     case GenServer.call(store, {:fetch, key}) do
       {:ok, value}         -> value
-      {:warn, msg}         -> IO.warn msg, System.stacktrace
       {:raise, type, args} -> raise type, args
     end
   end
   
   @doc """
-  Puts the given `value` under `key`.
+  Creates a new entry for `value` under `key` in `store`.
   
   ## Examples
   
@@ -113,7 +110,6 @@ defmodule Mnemonix do
   def put(store, key, value) do
     case GenServer.call(store, {:put, key, value}) do
       :ok                  -> store
-      {:warn, msg}         -> IO.warn msg, System.stacktrace
       {:raise, type, args} -> raise type, args
     end
   end
@@ -139,7 +135,6 @@ defmodule Mnemonix do
   def fetch!(store, key) do
     case GenServer.call(store, {:fetch!, key}) do
       {:ok, value}         -> value
-      {:warn, msg}         -> IO.warn msg, System.stacktrace
       {:raise, type, args} -> raise type, args
     end
   end
@@ -161,7 +156,6 @@ defmodule Mnemonix do
   def get(store, key) do
     case GenServer.call(store, {:get, key}) do
       {:ok, value}         -> value
-      {:warn, msg}         -> IO.warn msg, System.stacktrace
       {:raise, type, args} -> raise type, args
     end
   end
@@ -183,7 +177,6 @@ defmodule Mnemonix do
   def get(store, key, default) do
     case GenServer.call(store, {:get, key, default}) do
       {:ok, value}         -> value
-      {:warn, msg}         -> IO.warn msg, System.stacktrace
       {:raise, type, args} -> raise type, args
     end
   end
@@ -239,7 +232,6 @@ defmodule Mnemonix do
   def get_and_update(store, key, fun) do
     case GenServer.call(store, {:get_and_update, key, fun}) do
       {:ok, value}         -> {value, store}
-      {:warn, msg}         -> IO.warn msg, System.stacktrace
       {:raise, type, args} -> raise type, args
     end
   end
@@ -287,7 +279,6 @@ defmodule Mnemonix do
   def get_and_update!(store, key, fun) do
     case GenServer.call(store, {:get_and_update!, key, fun}) do
       {:ok, value}         -> {value, store}
-      {:warn, msg}         -> IO.warn msg, System.stacktrace
       {:raise, type, args} -> raise type, args
     end
   end
@@ -316,7 +307,6 @@ defmodule Mnemonix do
   def get_lazy(store, key, fun) when is_function(fun, 0) do
     case GenServer.call(store, {:get_lazy, key, fun}) do
       {:ok, value}         -> value
-      {:warn, msg}         -> IO.warn msg, System.stacktrace
       {:raise, type, args} -> raise type, args
     end
   end
@@ -336,13 +326,12 @@ defmodule Mnemonix do
   def has_key?(store, key) do
     case GenServer.call(store, {:has_key?, key}) do
       {:ok, value}         -> value
-      {:warn, msg}         -> IO.warn msg, System.stacktrace
       {:raise, type, args} -> raise type, args
     end
   end
   
   @doc """
-  Starts a new Mnemonix.Map.Store server with an empty map.
+  Starts a new `Mnemonix.Map.Store server` with an empty map.
   
   ## Examples
   
@@ -358,7 +347,7 @@ defmodule Mnemonix do
   end
   
   @doc """
-  Starts a new Mnemonix.Map.Store server from the `enumerable`.
+  Starts a new `Mnemonix.Map.Store` server from the `enumerable`.
   
   Duplicated keys are removed; the latest one prevails.
   
@@ -377,7 +366,7 @@ defmodule Mnemonix do
   end
   
   @doc """
-  Starts a new Mnemonix.Map.Store server from the `enumerable` via the `transformation` function.
+  Starts a new `Mnemonix.Map.Store` server from the `enumerable` via the `transformation` function.
 
   Duplicated keys are removed; the latest one prevails.
   
@@ -418,7 +407,6 @@ defmodule Mnemonix do
   def pop(store, key) do
     case GenServer.call(store, {:pop, key}) do
       {:ok, value}         -> {value, store}
-      {:warn, msg}         -> IO.warn msg, System.stacktrace
       {:raise, type, args} -> raise type, args
     end
   end
@@ -444,7 +432,6 @@ defmodule Mnemonix do
   def pop(store, key, default) do
     case GenServer.call(store, {:pop, key, default}) do
       {:ok, value}         -> {value, store}
-      {:warn, msg}         -> IO.warn msg, System.stacktrace
       {:raise, type, args} -> raise type, args
     end
   end
@@ -473,7 +460,6 @@ defmodule Mnemonix do
   def pop_lazy(store, key, fun) when is_function(fun, 0) do
     case GenServer.call(store, {:pop_lazy, key, fun}) do
       {:ok, value}         -> {value, store}
-      {:warn, msg}         -> IO.warn msg, System.stacktrace
       {:raise, type, args} -> raise type, args
     end
   end
@@ -496,7 +482,6 @@ defmodule Mnemonix do
   def put_new(store, key, value) do
     case GenServer.call(store, {:put_new, key, value}) do
       :ok                  -> store
-      {:warn, msg}         -> IO.warn msg, System.stacktrace
       {:raise, type, args} -> raise type, args
     end
   end
@@ -526,7 +511,6 @@ defmodule Mnemonix do
   def put_new_lazy(store, key, fun) when is_function(fun, 0) do
     case GenServer.call(store, {:put_new_lazy, key, fun}) do
       :ok                  -> store
-      {:warn, msg}         -> IO.warn msg, System.stacktrace
       {:raise, type, args} -> raise type, args
     end
   end
@@ -558,7 +542,6 @@ defmodule Mnemonix do
   def update(store, key, initial, fun) do
     case GenServer.call(store, {:update, key, initial, fun}) do
       :ok                  -> store
-      {:warn, msg}         -> IO.warn msg, System.stacktrace
       {:raise, type, args} -> raise type, args
     end
   end
@@ -581,7 +564,6 @@ defmodule Mnemonix do
   def update!(store, key, fun) do
     case GenServer.call(store, {:update!, key, fun}) do
       :ok                  -> store
-      {:warn, msg}         -> IO.warn msg, System.stacktrace
       {:raise, type, args} -> raise type, args
     end
   end

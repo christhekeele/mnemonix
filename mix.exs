@@ -1,32 +1,54 @@
 defmodule Mnemonix.Mixfile do
   use Mix.Project
 
-  def project do
-    [app: :mnemonix,
-     version: "0.1.0",
-     elixir: "~> 1.3",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps()]
-  end
-
-  # Configuration for the OTP application
-  #
-  # Type "mix help compile.app" for more information
-  def application do
-    [applications: [:logger]]
-  end
-
-  # Dependencies can be Hex packages:
-  #
-  #   {:mydep, "~> 0.3.0"}
-  #
-  # Or git/path repositories:
-  #
-  #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
-  #
-  # Type "mix help deps" for more examples and options
-  defp deps do
-    []
-  end
+  def project, do: [
+    name: Mnemonix,
+    app: :mnemonix,
+    
+    version: "0.1.0",
+    elixir: "~> 1.2",
+    
+    build_embedded: Mix.env == :prod,
+    start_permanent: Mix.env == :prod,
+    
+    deps: deps(),
+    docs: docs(),
+    package: package(),
+    
+    source_url:   package()[:links][:Source],
+    homepage_url: package()[:links][:Homepage],
+  ]
+  
+  def application, do: [
+    applications: [:logger],
+  ]
+  
+  defp deps, do: [
+    {:ex_doc, "~> 0.14", only: :dev},
+  ]
+  
+  defp docs, do: [
+    main: Mnemonix.Store,
+    # logo: "",
+    extras: [
+      "README.md",
+      "LICENSE.md",
+    ]
+  ]
+  
+  defp package, do: [
+    description: "A unified interface to key-value stores.",
+    maintainers: [
+      "Chris Keele <dev@chriskeele.com>",
+    ],
+    licenses: [
+      "MIT",
+    ],
+    links: %{
+      Source: "https://github.com/christhekeele/mnemonix",
+      Homepage: "https://christhekeele.github.io/mnemonix",
+      Tests: "https://travis-ci.org/christhekeele/mnemonix",
+    }
+  ]
+  
 end

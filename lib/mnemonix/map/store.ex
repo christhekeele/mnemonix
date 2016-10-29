@@ -4,12 +4,13 @@
 
 defmodule Mnemonix.Map.Store do
   @moduledoc """
-  A Mnemonix.Store that uses a single map to store state.
+  A `Mnemonix.Store` that uses a map to store state.
   
-  ## Options
+  Intended to be an example for implementing the `Mnemonix.Store.Behaviour` and
+  experimenting with the `Mnemonix` API rather than production usage.
   
-  - `initial:` A map to start the store with.
-    *Default:* `%{}`
+  It intentionally doesn't override any optional callback with optimal versions
+  so that the default implementations can be easily tested.
   """
   
   use Mnemonix.Store
@@ -22,6 +23,14 @@ defmodule Mnemonix.Map.Store do
   @typep value  :: Store.value
   # @typep ttl    :: Store.ttl # TODO: expiry
   
+  @doc """
+  Constructs a map to store data.
+  
+  ## Options
+  
+  - `initial:` An existing map to start the store with.
+    *Default:* `%{}`
+  """
   @spec init(opts) :: {:ok, state}
   def init(opts) do
     {:ok, Keyword.get(opts, :initial, %{})}

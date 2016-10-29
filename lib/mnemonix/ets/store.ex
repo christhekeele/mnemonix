@@ -8,11 +8,25 @@ end
 
 defmodule Mnemonix.ETS.Store do
   @moduledoc """
-  A Mnemonix.Store that uses an ETS table to store state.
+  A `Mnemonix.Store` adapter that uses an ETS table to store state.
+  """
+  
+  use Mnemonix.Store
+  alias Mnemonix.Store
+  
+  @typep store  :: Store.t
+  @typep opts   :: Store.opts
+  @typep state  :: Store.state
+  @typep key    :: Store.key
+  @typep value  :: Store.value
+  # @typep ttl    :: Store.ttl # TODO: expiry
+  
+  @doc """
+  Creates a new ETS table to store state.
   
   ## Options
   
-  - `table:` Name of the table to connect to.
+  - `table:` Name of the table to create.
     *Default:* `#{__MODULE__}.Table`
     
   - `named:` ETS named table option
@@ -29,19 +43,11 @@ defmodule Mnemonix.ETS.Store do
   
   - `transactional`: Whether or not to perform transactional reads or writes.
     *Allowed:* `:reads | :writes | :both | nil`
-    *Default:* `:both`
+    *Default:* `nil`
+  
+  - `compressed`: Whether or not to compress the values being stored.
+    *Default:* `false`
   """
-  
-  use Mnemonix.Store
-  alias Mnemonix.Store
-  
-  @typep store  :: Store.t
-  @typep opts   :: Store.opts
-  @typep state  :: Store.state
-  @typep key    :: Store.key
-  @typep value  :: Store.value
-  # @typep ttl    :: Store.ttl # TODO: expiry
-  
   @spec init(opts) :: {:ok, state} | {:stop, reason :: any}
   def init(opts) do
     table   = Keyword.get(opts, :table)       || Module.concat(__MODULE__, Table)
@@ -52,6 +58,7 @@ defmodule Mnemonix.ETS.Store do
     
     options = [:set, privacy, heir: heir, read_concurrency: read, write_concurrency: write]
     options = if Keyword.get(opts, :named), do: [:named_table | options], else: options
+    options = if Keyword.get(opts, :compressed), do: [:compressed | options], else: options
     
     case :ets.new(table, options) do
       {:error, reason} -> {:stop, reason}

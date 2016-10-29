@@ -1,42 +1,60 @@
 Mnemonix
 ========
 
-> *A common interface and GenServer wrapper around key-value stores.*
-
-###### Pronunciation: *`noo-MAHN-icks`*
-
-> "Mnemonic systems are techniques or strategies consciously used to improve memory. They help use information already stored in long-term memory to make memorization an easier task."
->
-> -- *[Mnemonics](https://en.wikipedia.org/wiki/Mnemonic)*, **Wikipedia**
+> *A unified interface to key-value stores.*
 
 Synopsis
 --------
 
-The goal of Mnemonix is to make it easy to play around with various key-value stores, get running with them with minimal ceremony, and allow library developers whose works need access to a key-value store to defer the implementation decision to their end users.
+`Mnemonix` aims to help you:
 
-Mnemonix encodes the common behaviour any key-value store library must have to be useful, normalizes them to conform to that interface, wraps access to them in a GenServer, and wraps access to that in an easy-to-use Map-style API.
+  - Get running with key-values stores with minimal ceremony
+  - Experiment with different backends for your application
+  - Offer end-users of your library liberty to choose their backend
+
+It encodes the behaviour, lifecycle, and feature set of a key-value store in a common interface, normalizes different store APIs to conform to that interface, and exposes access to them with `GenServer` and `Map` APIs.
+
+Learn more about `Mnemonix` by [reading the docs](https://hexdocs.pm/mnemonix).
+
+##### Pronunciation: *`noo-MAHN-icks`*
+
+> Mnemonic systems are techniques or strategies consciously used to improve memory. They help use information already stored in long-term memory to make memorization an easier task.
+>
+> -- *[Mnemonics](https://en.wikipedia.org/wiki/Mnemonic)*, **Wikipedia**
 
 Installation
 ------------
 
-1. Add `mnemonix` and any key-value implementations you want to use to the list of dependencies in `mix.exs`:
+1. Add `Mnemonix` to your project's dependencies in its `mix.exs`:
 
 ```elixir
 def deps do
-  [
-    {:mnemonix, "~> 0.1.0"},
-    {:redix, ">= 0.0.0"},
-  ]
+  [{:mnemonix, "~> 0.1.0"}]
 end
 ```
 
-2. Ensure `mnemonix` is started before your application and alongside your other key-value store implementations:
+2. Ensure `Mnemonix` is started before your application:
 
 ```elixir
 def application do
-  [applications: [:redix, :mnemonix]]
+  [applications: [:mnemonix]]
 end
 ```
+
+3. Follow setup instructions for any key-value stores you want to use:
+
+4. Run `mix deps.get`.
+
+Contributing
+------------
+
+Pull requests are welcome and greatly appreciated!
+
+Here are useful commands if you've just forked the project and want to contribute.
+
+- `mix deps.get`: Get development dependencies
+- `mix test`:     Run the tests
+- `mix docs`:     Generate documentation
 
 Usage
 -----
@@ -231,6 +249,7 @@ Status
 ### Limitations
 
 - Can't set keys to expire (yet)
+- Can't consistently use transactions (yet)
 - Can't iterate over stores (Enumerable is not implemented since that could be detrimentally costly for some stores)
 - Can't re-shape stores (Collectable is not implemented since there's no point making Enum.into work but none of the other Enum methods)
 - Can't use Access behaviour (can't implement Access on stores since `store` is assumed to be a GenServer name, not a Struct)
