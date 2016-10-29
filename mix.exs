@@ -28,7 +28,7 @@ defmodule Mnemonix.Mixfile do
   ]
   
   defp docs, do: [
-    main: Mnemonix.Store,
+    main: Mnemonix,
     # logo: "",
     extras: [
       "README.md",

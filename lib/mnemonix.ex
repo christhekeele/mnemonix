@@ -1,10 +1,37 @@
 defmodule Mnemonix do
   @moduledoc """
-  This module provides easy access to `Mnemonix.Store` servers with a
-  Map-like interface.
+  Easy access to `Mnemonix.Store` servers with a Map-like interface.
+  
+  Instead of using a map, you can use the pid or `GenServer.server/0` returned
+  by `Mnemonix.Store.start_link/2` to perform operations on Mnemonix stores.
+  
+  The `new/0`, `new/1`, and `new/3` functions start links to a `Mnemonix.Map.Store`
+  (similar to `Map.new`) to make it easy to play with `Mnemonix` functions:
+  
+      iex> store = Mnemonix.new(fizz: 1) 
+      iex> Mnemonix.get(store, :foo) 
+      nil
+      iex> Mnemonix.get(store, :fizz)
+      1
+      iex> Mnemonix.put_new(store, :foo, "bar")
+      iex> Mnemonix.get(store, :foo)
+      "bar"
+      iex> Mnemonix.put_new(store, :foo, "baz")
+      iex> Mnemonix.get(store, :foo)
+      "bar"
+      iex> Mnemonix.put(store, :foo, "baz")
+      iex> Mnemonix.get(store, :foo)
+      "baz"
+      iex> Mnemonix.get(store, :fizz)
+      1
+      iex> Mnemonix.get_and_update(store, :fizz, &({&1, &1 * 2}))
+      iex> Mnemonix.get_and_update(store, :fizz, &({&1, &1 * 2}))
+      iex> Mnemonix.get(store, :fizz)
+      4
     
-  Behaves exactly like Map, but without analogs for functions that assume
-  a store can be exhaustively iterated or fit into a specific shape:
+  These functions behave exactly like their Map counteparts. However, `Mnemonix`
+  doesn't supply analogs for functions that assume a store can be exhaustively
+  iterated or fit into a specific shape:
   
   - equal?(Map.t, Map.t) :: boolean
   - from_struct(Struct.t) :: Map.t
@@ -15,7 +42,6 @@ defmodule Mnemonix do
   - take(Map.t, keys) :: Map.t
   - to_list(Map.t) :: Map.t
   - values(Map.t) :: [values]
-  
   """
   
   alias Mnemonix.Store

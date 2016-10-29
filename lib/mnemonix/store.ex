@@ -1,8 +1,6 @@
 defmodule Mnemonix.Store do
   @moduledoc """
-  Normalizes access to different key-value stores through a `GenServer`.
-  
-  
+  Normalizes access to different key-value stores behind a `GenServer`.
   """
   
   @typedoc """
