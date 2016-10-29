@@ -440,7 +440,7 @@ defmodule Mnemonix do
       iex> value
       2
   """
-  @spec pop(store, key, any) :: {value, store}
+  @spec pop(store, key, term) :: {value, store}
   def pop(store, key, default) do
     case GenServer.call(store, {:pop, key, default}) do
       {:ok, value}         -> {value, store}

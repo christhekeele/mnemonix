@@ -27,14 +27,21 @@ defmodule Mnemonix.Store.Behaviour do
   # @typep ttl   :: Store.ttl # TODO: expiry
   
   @typep exception :: Exception.t
-  @typep info      :: any
+  @typep info      :: term
   @typep msg       :: String.t
+
+####
+# LIFECYCLE
+##
   
   @callback init(Store.opts) ::
     {:ok, Store.state} |
     {:ok, Store.state, timeout | :hibernate} |
     :ignore |
-    {:stop, reason :: any}
+    {:stop, reason :: term}
+    
+  @callback teardown(reason, store) :: {:ok, reason} | {:error, reason} 
+    when reason: :normal | :shutdown | {:shutdown, term} | term
 
 ####
 # CORE

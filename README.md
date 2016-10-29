@@ -162,7 +162,7 @@ Note that these functions will not chain like `Mnemonix` ones do! We've moved aw
 
 Of course, the whole point of Mnemonix is that you're not just limited to Maps if you want to use a Map-like API to access key-value data. 
 
-Mnemonix comes with many adapters. It natively supports two in-memory adapters for Map and ETS, and one persisted adapter for DETS. Other adapters are capable of bridging wider gaps to other types of key-value store but will only be loaded if support for them is detected.
+Mnemonix comes with many adapters. It natively supports two in-memory adapters for Map and ETS, and one persisted adapter for DETS, and one distributed adapter for Mnesia. Other adapters are capable of bridging wider gaps to other types of key-value store but will only be loaded if support for them is detected.
 
 Using other adapters is as simple as linking to another store:
 
@@ -177,8 +177,9 @@ Everything we've discussed, you can accomplish with these ETS stores as well.
 Available adapters are:
 
 - `Mnemonix.Map.Store`
-- ~~`Mnemonix.ETS.Store`~~
-- ~~`Mnemonix.DETS.Store`~~
+- `Mnemonix.ETS.Store`
+- `Mnemonix.DETS.Store`
+- `Mnemonix.Mnesia.Store`
 - ~~`Mnemonix.Ecto.Store`~~
 - ~~`Mnemonix.Redix.Store`~~
 - ~~`Mnemonix.ExRedis.Store`~~

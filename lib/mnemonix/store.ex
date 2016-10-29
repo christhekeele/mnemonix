@@ -15,10 +15,10 @@ defmodule Mnemonix.Store do
   
   @type adapter :: Atom.t
   @type opts    :: Keyword.t
-  @type state   :: any
+  @type state   :: term
   
-  @type key   :: any
-  @type value :: any
+  @type key   :: term
+  @type value :: term
   @type ttl   :: non_neg_integer
   
   @spec start_link(adapter)                            :: GenServer.on_start
@@ -40,7 +40,7 @@ defmodule Mnemonix.Store do
     {:ok, state} |
     {:ok, state, timeout | :hibernate} |
     :ignore |
-    {:stop, reason :: any}
+    {:stop, reason} when reason: term, timeout: pos_integer
     
   def init({adapter, opts}) do
     case adapter.init(opts) do
@@ -50,13 +50,13 @@ defmodule Mnemonix.Store do
     end
   end
   
-  @spec init({adapter, opts})  ::
-    {:reply, reply, new_state} |
-    {:reply, reply, new_state, timeout | :hibernate} |
-    {:noreply, new_state} |
-    {:noreply, new_state, timeout | :hibernate} |
-    {:stop, reason, reply, new_state} |
-    {:stop, reason, new_state} when reply: term, new_state: state, reason: term
+  @spec handle_call(request :: term, GenServer.from, t) ::
+    {:reply, reply, new_store} |
+    {:reply, reply, new_store, timeout | :hibernate} |
+    {:noreply, new_store} |
+    {:noreply, new_store, timeout | :hibernate} |
+    {:stop, reason, reply, new_store} |
+    {:stop, reason, new_store} when reply: term, new_store: t, reason: term, timeout: pos_integer
     
 ####  
 # CORE
@@ -208,6 +208,16 @@ defmodule Mnemonix.Store do
       {:ok, store}         -> {:reply, :ok, store}
       {:warn, args}        -> {:reply, {:warn, args}, store}
       {:raise, type, args} -> {:reply, {:raise, type, args}, store}
+    end
+  end
+  
+  @spec terminate(reason, t) :: reason
+    when reason: :normal | :shutdown | {:shutdown, term} | term
+
+  def terminate(reason, store = %__MODULE__{adapter: adapter}) do
+    case adapter.teardown(reason, store) do
+      {:ok, reason}    -> reason
+      {:error, reason} -> reason
     end
   end
   

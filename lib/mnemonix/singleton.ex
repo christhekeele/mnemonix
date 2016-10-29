@@ -314,7 +314,7 @@ defmodule Mnemonix.Singleton do
           iex> value
           2
       """
-      @spec pop(key, any) :: {value, store}
+      @spec pop(key, term) :: {value, store}
       def pop(key, default), do: Mnemonix.pop(@module, key, default)
       
       @doc """

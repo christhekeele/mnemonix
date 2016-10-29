@@ -1,6 +1,6 @@
-defmodule Mnemonix.Map.State do
-  defstruct data: %{}, expiry: %{}
-end
+# defmodule Mnemonix.Map.State do
+#   defstruct data: %{}, expiry: %{}
+# end
 
 defmodule Mnemonix.Map.Store do
   @moduledoc """
@@ -9,7 +9,7 @@ defmodule Mnemonix.Map.Store do
   ## Options
   
   - `initial:` A map to start the store with.
-    *Default*: %{}
+    *Default:* `%{}`
   """
   
   use Mnemonix.Store
@@ -28,8 +28,8 @@ defmodule Mnemonix.Map.Store do
   end
   
   @spec delete(store, key) :: {:ok, store}
-  def delete(store = %Store{state: state}, key) do
-    {:ok, %{store | state: Map.delete(state, key) }}
+  def delete(store = %Store{state: map}, key) do
+    {:ok, %{store | state: Map.delete(map, key) }}
   end
   
   # TODO: expiry
@@ -39,13 +39,13 @@ defmodule Mnemonix.Map.Store do
   # end
   
   @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error}
-  def fetch(store = %Store{state: state}, key) do
-    {:ok, store, Map.fetch(state, key)}
+  def fetch(store = %Store{state: map}, key) do
+    {:ok, store, Map.fetch(map, key)}
   end
   
   @spec put(store, key, Store.value) :: {:ok, store}
-  def put(store = %Store{state: state}, key, value) do
-    {:ok, %{store | state: Map.put(state, key, value) }}
+  def put(store = %Store{state: map}, key, value) do
+    {:ok, %{store | state: Map.put(map, key, value) }}
   end
   
 end

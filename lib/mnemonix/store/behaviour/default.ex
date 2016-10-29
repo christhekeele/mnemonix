@@ -3,6 +3,15 @@ defmodule Mnemonix.Store.Behaviour.Default do
   
   defmacro __using__(_) do
     quote location: :keep do
+
+    ####
+    # LIFECYCLE
+    ##
+    
+    def teardown(reason, _store) do
+      {:ok, reason}
+    end
+    defoverridable teardown: 2
       
     ####
     # MAP FUNCTIONS
