@@ -27,11 +27,14 @@ defmodule Mnemonix.Store.Behaviour do
       ## Examples
       
           iex> {:ok, store} = #{__MODULE__}.start_link
-          iex> is_pid store
-          true
+          iex> Mnemonix.put(store, :foo, :bar)
+          iex> Mnemonix.get(store, :foo)
+          :bar
           
           iex> {:ok, store} = #{__MODULE__}.start_link(name: Cache)
-          {:ok, Cache}
+          iex> Mnemonix.put(Cache, :foo, :bar)
+          iex> Mnemonix.get(Cache, :foo)
+          :bar
       """
       def start_link(opts \\ []) do
         Mnemonix.Store.start_link(__MODULE__, opts)

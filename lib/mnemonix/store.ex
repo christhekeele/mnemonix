@@ -63,11 +63,12 @@ defmodule Mnemonix.Store do
   
   ## Examples
   
-      iex> {:ok, store} = Mnemonix.start_link(Mnemonix.Map.Store)
-      iex> is_pid store
-      true
+      iex> {:ok, store} = Mnemonix.Store.start_link(Mnemonix.Map.Store)
+      iex> Mnemonix.put(store, :foo, :bar)
+      iex> Mnemonix.get(store, :foo)
+      :bar
       
-      iex> {:ok, store} = Mnemonix.start_link({Mnemonix.Map.Store, initial: %{foo: :bar}})
+      iex> {:ok, store} = Mnemonix.Store.start_link({Mnemonix.Map.Store, initial: %{foo: :bar}})
       iex> Mnemonix.get(store, :foo)
       :bar
   """
@@ -81,12 +82,13 @@ defmodule Mnemonix.Store do
   The returned `GenServer.on_start/0` reference can be used in the `Mnemonix` API.
   
   ## Examples
-      iex> {:ok, store} = Mnemonix.start_link(Mnemonix.Map.Store, name: Cache)
-      {:ok, Cache}
+      iex> {:ok, store} = Mnemonix.Store.start_link(Mnemonix.Map.Store, name: Cache)
+      iex> Mnemonix.put(Cache, :foo, :bar)
+      iex> Mnemonix.get(Cache, :foo)
+      :bar
       
-      iex> {:ok, store} = Mnemonix.start_link({Mnemonix.Map.Store, initial: %{foo: :bar}}, name: Cache)
-      {:ok, Cache}
-      iex> Mnemonix.get(store, :foo)
+      iex> {:ok, store} = Mnemonix.Store.start_link({Mnemonix.Map.Store, initial: %{foo: :bar}}, name: Cache)
+      iex> Mnemonix.get(Cache, :foo)
       :bar
   """
   @spec start_link({adapter, opts}, GenServer.options) :: GenServer.on_start
