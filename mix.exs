@@ -2,7 +2,7 @@ defmodule Mnemonix.Mixfile do
   use Mix.Project
 
   def project, do: [
-    name: Mnemonix,
+    name: "Mnemonix",
     app: :mnemonix,
     
     version: "0.1.0",
