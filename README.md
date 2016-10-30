@@ -13,7 +13,7 @@ Mnemonix
 
 It encodes the behaviour, lifecycle, and feature set of a key-value store behind a common `GenServer` interface, normalizes different store APIs to conform to that interface, and exposes access to them a `Map` inspired API.
 
-Learn more about creating a `Mnemonix.Store` and manipulating them with the `Mnemonix` API by [reading their documentation](https://hexdocs.pm/mnemonix).
+Learn more about creating a `Mnemonix.Store` and manipulating it with the `Mnemonix` API by [reading their documentation](https://hexdocs.pm/mnemonix).
 
 ##### Pronunciation: *`noo-MAHN-icks`*
 
@@ -39,21 +39,12 @@ Learn more about creating a `Mnemonix.Store` and manipulating them with the `Mne
   end
   ```
 
-- Follow setup instructions for any key-value stores you want to use.
-
-- Run `mix deps.get`.
-
 ## Contributing
 
 Pull requests are welcome and greatly appreciated!
 
 Here are useful commands if you've just forked the project and want to contribute:
 
-- Get development dependencies:
-  `mix deps.get`
-  
-- Run the tests:
-  `mix test`
-  
-- Generate documentation:
-  `mix docs`
+- `mix deps.get` - Get development dependencies
+- `mix test` - Run the tests
+- `mix docs` - Generate documentation
