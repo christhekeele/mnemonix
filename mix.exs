@@ -5,7 +5,7 @@ defmodule Mnemonix.Mixfile do
     name: "Mnemonix",
     app: :mnemonix,
     
-    version: "0.1.0",
+    version: "0.1.1",
     elixir: "~> 1.2",
     
     build_embedded: Mix.env == :prod,
@@ -18,7 +18,7 @@ defmodule Mnemonix.Mixfile do
     source_url:   package()[:links][:Source],
     homepage_url: package()[:links][:Homepage],
     
-    test_coverage: coverage()
+    test_coverage: coverage(),
   ]
   
   def application, do: [
@@ -31,7 +31,7 @@ defmodule Mnemonix.Mixfile do
   ]
   
   defp docs, do: [
-    main: Mnemonix,
+    main: "Mnemonix",
     # logo: "",
     extras: [
       "README.md",

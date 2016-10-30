@@ -19,7 +19,7 @@ Mnemonix
   - Experiment with different key-value store backends for your application
   - Allow end-users of your library liberty to choose their preferred backend
 
-It encodes the behaviour, lifecycle, and feature set of a key-value store behind a common `GenServer` interface, normalizes different store APIs to conform to that interface, and exposes access to them a `Map` inspired API.
+It encodes the behaviour, lifecycle, and feature set of a key-value store behind a common `GenServer` interface, normalizes different store APIs to conform to that interface, and exposes access to them through a `Map` inspired API.
 
 Learn more about creating a `Mnemonix.Store` and manipulating it with the `Mnemonix` API by [reading their documentation](https://hexdocs.pm/mnemonix/index.html).
 
@@ -27,7 +27,7 @@ Learn more about creating a `Mnemonix.Store` and manipulating it with the `Mnemo
 
 > Mnemonic systems are techniques or strategies consciously used to improve memory. They help use information already stored in long-term memory to make memorization an easier task.
 >
-> -- *[Mnemonics](https://en.wikipedia.org/wiki/Mnemonic)*, **Wikipedia**
+> - *[Mnemonics](https://en.wikipedia.org/wiki/Mnemonic)*, **Wikipedia**
 
 ## Status
 
@@ -53,7 +53,7 @@ Learn more about creating a `Mnemonix.Store` and manipulating it with the `Mnemo
 
   ```elixir
   def deps do
-    [{:mnemonix, "~> 0.1.0"}]
+    [{:mnemonix, "~> 0.1.1"}]
   end
   ```
 
@@ -69,7 +69,7 @@ Learn more about creating a `Mnemonix.Store` and manipulating it with the `Mnemo
 
 [Pull requests](https://github.com/christhekeele/mnemonix/pulls) are welcome and greatly appreciated!
 
-Here are useful commands if you've just forked the project and want to contribute:
+Here are some useful commands if you've just forked the project and want to contribute:
 
 - `mix deps.get` - Get development dependencies
 - `mix test` - Run the tests
