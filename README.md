@@ -27,7 +27,7 @@ Learn more about creating a `Mnemonix.Store` and manipulating it with the `Mnemo
 
 > Mnemonic systems are techniques or strategies consciously used to improve memory. They help use information already stored in long-term memory to make memorization an easier task.
 >
-> - *[Mnemonics](https://en.wikipedia.org/wiki/Mnemonic)*, **Wikipedia**
+> — *[Mnemonics](https://en.wikipedia.org/wiki/Mnemonic)*, **Wikipedia**
 
 ## Status
 
