@@ -31,7 +31,7 @@ Learn more about creating a `Mnemonix.Store` and manipulating it with the `Mnemo
 
 ## Status
 
-|         :thumbsup:         |  [Continuous Integration](status)   |        [Test Coverage](coverage)         |
+|         :thumbsup:         |  [Continuous Integration][status]   |        [Test Coverage][coverage]         |
 |:--------------------------:|:-----------------------------------:|:----------------------------------------:|
 |      [Master][master]      |   ![Build Status][master-status]    |   ![Coverage Status][master-coverage]    |
 | [Development][development] | ![Build Status][development-status] | ![Coverage Status][development-coverage] |
