@@ -2,7 +2,7 @@ defmodule Mnemonix.Store do
   @moduledoc """
   Normalizes access to different key-value stores behind a `GenServer`.
   
-  Once a store has been started, you can use `Mnemonix` methods to manipulate it:
+  Once a store [has been started](#start_link/1), you can use `Mnemonix` methods to manipulate it:
   
       iex> Mnemonix.Store.start_link(Mnemonix.Map.Store, name: Store)
       iex> Mnemonix.put(Store, :foo, "bar")
@@ -282,9 +282,8 @@ defmodule Mnemonix.Store do
     when reason: :normal | :shutdown | {:shutdown, term} | term
 
   def terminate(reason, store = %__MODULE__{adapter: adapter}) do
-    case adapter.teardown(reason, store) do
-      {:ok, reason}    -> reason
-      {:error, reason} -> reason
+    with {:ok, reason} <- adapter.teardown(reason, store) do
+      reason
     end
   end
   

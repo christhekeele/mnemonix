@@ -31,7 +31,7 @@ defmodule Mnemonix.Mixfile do
   ]
   
   defp docs, do: [
-    main: "readme",
+    main: Mnemonix,
     # logo: "",
     extras: [
       "README.md",

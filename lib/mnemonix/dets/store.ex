@@ -85,7 +85,9 @@ defmodule Mnemonix.DETS.Store do
   end
   
   def teardown(reason, %Store{state: state}) do
-    :dets.close state
+    with :ok <- :dets.close(state) do
+      {:ok, reason}
+    end
   end
   
 end
