@@ -1,11 +1,3 @@
-# defmodule Mnemonix.DETS.State do
-#   defstruct data: %{}, expiry: %{}
-# end
-
-defmodule Mnemonix.DETS.Exception do
-  defexception [:message]
-end
-
 defmodule Mnemonix.DETS.Store do
   @moduledoc """
   A `Mnemonix.Store` adapter that uses a DETS table to store state.
@@ -20,7 +12,9 @@ defmodule Mnemonix.DETS.Store do
   """
 
   use Mnemonix.Store
+
   alias Mnemonix.Store
+  alias Mnemonix.DETS.Exception
 
   @typep store  :: Store.t
   @typep opts   :: Store.opts
@@ -57,7 +51,7 @@ defmodule Mnemonix.DETS.Store do
     if :dets.delete(table, key) do
       {:ok, store}
     else
-      {:raise, Mnemonix.DETS.Exception,
+      {:raise, Exception,
         "DETS operation failed: `:dets.delete(#{table}, #{key})`"
       }
     end
@@ -74,7 +68,7 @@ defmodule Mnemonix.DETS.Store do
     case :dets.lookup(table, key) do
       [{^key, value} | []] -> {:ok, store, {:ok, value}}
       []                   -> {:ok, store, :error}
-      other                -> {:raise, Mnemonix.DETS.Exception, other}
+      other                -> {:raise, Exception, other}
     end
   end
 
@@ -83,7 +77,7 @@ defmodule Mnemonix.DETS.Store do
     if :dets.insert(table, {key, value}) do
       {:ok, store}
     else
-      {:raise, Mnemonix.DETS.Exception,
+      {:raise, Exception,
         "DETS operation failed: `:dets.insert(#{table}, {#{key}, #{value}})`"
       }
     end

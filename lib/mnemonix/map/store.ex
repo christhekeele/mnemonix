@@ -1,7 +1,3 @@
-# defmodule Mnemonix.Map.State do
-#   defstruct data: %{}, expiry: %{}
-# end
-
 defmodule Mnemonix.Map.Store do
   @moduledoc """
   A `Mnemonix.Store` that uses a map to store state.

@@ -1,11 +1,3 @@
-# defmodule Mnemonix.ETS.State do
-#   defstruct data: %{}, expiry: %{}
-# end
-
-defmodule Mnemonix.ETS.Exception do
-  defexception [:message]
-end
-
 defmodule Mnemonix.ETS.Store do
   @moduledoc """
   A `Mnemonix.Store` adapter that uses an ETS table to store state.
@@ -20,7 +12,9 @@ defmodule Mnemonix.ETS.Store do
   """
 
   use Mnemonix.Store
+
   alias Mnemonix.Store
+  alias Mnemonix.ETS.Exception
 
   @typep store  :: Store.t
   @typep opts   :: Store.opts
@@ -93,7 +87,7 @@ defmodule Mnemonix.ETS.Store do
     if :ets.delete(table, key) do
       {:ok, store}
     else
-      {:raise, Mnemonix.ETS.Exception,
+      {:raise, Exception,
         "ETS operation failed: `:ets.delete(#{table}, #{key})`"
       }
     end
@@ -110,7 +104,7 @@ defmodule Mnemonix.ETS.Store do
     case :ets.lookup(table, key) do
       [{^key, value} | []] -> {:ok, store, {:ok, value}}
       []                   -> {:ok, store, :error}
-      other                -> {:raise, Mnemonix.ETS.Exception, other}
+      other                -> {:raise, Exception, other}
     end
   end
 
@@ -119,7 +113,7 @@ defmodule Mnemonix.ETS.Store do
     if :ets.insert(table, {key, value}) do
       {:ok, store}
     else
-      {:raise, Mnemonix.ETS.Exception,
+      {:raise, Exception,
         "ETS operation failed: `:ets.insert(#{table}, {#{key}, #{value}})`"
       }
     end

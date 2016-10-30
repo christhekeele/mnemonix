@@ -53,7 +53,7 @@ Learn more about creating a `Mnemonix.Store` and manipulating it with the `Mnemo
 
   ```elixir
   def deps do
-    [{:mnemonix, "~> 0.1.1"}]
+    [{:mnemonix, "~> 0.2.0"}]
   end
   ```
 

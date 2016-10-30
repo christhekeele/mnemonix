@@ -1,11 +1,3 @@
-# defmodule Mnemonix.Mnesia.State do
-#   defstruct data: %{}, expiry: %{}
-# end
-
-defmodule Mnemonix.Mnesia.Exception do
-  defexception [:message]
-end
-
 defmodule Mnemonix.Mnesia.Store do
   @moduledoc """
   A `Mnemonix.Store` adapter that uses a Mnesia table to store state.
@@ -25,7 +17,9 @@ defmodule Mnemonix.Mnesia.Store do
   """
 
   use Mnemonix.Store
+
   alias Mnemonix.Store
+  alias Mnemonix.Mnesia.Exception
 
   @typep store  :: Store.t
   @typep opts   :: Store.opts
@@ -85,7 +79,7 @@ defmodule Mnemonix.Mnesia.Store do
     case :mnesia.dirty_read(table, key) do
       [{^table, ^key, value} | []] -> {:ok, store, {:ok, value}}
       []                           -> {:ok, store, :error}
-      other                        -> {:raise, Mnemonix.Mnesia.Exception, other}
+      other                        -> {:raise, Exception, other}
     end
   end
 
