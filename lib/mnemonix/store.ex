@@ -69,7 +69,7 @@ defmodule Mnemonix.Store do
 
   If you wish to pass options to `GenServer.start_link/3`, use `start_link/2`.
 
-  The returned `GenServer.on_start/0` reference can be used in
+  The returned `t:GenServer.server/0` reference can be used in
   the `Mnemonix` API.
 
   ## Examples
@@ -92,7 +92,7 @@ defmodule Mnemonix.Store do
   @doc """
   Starts a new `Mnemonix.Store` using `adapter` with `opts`.
 
-  The returned `GenServer.on_start/0` reference can be used in
+  The returned `t:GenServer.server/0` reference can be used in
   the `Mnemonix` API.
 
   ## Examples

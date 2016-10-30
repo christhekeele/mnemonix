@@ -30,19 +30,19 @@ defmodule Mnemonix do
       iex> Mnemonix.get(store, :fizz)
       4
 
-  These functions behave exactly like their Map counteparts. However, `Mnemonix`
+  These functions behave exactly like their Map counterparts. However, `Mnemonix`
   doesn't supply analogs for functions that assume a store can be exhaustively
   iterated or fit into a specific shape:
 
-  - equal?(Map.t, Map.t) :: boolean
-  - from_struct(Struct.t) :: Map.t
-  - keys(Map.t) :: [keys]
-  - merge(Map.t, Map.t) :: Map.t
-  - merge(Map.t, Map.t, callback) :: Map.t
-  - split(Map.t, keys) :: Map.t
-  - take(Map.t, keys) :: Map.t
-  - to_list(Map.t) :: Map.t
-  - values(Map.t) :: [values]
+  - `equal?(Map.t, Map.t) :: boolean`
+  - `from_struct(Struct.t) :: Map.t`
+  - `keys(Map.t) :: [keys]`
+  - `merge(Map.t, Map.t) :: Map.t`
+  - `merge(Map.t, Map.t, callback) :: Map.t`
+  - `split(Map.t, keys) :: Map.t`
+  - `take(Map.t, keys) :: Map.t`
+  - `to_list(Map.t) :: Map.t`
+  - `values(Map.t) :: [values]`
   """
 
   alias Mnemonix.Store

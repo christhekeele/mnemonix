@@ -15,9 +15,6 @@ defmodule Mnemonix.Store.Behaviour do
       alias Mnemonix.Store
       use Store.Behaviour.Default
 
-      @spec start_link()                              :: GenServer.on_start
-      @spec start_link(GenServer.options)             :: GenServer.on_start
-      @spec start_link(Store.opts, GenServer.options) :: GenServer.on_start
 
       @store __MODULE__ |> Inspect.inspect(%Inspect.Opts{})
 
@@ -28,8 +25,8 @@ defmodule Mnemonix.Store.Behaviour do
       If you wish to pass configuration options to the adapter instead,
       use `start_link/2` with an empty `opts` list.
 
-      The returned `GenServer.on_start/0` reference can be used in the
-      `Mnemonix` API.
+      The returned `t:GenServer.server/0` reference can be used as the primary
+      argument to the `Mnemonix` API.
 
       ## Examples
 
@@ -41,6 +38,8 @@ defmodule Mnemonix.Store.Behaviour do
           iex> Mnemonix.get(store, :foo)
           nil
       """
+      @spec start_link()                              :: GenServer.on_start
+      @spec start_link(GenServer.options)             :: GenServer.on_start
       def start_link(opts \\ []) do
         Store.start_link(__MODULE__, opts)
       end
@@ -49,9 +48,10 @@ defmodule Mnemonix.Store.Behaviour do
       Starts a new `Mnemonix.Store` using the `#{@store}` adapter
        with `init` opts.
 
-      The returned `GenServer.on_start/0` reference can be used in
-      the `Mnemonix` API.
+      The returned `t:GenServer.server/0` reference can be used as the primary
+      argument to the `Mnemonix` API.
       """
+      @spec start_link(Store.opts, GenServer.options) :: GenServer.on_start
       def start_link(init, opts) do
         Store.start_link({__MODULE__, init}, opts)
       end
