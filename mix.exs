@@ -48,9 +48,10 @@ defmodule Mnemonix.Mixfile do
       "MIT",
     ],
     links: %{
-      Source: "https://github.com/christhekeele/mnemonix",
       Homepage: "https://christhekeele.github.io/mnemonix",
+      Source: "https://github.com/christhekeele/mnemonix",
       Tests: "https://travis-ci.org/christhekeele/mnemonix",
+      Coverage: "https://travis-ci.org/christhekeele/mnemonix",
     }
   ]
   
