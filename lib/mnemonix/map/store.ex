@@ -9,8 +9,16 @@ defmodule Mnemonix.Map.Store do
   Intended to be an example for implementing the `Mnemonix.Store.Behaviour` and
   experimenting with the `Mnemonix` API rather than production usage.
   
-  It intentionally doesn't override any optional callback with optimal versions
+  It intentionally doesn't override any optional callback with optimized versions
   so that the default implementations can be easily tested.
+  
+      iex> {:ok, store} = Mnemonix.Map.Store.start_link
+      iex> Mnemonix.put(store, :foo, "bar")
+      iex> Mnemonix.get(store, :foo)
+      "bar"
+      iex> Mnemonix.delete(store, :foo)
+      iex> Mnemonix.get(store, :foo)
+      nil
   """
   
   use Mnemonix.Store

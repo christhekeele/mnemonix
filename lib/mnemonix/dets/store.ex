@@ -9,6 +9,14 @@ end
 defmodule Mnemonix.DETS.Store do
   @moduledoc """
   A `Mnemonix.Store` adapter that uses a DETS table to store state.
+  
+      iex> {:ok, store} = Mnemonix.DETS.Store.start_link
+      iex> Mnemonix.put(store, :foo, "bar")
+      iex> Mnemonix.get(store, :foo)
+      "bar"
+      iex> Mnemonix.delete(store, :foo)
+      iex> Mnemonix.get(store, :foo)
+      nil
   """
   
   use Mnemonix.Store
@@ -29,7 +37,7 @@ defmodule Mnemonix.DETS.Store do
   ## Options
   
   - `table:` Name of the table to connect to.
-    *Default:* `#{__MODULE__}.Table`
+    *Default:* `#{__MODULE__ |> IO.inspect}.Table`
     
   The rest of the options are passed into `:dets.open_file/2` verbaitm, except
   for `type:`, which will always be `:set`.
@@ -74,6 +82,10 @@ defmodule Mnemonix.DETS.Store do
     else
       {:raise, Mnemonix.DETS.Exception, "DETS operation failed: `:dets.insert(#{table}, {#{key}, #{value}})`"}
     end
+  end
+  
+  def teardown(reason, store = %Store{state: state}) do
+    :dets.close state
   end
   
 end

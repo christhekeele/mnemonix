@@ -9,6 +9,14 @@ end
 defmodule Mnemonix.ETS.Store do
   @moduledoc """
   A `Mnemonix.Store` adapter that uses an ETS table to store state.
+  
+      iex> {:ok, store} = Mnemonix.ETS.Store.start_link
+      iex> Mnemonix.put(store, :foo, "bar")
+      iex> Mnemonix.get(store, :foo)
+      "bar"
+      iex> Mnemonix.delete(store, :foo)
+      iex> Mnemonix.get(store, :foo)
+      nil
   """
   
   use Mnemonix.Store
@@ -27,7 +35,7 @@ defmodule Mnemonix.ETS.Store do
   ## Options
   
   - `table:` Name of the table to create.
-    *Default:* `#{__MODULE__}.Table`
+    *Default:* `#{__MODULE__ |> IO.inspect}.Table`
     
   - `named:` ETS named table option
     *Default:* `false`

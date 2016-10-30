@@ -15,10 +15,13 @@ defmodule Mnemonix.Mnesia.Store do
       iex> :mnesia.create_schema([node])
       iex> :mnesia.start()
       :ok
-      iex> Mnemonix.Mnesia.Store.start_link(name: Data)
-      iex> Mnemonix.put_new(Data, :foo, "bar")
-      iex> Mnemonix.get(Data, :foo)
+      iex> {:ok, store} = Mnemonix.Mnesia.Store.start_link
+      iex> Mnemonix.put(store, :foo, "bar")
+      iex> Mnemonix.get(store, :foo)
       "bar"
+      iex> Mnemonix.delete(store, :foo)
+      iex> Mnemonix.get(store, :foo)
+      nil
   """
   
   use Mnemonix.Store
@@ -39,7 +42,7 @@ defmodule Mnemonix.Mnesia.Store do
   ## Options
   
   - `table:` Name of the table to use, will be created if it doesn't exist.
-    *Default:* `#{__MODULE__}.Table`
+    *Default:* `#{__MODULE__ |> IO.inspect}.Table`
   
   - `transactional`: Whether or not to perform transactional reads or writes.
     *Allowed:* `:reads | :writes | :both | nil`

@@ -4,10 +4,13 @@ defmodule Mnemonix.Store do
   
   Once a store has been started, you can use `Mnemonix` methods to manipulate it:
   
-      iex> Mnemonix.Store.start_link(Mnemonix.Map.Store, name: Data)
-      iex> Mnemonix.put_new(Data, :foo, "bar")
-      iex> Mnemonix.get(Data, :foo)
+      iex> Mnemonix.Store.start_link(Mnemonix.Map.Store, name: Store)
+      iex> Mnemonix.put(Store, :foo, "bar")
+      iex> Mnemonix.get(Store, :foo)
       "bar"
+      iex> Mnemonix.delete(Store, :foo)
+      iex> Mnemonix.get(Store, :foo)
+      nil
   """
   
   @typedoc """
