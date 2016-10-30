@@ -39,7 +39,7 @@ defmodule Mnemonix.Mixfile do
 
   defp docs, do: [
     main: "Mnemonix",
-    # logo: "",
+    # logo: "mnemonix.png",
     extras: [
       "README.md",
       "CREDITS.md",

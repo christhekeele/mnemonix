@@ -2,7 +2,7 @@ defmodule Mnemonix do
   @moduledoc """
   Easy access to `Mnemonix.Store` servers with a Map-like interface.
 
-  Rather than a map, you can use the pid or `GenServer.server/0` name returned
+  Rather than a map, you can use the `t:GenServer.server/0` reference returned
   by `Mnemonix.Store.start_link/2` to perform operations on Mnemonix stores.
 
   The `new/0`, `new/1`, and `new/3` functions start links to a
