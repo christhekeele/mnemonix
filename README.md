@@ -3,8 +3,7 @@ Mnemonix
 
 > *A unified interface to key-value stores.*
 
-Synopsis
---------
+## Synopsis
 
 `Mnemonix` aims to help you:
 
@@ -12,7 +11,7 @@ Synopsis
   - Experiment with different backends for your application
   - Offer end-users of your library liberty to choose their backend
 
-It encodes the behaviour, lifecycle, and feature set of a key-value store in a common interface, normalizes different store APIs to conform to that interface, and exposes access to them with `GenServer` and `Map` APIs.
+It encodes the behaviour, lifecycle, and feature set of a key-value store behind a common `GenServer` interface, normalizes different store APIs to conform to that interface, and exposes access to them a `Map` inspired API.
 
 Learn more about creating a `Mnemonix.Store` and manipulating them with the `Mnemonix` API by [reading their documentation](https://hexdocs.pm/mnemonix).
 
@@ -22,31 +21,29 @@ Learn more about creating a `Mnemonix.Store` and manipulating them with the `Mne
 >
 > -- *[Mnemonics](https://en.wikipedia.org/wiki/Mnemonic)*, **Wikipedia**
 
-Installation
-------------
+## Installation
 
-1. Add `Mnemonix` to your project's dependencies in its `mix.exs`:
+- Add `Mnemonix` to your project's dependencies in its `mix.exs`:
 
-```elixir
-def deps do
-  [{:mnemonix, "~> 0.1.0"}]
-end
-```
+  ```elixir
+  def deps do
+    [{:mnemonix, "~> 0.1.0"}]
+  end
+  ```
 
-2. Ensure `Mnemonix` is started before your application:
+- Ensure `Mnemonix` is started before your application:
 
-```elixir
-def application do
-  [applications: [:mnemonix]]
-end
-```
+  ```elixir
+  def application do
+    [applications: [:mnemonix]]
+  end
+  ```
 
-3. Follow setup instructions for any key-value stores you want to use.
+- Follow setup instructions for any key-value stores you want to use.
 
-4. Run `mix deps.get`.
+- Run `mix deps.get`.
 
-Contributing
-------------
+## Contributing
 
 Pull requests are welcome and greatly appreciated!
 
