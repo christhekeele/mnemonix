@@ -21,7 +21,7 @@ Mnemonix
 
 It encodes the behaviour, lifecycle, and feature set of a key-value store behind a common `GenServer` interface, normalizes different store APIs to conform to that interface, polyfill stores lacking features, and exposes access to them through a `Map` inspired API.
 
-Learn more about creating a `Mnemonix.Store` and manipulating it with the `Mnemonix` API in the [documentation](https://hexdocs.pm/mnemonix/index.html).
+Learn more about starting a `Mnemonix.Store` and manipulating it with the `Mnemonix` API in the [documentation](https://hexdocs.pm/mnemonix/index.html).
 
 ##### Pronunciation: *`noo-MAHN-icks`*
 
