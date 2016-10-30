@@ -1,6 +1,6 @@
 defmodule MnemonixTest do
   use ExUnit.Case, async: true
-  
+
   doctest Mnemonix
 
   test "implements (almost) all functions in Map" do
@@ -18,5 +18,5 @@ defmodule MnemonixTest do
       values: 1,
     ]
   end
-  
+
 end

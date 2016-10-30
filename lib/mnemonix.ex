@@ -1,15 +1,16 @@
 defmodule Mnemonix do
   @moduledoc """
   Easy access to `Mnemonix.Store` servers with a Map-like interface.
-  
+
   Rather than a map, you can use the pid or `GenServer.server/0` name returned
   by `Mnemonix.Store.start_link/2` to perform operations on Mnemonix stores.
-  
-  The `new/0`, `new/1`, and `new/3` functions start links to a `Mnemonix.Map.Store`
-  (mimicing to `Map.new`) to make it easy to play with the `Mnemonix` interface:
-  
-      iex> store = Mnemonix.new(fizz: 1) 
-      iex> Mnemonix.get(store, :foo) 
+
+  The `new/0`, `new/1`, and `new/3` functions start links to a
+  `Mnemonix.Map.Store` (mimicing to `Map.new`) to make it easy to play with the
+  `Mnemonix` interface:
+
+      iex> store = Mnemonix.new(fizz: 1)
+      iex> Mnemonix.get(store, :foo)
       nil
       iex> Mnemonix.get(store, :fizz)
       1
@@ -28,11 +29,11 @@ defmodule Mnemonix do
       iex> Mnemonix.get_and_update(store, :fizz, &({&1, &1 * 2}))
       iex> Mnemonix.get(store, :fizz)
       4
-    
+
   These functions behave exactly like their Map counteparts. However, `Mnemonix`
   doesn't supply analogs for functions that assume a store can be exhaustively
   iterated or fit into a specific shape:
-  
+
   - equal?(Map.t, Map.t) :: boolean
   - from_struct(Struct.t) :: Map.t
   - keys(Map.t) :: [keys]
@@ -43,15 +44,15 @@ defmodule Mnemonix do
   - to_list(Map.t) :: Map.t
   - values(Map.t) :: [values]
   """
-  
+
   alias Mnemonix.Store
-  
+
   @typep store  :: GenServer.server
   @typep key    :: Store.key
   @typep value  :: Store.value
   # @typep ttl    :: Store.ttl # TODO: expiry
-  
-####  
+
+####
 # CORE
 ##
 
@@ -61,7 +62,7 @@ defmodule Mnemonix do
   If the `key` does not exist, the contents of `store` will be unaffected.
 
   ## Examples
-  
+
       iex> store = Mnemonix.new(%{a: 1})
       iex> Mnemonix.get(store, :a)
       1
@@ -80,11 +81,11 @@ defmodule Mnemonix do
   # TODO: expiry
   # @doc """
   # Sets the entry under `key` to expire in `ttl` seconds.
-  # 
+  #
   # If the `key` does not exist, the contents of `store` will be unaffected.
-  # 
+  #
   # ## Examples
-  
+
   #     iex> store = Mnemonix.new(%{a: 1})
   #     iex> Mnemonix.expires(store, :a, 100)
   #     iex> :timer.sleep(101)
@@ -98,14 +99,15 @@ defmodule Mnemonix do
   #     {:raise, type, args} -> raise type, args
   #   end
   # end
-   
+
   @doc """
   Retrievs the value of the entry under `key` in `store`.
- 
-  If the `key` does not exist, returns `:error`, otherwise returns `{:ok, value}`.
- 
+
+  If the `key` does not exist, returns `:error`, otherwise returns
+  `{:ok, value}`.
+
   ## Examples
-  
+
       iex> store = Mnemonix.new(%{a: 1})
       iex> Mnemonix.fetch(store, :a)
       {:ok, 1}
@@ -119,12 +121,12 @@ defmodule Mnemonix do
       {:raise, type, args} -> raise type, args
     end
   end
-  
+
   @doc """
   Creates a new entry for `value` under `key` in `store`.
-  
+
   ## Examples
-  
+
       iex> store = Mnemonix.new(%{a: 1})
       iex> Mnemonix.get(store, :b)
       nil
@@ -140,17 +142,17 @@ defmodule Mnemonix do
     end
   end
 
-####  
+####
 # MAP FUNCTIONS
 ##
- 
+
   @doc """
   Fetches the value for specific `key`.
- 
+
   If `key` does not exist, a `KeyError` is raised.
- 
+
   ## Examples
-  
+
       iex> store = Mnemonix.new(%{a: 1})
       iex> Mnemonix.fetch!(store, :a)
       1
@@ -164,14 +166,14 @@ defmodule Mnemonix do
       {:raise, type, args} -> raise type, args
     end
   end
-  
+
   @doc """
   Gets the value for a specific `key`.
-  
+
   If `key` does not exist, returns `nil`.
-  
+
   ## Examples
-  
+
       iex> store = Mnemonix.new(%{a: 1})
       iex> Mnemonix.get(store, :a)
       1
@@ -185,14 +187,14 @@ defmodule Mnemonix do
       {:raise, type, args} -> raise type, args
     end
   end
-  
+
   @doc """
   Gets the value for a specific `key` with `default`.
-   
+
   If `key` does not exist, returns `default`.
-   
+
   ## Examples
-  
+
       iex> store = Mnemonix.new(%{a: 1})
       iex> Mnemonix.get(store, :a, 2)
       1
@@ -206,47 +208,47 @@ defmodule Mnemonix do
       {:raise, type, args} -> raise type, args
     end
   end
-  
+
   @doc """
   Gets the value from `key` and updates it, all in one pass.
-  
+
   This `fun` argument receives the value of `key` (or `nil` if `key`
   is not present) and must return a two-element tuple: the "get" value
   (the retrieved value, which can be operated on before being returned)
   and the new value to be stored under `key`. The `fun` may also
   return `:pop`, implying the current value shall be removed
   from `store` and returned.
-  
+
   The returned value is a tuple with the "get" value returned by
   `fun` and a reference to the `store` with the updated value under `key`.
-  
+
   ## Examples
-  
+
       iex> store = Mnemonix.new(%{a: 1})
-      iex> {value, ^store} = Mnemonix.get_and_update(store, :a, fn current_value ->
-      ...>   {current_value, "new value!"}
+      iex> {value, ^store} = Mnemonix.get_and_update(store, :a, fn current ->
+      ...>   {current, "new value!"}
       ...> end)
       iex> value
       1
       iex> Mnemonix.get(store, :a)
       "new value!"
-      
+
       iex> store = Mnemonix.new(%{a: 1})
-      iex> {value, ^store} = Mnemonix.get_and_update(store, :b, fn current_value ->
-      ...>   {current_value, "new value!"}
+      iex> {value, ^store} = Mnemonix.get_and_update(store, :b, fn current ->
+      ...>   {current, "new value!"}
       ...> end)
       iex> value
       nil
       iex> Mnemonix.get(store, :b)
       "new value!"
-      
+
       iex> store = Mnemonix.new(%{a: 1})
       iex> {value, ^store} = Mnemonix.get_and_update(store, :a, fn _ -> :pop end)
       iex> value
       1
       iex> Mnemonix.get(store, :a)
       nil
-      
+
       iex> store = Mnemonix.new(%{a: 1})
       iex> {value, ^store} = Mnemonix.get_and_update(store, :b, fn _ -> :pop end)
       iex> value
@@ -254,71 +256,73 @@ defmodule Mnemonix do
       iex> Mnemonix.get(store, :b)
       nil
   """
-  @spec get_and_update(store, key, (value -> {get, value} | :pop)) :: {get, store} | no_return when get: term
+  @spec get_and_update(store, key, (value -> {get, value} | :pop))
+    :: {get, store} | no_return when get: term
   def get_and_update(store, key, fun) do
     case GenServer.call(store, {:get_and_update, key, fun}) do
       {:ok, value}         -> {value, store}
       {:raise, type, args} -> raise type, args
     end
   end
-  
+
   @doc """
   Gets the value from `key` and updates it. Raises if there is no `key`.
-  
+
   This `fun` argument receives the value of `key` and must return a
   two-element tuple: the "get" value (the retrieved value, which can be
   operated on before being returned) and the new value to be stored under
   `key`.
-  
+
   The returned value is a tuple with the "get" value returned by `fun` and a
   a reference to the `store` with the updated value under `key`.
-  
+
   ## Examples
-  
+
       iex> store = Mnemonix.new(%{a: 1})
-      iex> {value, ^store} = Mnemonix.get_and_update!(store, :a, fn current_value ->
-      ...>   {current_value, "new value!"}
+      iex> {value, ^store} = Mnemonix.get_and_update!(store, :a, fn current ->
+      ...>   {current, "new value!"}
       ...> end)
       iex> value
       1
       iex> Mnemonix.get(store, :a)
       "new value!"
-      
+
       iex> store = Mnemonix.new(%{a: 1})
-      iex> {value, ^store} = Mnemonix.get_and_update!(store, :b, fn current_value ->
-      ...>   {current_value, "new value!"}
+      iex> {_value, ^store} = Mnemonix.get_and_update!(store, :b, fn current ->
+      ...>   {current, "new value!"}
       ...> end)
       ** (KeyError) key :b not found in: Mnemonix.Map.Store
-      
+
       iex> store = Mnemonix.new(%{a: 1})
       iex> {value, ^store} = Mnemonix.get_and_update!(store, :a, fn _ -> :pop end)
       iex> value
       1
       iex> Mnemonix.get(store, :a)
       nil
-      
+
       iex> store = Mnemonix.new(%{a: 1})
-      iex> {value, ^store} = Mnemonix.get_and_update!(store, :b, fn _ -> :pop end)
+      iex> {_value, ^store} = Mnemonix.get_and_update!(store, :b, fn _ -> :pop end)
       ** (KeyError) key :b not found in: Mnemonix.Map.Store
   """
-  @spec get_and_update!(store, key, (value -> {get, value})) :: {get, store} | no_return when get: term
+  @spec get_and_update!(store, key, (value -> {get, value}))
+    :: {get, store} | no_return when get: term
   def get_and_update!(store, key, fun) do
     case GenServer.call(store, {:get_and_update!, key, fun}) do
       {:ok, value}         -> {value, store}
       {:raise, type, args} -> raise type, args
     end
   end
-  
+
   @doc """
   Gets the value for a specific `key`.
-  
+
   If `key` does not exist, lazily evaluates `fun` and returns its result.
-  
+
   This is useful if the default value is very expensive to calculate or
   generally difficult to setup and teardown again.
-  
+
   ## Examples
-  
+
       iex> store = Mnemonix.new(%{a: 1})
       iex> fun = fn ->
       ...>   # some expensive operation here
@@ -336,12 +340,12 @@ defmodule Mnemonix do
       {:raise, type, args} -> raise type, args
     end
   end
-  
+
   @doc """
   Returns whether a given `key` exists in the given `store`.
-  
+
   ## Examples
-  
+
       iex> store = Mnemonix.new(%{a: 1})
       iex> Mnemonix.has_key?(store, :a)
       true
@@ -355,12 +359,12 @@ defmodule Mnemonix do
       {:raise, type, args} -> raise type, args
     end
   end
-  
+
   @doc """
   Starts a new `Mnemonix.Map.Store server` with an empty map.
-  
+
   ## Examples
-  
+
       iex> store = Mnemonix.new
       iex> Mnemonix.get(store, :a)
       nil
@@ -369,16 +373,18 @@ defmodule Mnemonix do
   """
   @spec new() :: store
   def new() do
-    with {:ok, store} <- Mnemonix.Store.start_link(Mnemonix.Map.Store), do: store
+    with {:ok, store} <- Mnemonix.Store.start_link(Mnemonix.Map.Store) do
+      store
+    end
   end
-  
+
   @doc """
   Starts a new `Mnemonix.Map.Store` server from the `enumerable`.
-  
+
   Duplicated keys are removed; the latest one prevails.
-  
+
   ## Examples
-  
+
       iex> store = Mnemonix.new(a: 1)
       iex> Mnemonix.get(store, :a)
       1
@@ -390,14 +396,15 @@ defmodule Mnemonix do
     init = {Mnemonix.Map.Store, [initial: Map.new(enumerable)]}
     with {:ok, store} <- Mnemonix.Store.start_link(init), do: store
   end
-  
+
   @doc """
-  Starts a new `Mnemonix.Map.Store` server from the `enumerable` via the `transformation` function.
+  Starts a new `Mnemonix.Map.Store` server from the `enumerable` via
+  the `transformation` function.
 
   Duplicated keys are removed; the latest one prevails.
-  
+
   ## Examples
-  
+
       iex> store = Mnemonix.new(%{"A" => 0}, fn {key, value} ->
       ...>  { String.downcase(key), value + 1 }
       ...> end )
@@ -411,14 +418,14 @@ defmodule Mnemonix do
     init = {Mnemonix.Map.Store, [initial: Map.new(enumerable, transform)]}
     with {:ok, store} <- Mnemonix.Store.start_link(init), do: store
   end
-    
+
   @doc """
   Returns and removes the value associated with `key` in `store`.
-  
+
   If no value is associated with the `key`, `nil` is returned.
-  
+
   ## Examples
-  
+
       iex> store = Mnemonix.new(%{a: 1})
       iex> {value, ^store} = Mnemonix.pop(store, :a)
       iex> value
@@ -436,16 +443,16 @@ defmodule Mnemonix do
       {:raise, type, args} -> raise type, args
     end
   end
-  
-  
+
+
   @doc """
   Returns and removes the value associated with `key` in `store` with `default`.
-  
+
   If no value is associated with the `key` but `default` is given,
   that will be returned instead without touching the store.
-  
+
   ## Examples
-  
+
       iex> store = Mnemonix.new()
       iex> {value, ^store} = Mnemonix.pop(store, :a)
       iex> value
@@ -461,15 +468,15 @@ defmodule Mnemonix do
       {:raise, type, args} -> raise type, args
     end
   end
-  
+
   @doc """
   Lazily returns and removes the value associated with `key` in `store`.
-  
+
   This is useful if the default value is very expensive to calculate or
   generally difficult to setup and teardown again.
-  
+
   ## Examples
-  
+
       iex> store = Mnemonix.new(%{a: 1})
       iex> fun = fn ->
       ...>   # some expensive operation here
@@ -489,13 +496,13 @@ defmodule Mnemonix do
       {:raise, type, args} -> raise type, args
     end
   end
-  
+
   @doc """
   Puts the given `value` under `key` unless the entry `key`
   already exists.
-  
+
   ## Examples
-  
+
       iex> store = Mnemonix.new(%{a: 1})
       iex> Mnemonix.put_new(store, :b, 2)
       iex> Mnemonix.get(store, :b)
@@ -511,16 +518,16 @@ defmodule Mnemonix do
       {:raise, type, args} -> raise type, args
     end
   end
-  
+
   @doc """
   Evaluates `fun` and puts the result under `key`
   in `store` unless `key` is already present.
-  
+
   This is useful if the value is very expensive to calculate or
   generally difficult to setup and teardown again.
-  
+
   ## Examples
-  
+
       iex> store = Mnemonix.new(%{a: 1})
       iex> fun = fn ->
       ...>   # some expensive operation here
@@ -540,22 +547,22 @@ defmodule Mnemonix do
       {:raise, type, args} -> raise type, args
     end
   end
-  
-  # TODO:
-  # split(store, keys)
-  #   Takes all entries corresponding to the given keys and extracts them into a map
-    
-  # TODO:
-  # take(store, keys)
-  #   Takes all entries corresponding to the given keys and returns them in a map
-  
+
+# TODO:
+# split(store, keys)
+# Takes all entries corresponding to the given keys and extracts them into a map
+
+# TODO:
+# take(store, keys)
+# Takes all entries corresponding to the given keys and returns them in a map
+
   @doc """
   Updates the `key` in `store` with the given function.
-  
+
   If the `key` does not exist, inserts the given `initial` value.
-  
+
   ## Examples
-  
+
       iex> store = Mnemonix.new(%{a: 1})
       iex> Mnemonix.update(store, :a, 13, &(&1 * 2))
       iex> Mnemonix.get(store, :a)
@@ -571,14 +578,14 @@ defmodule Mnemonix do
       {:raise, type, args} -> raise type, args
     end
   end
-  
+
   @doc """
   Updates the `key` with the given function.
-  
+
   If the `key` does not exist, raises `KeyError`.
-  
+
   ## Examples
-  
+
       iex> store = Mnemonix.new(%{a: 1})
       iex> Mnemonix.update!(store, :a, &(&1 * 2))
       iex> Mnemonix.get(store, :a)
@@ -593,5 +600,5 @@ defmodule Mnemonix do
       {:raise, type, args} -> raise type, args
     end
   end
-  
+
 end

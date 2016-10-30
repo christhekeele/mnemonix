@@ -19,7 +19,7 @@ Mnemonix
   - Experiment with different key-value store backends for your application
   - Allow end-users of your library liberty to choose their preferred backend
 
-It encodes the behaviour, lifecycle, and feature set of a key-value store behind a common `GenServer` interface, normalizes different store APIs to conform to that interface, and exposes access to them through a `Map` inspired API.
+It encodes the behaviour, lifecycle, and feature set of a key-value store behind a common `GenServer` interface, normalizes different store APIs to conform to that interface, polyfill stores lacking features, and exposes access to them through a `Map` inspired API.
 
 Learn more about creating a `Mnemonix.Store` and manipulating it with the `Mnemonix` API in the [documentation](https://hexdocs.pm/mnemonix/index.html).
 
@@ -72,5 +72,8 @@ Learn more about creating a `Mnemonix.Store` and manipulating it with the `Mnemo
 Here are some useful commands if you've just forked the project and want to contribute:
 
 - `mix deps.get` - Get development dependencies
-- `mix test` - Run the tests
-- `mix docs` - Generate documentation
+- `mix test` - Run the test suite
+- `mix credo` - Run static code analysis on Elixir source
+- `mix dialyzer` - Run static code analysis on compiled BEAM bytecode
+- `mix docs` - Generate documentation files
+- `mix clean` - If any of the above stop behaving as expected

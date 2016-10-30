@@ -4,34 +4,39 @@ defmodule Mnemonix.Mixfile do
   def project, do: [
     name: "Mnemonix",
     app: :mnemonix,
-    
+
     version: "0.1.1",
     elixir: "~> 1.2",
-    
+
     build_embedded: Mix.env == :prod,
     start_permanent: Mix.env == :prod,
-    
+
     deps: deps(),
     docs: docs(),
     package: package(),
-    
+
     source_url:   package()[:links][:Source],
     homepage_url: package()[:links][:Homepage],
-    
+
     test_coverage: coverage(),
     dialyzer: dialyzer(),
   ]
-  
+
   def application, do: [
     applications: [:logger],
   ]
-  
-  defp deps, do: [
+
+  defp deps, do: tools ++ backends
+
+  defp tools, do: [
     {:dialyxir,    "~> 0.3.5", only: :dev},
     {:ex_doc,      "~> 0.14",  only: :dev},
     {:excoveralls, "~> 0.5",   only: :test},
+    {:credo,       "~> 0.4",   only: [:dev, :test]},
   ]
-  
+
+  defp backends, do: []
+
   defp docs, do: [
     main: "Mnemonix",
     # logo: "",
@@ -41,7 +46,7 @@ defmodule Mnemonix.Mixfile do
       "LICENSE.md",
     ]
   ]
-  
+
   defp package, do: [
     description: "A unified interface to key-value stores.",
     maintainers: [
@@ -57,17 +62,17 @@ defmodule Mnemonix.Mixfile do
       Coverage: "https://travis-ci.org/christhekeele/mnemonix",
     }
   ]
-  
+
   defp coverage, do: [
-    tool: ExCoveralls, 
+    tool: ExCoveralls,
     coveralls: true,
   ]
-  
+
   defp dialyzer, do: [
     plt_add_apps: [
-      :mnesia, 
+      :mnesia,
       # :ecto,
     ]
   ]
-  
+
 end

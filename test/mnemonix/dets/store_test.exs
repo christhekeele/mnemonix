@@ -1,6 +1,6 @@
 defmodule Mnemonix.DETS.StoreTest do
   use ExUnit.Case, async: true
-  
+
   setup do
     on_exit fn ->
       :dets.close(Mnemonix.DETS.Store.Table)
@@ -8,7 +8,7 @@ defmodule Mnemonix.DETS.StoreTest do
       :ok
     end
   end
-  
+
   doctest Mnemonix.DETS.Store
-  
+
 end
