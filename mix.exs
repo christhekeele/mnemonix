@@ -19,6 +19,7 @@ defmodule Mnemonix.Mixfile do
     homepage_url: package()[:links][:Homepage],
     
     test_coverage: coverage(),
+    dialyzer: dialyzer(),
   ]
   
   def application, do: [
@@ -26,8 +27,9 @@ defmodule Mnemonix.Mixfile do
   ]
   
   defp deps, do: [
-    {:ex_doc,      "~> 0.14", only: :dev},
-    {:excoveralls, "~> 0.5",  only: :test}
+    {:dialyxir,    "~> 0.3.5", only: :dev},
+    {:ex_doc,      "~> 0.14",  only: :dev},
+    {:excoveralls, "~> 0.5",   only: :test},
   ]
   
   defp docs, do: [
@@ -59,6 +61,13 @@ defmodule Mnemonix.Mixfile do
   defp coverage, do: [
     tool: ExCoveralls, 
     coveralls: true,
+  ]
+  
+  defp dialyzer, do: [
+    plt_add_apps: [
+      :mnesia, 
+      # :ecto,
+    ]
   ]
   
 end
