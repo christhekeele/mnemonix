@@ -35,6 +35,7 @@ defmodule Mnemonix.Mixfile do
     # logo: "",
     extras: [
       "README.md",
+      "CREDITS.md",
       "LICENSE.md",
     ]
   ]
