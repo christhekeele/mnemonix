@@ -14,7 +14,7 @@ Synopsis
 
 It encodes the behaviour, lifecycle, and feature set of a key-value store in a common interface, normalizes different store APIs to conform to that interface, and exposes access to them with `GenServer` and `Map` APIs.
 
-Learn more about creating a `Mnemonix.Store` and manipulating them with the `Mnemonix` API by [reading the docs](https://hexdocs.pm/mnemonix).
+Learn more about creating a `Mnemonix.Store` and manipulating them with the `Mnemonix` API by [reading their documentation](https://hexdocs.pm/mnemonix).
 
 ##### Pronunciation: *`noo-MAHN-icks`*
 
@@ -41,7 +41,7 @@ def application do
 end
 ```
 
-3. Follow setup instructions for any key-value stores you want to use:
+3. Follow setup instructions for any key-value stores you want to use.
 
 4. Run `mix deps.get`.
 
@@ -52,6 +52,11 @@ Pull requests are welcome and greatly appreciated!
 
 Here are useful commands if you've just forked the project and want to contribute:
 
-- `mix deps.get`: Get development dependencies
-- `mix test`:     Run the tests
-- `mix docs`:     Generate documentation
+- Get development dependencies:
+  `mix deps.get`
+  
+- Run the tests:
+  `mix test`
+  
+- Generate documentation:
+  `mix docs`
