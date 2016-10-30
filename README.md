@@ -39,7 +39,7 @@ Learn more about creating a `Mnemonix.Store` and manipulating it with the `Mnemo
 [status]: https://travis-ci.org/christhekeele/mnemonix
 [coverage]: https://coveralls.io/github/christhekeele/mnemonix
 
-[master]:              https://github.com/christhekeele/elixir-mnemonix/tree/master
+[master]:              https://github.com/christhekeele/mnemonix/tree/master
 [master-status]: https://img.shields.io/travis/christhekeele/mnemonix/master.svg?maxAge=86400&style=flat-square
 [master-coverage]: https://img.shields.io/coveralls/christhekeele/mnemonix/master.svg?maxAge=86400&style=flat-square
 
