@@ -7,3 +7,9 @@ branches:
   only:
     - master
     - development
+    
+env:
+  - MIX_ENV=test
+
+script: 
+  - mix coveralls.travis

@@ -17,6 +17,8 @@ defmodule Mnemonix.Mixfile do
     
     source_url:   package()[:links][:Source],
     homepage_url: package()[:links][:Homepage],
+    
+    test_coverage: coverage()
   ]
   
   def application, do: [
@@ -24,7 +26,8 @@ defmodule Mnemonix.Mixfile do
   ]
   
   defp deps, do: [
-    {:ex_doc, "~> 0.14", only: :dev},
+    {:ex_doc,      "~> 0.14", only: :dev},
+    {:excoveralls, "~> 0.5",  only: :test}
   ]
   
   defp docs, do: [
@@ -49,6 +52,11 @@ defmodule Mnemonix.Mixfile do
       Homepage: "https://christhekeele.github.io/mnemonix",
       Tests: "https://travis-ci.org/christhekeele/mnemonix",
     }
+  ]
+  
+  defp coverage, do: [
+    tool: ExCoveralls, 
+    coveralls: true,
   ]
   
 end

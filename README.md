@@ -3,6 +3,13 @@ Mnemonix
 
 > *A unified interface to key-value stores.*
 
+> [![Version][hex-version-badge] ![Hex][hex-downloads-badge] ![License][hex-license-badge]][hex]
+
+[hex]:                 https://hex.pm/packages/mnemonix
+[hex-version-badge]:   https://img.shields.io/hexpm/v/mnemonix.svg?maxAge=86400&style=flat-square
+[hex-downloads-badge]: https://img.shields.io/hexpm/dt/mnemonix.svg?maxAge=86400&style=flat-square
+[hex-license-badge]:   https://img.shields.io/badge/license-MIT-7D26CD.svg?maxAge=86400&style=flat-square
+
 ## Synopsis
 
 `Mnemonix` aims to help you:
@@ -20,6 +27,23 @@ Learn more about creating a `Mnemonix.Store` and manipulating it with the `Mnemo
 > Mnemonic systems are techniques or strategies consciously used to improve memory. They help use information already stored in long-term memory to make memorization an easier task.
 >
 > -- *[Mnemonics](https://en.wikipedia.org/wiki/Mnemonic)*, **Wikipedia**
+
+## Status
+
+|         :thumbsup:         |  [Continuous Integration](status)   |        [Test Coverage](coverage)         |
+|:--------------------------:|:-----------------------------------:|:----------------------------------------:|
+|      [Master][master]      |   ![Build Status][master-status]    |   ![Coverage Status][master-coverage]    |
+| [Development][development] | ![Build Status][development-status] | ![Coverage Status][development-coverage] |
+
+[travis-badge]: https://travis-ci.org/christhekeele/elixir-mnemonix
+
+[master]:              https://github.com/christhekeele/elixir-mnemonix/tree/master
+[master-status]: https://img.shields.io/travis/christhekeele/mnemonix/master.svg?maxAge=86400&style=flat-square
+[master-coverage]: https://img.shields.io/coveralls/christhekeele/mnemonix/master.svg?maxAge=86400&style=flat-square
+
+[development]:              https://github.com/christhekeele/mnemonix/tree/development
+[development-status]: https://img.shields.io/travis/christhekeele/mnemonix/development.svg?maxAge=86400&style=flat-square
+[development-coverage]: https://img.shields.io/coveralls/christhekeele/mnemonix/development.svg?maxAge=86400&style=flat-square
 
 ## Installation
 
@@ -41,7 +65,7 @@ Learn more about creating a `Mnemonix.Store` and manipulating it with the `Mnemo
 
 ## Contributing
 
-Pull requests are welcome and greatly appreciated!
+[Pull requests](https://github.com/christhekeele/mnemonix/pulls) are welcome and greatly appreciated!
 
 Here are useful commands if you've just forked the project and want to contribute:
 
