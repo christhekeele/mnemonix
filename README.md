@@ -29,6 +29,8 @@ Learn more about starting a `Mnemonix.Store` and manipulating it with the `Mnemo
 >
 > — *[Mnemonics](https://en.wikipedia.org/wiki/Mnemonic)*, **Wikipedia**
 
+Not to be confused with the mnemicode library, [`Mnemonex`](https://github.com/mwmiller/mnemonex).
+
 ## Status
 
 |         :thumbsup:         |  [Continuous Integration][status]   |        [Test Coverage][coverage]         |
