@@ -36,10 +36,13 @@ defmodule Mnemonix.Mnesia.Store do
   ## Options
 
   - `table:` Name of the table to use, will be created if it doesn't exist.
+
     *Default:* `#{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}.Table`
 
   - `transactional`: Whether or not to perform transactional reads or writes.
+
     *Allowed:* `:reads | :writes | :both | nil`
+
     *Default:* `:both`
 
   The rest of the options are passed into `:dets.open_file/2` verbaitm, except

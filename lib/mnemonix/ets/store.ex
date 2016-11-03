@@ -29,25 +29,32 @@ defmodule Mnemonix.ETS.Store do
   ## Options
 
   - `table:` Name of the table to create.
+
     *Default:* `#{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}.Table`
 
   - `named:` ETS named table option
+
     *Default:* `false`
 
     If making a non-public table it's reccommened to use this option, so that
     the table name can be used outside of this store.
 
   - `privacy:` ETS privacy option - `:public | :protected | :private`
+
     *Default:* `:private`
 
   - `heir:` ETS heir option - `{pid, any} | nil`
+
     *Default:* nil
 
   - `transactional`: Whether or not to perform transactional reads or writes.
+
     *Allowed:* `:reads | :writes | :both | nil`
+
     *Default:* `nil`
 
   - `compressed`: Whether or not to compress the values being stored.
+
     *Default:* `false`
   """
   @spec init(opts) :: {:ok, state} | {:stop, reason :: any}

@@ -8,6 +8,6 @@ defmodule Mnemonix.Mnesia.StoreTest do
     end
   end
 
-  doctest Mnemonix.Mnesia.Store, except: [start_link: 0, start_link: 1, start_link: 3]
+  doctest Mnemonix.Mnesia.Store
 
 end

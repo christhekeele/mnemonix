@@ -33,6 +33,7 @@ defmodule Mnemonix.Map.Store do
   ## Options
 
   - `initial:` An existing map to start the store with.
+
     *Default:* `%{}`
   """
   @spec init(opts) :: {:ok, state}

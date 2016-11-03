@@ -31,6 +31,7 @@ defmodule Mnemonix.DETS.Store do
   ## Options
 
   - `table:` Name of the table to connect to.
+
     *Default:* `#{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}.Table`
 
   The rest of the options are passed into `:dets.open_file/2` verbaitm, except

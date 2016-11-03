@@ -35,7 +35,9 @@ defmodule Mnemonix.Mixfile do
     {:credo,       "~> 0.4",   only: [:dev, :test]},
   ]
 
-  defp backends, do: []
+  defp backends, do: [
+    {:redix, ">= 0.0.0", only: [:dev, :test]},
+  ]
 
   defp docs, do: [
     main: "Mnemonix",
