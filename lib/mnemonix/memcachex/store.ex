@@ -1,9 +1,9 @@
-if Code.ensure_loaded?(Redix) do
-  defmodule Mnemonix.Redix.Store do
+if Code.ensure_loaded?(Memcache) do
+  defmodule Mnemonix.Memcachex.Store do
     @moduledoc """
-    A `Mnemonix.Store` that uses Redix to store state in redis.
+    A `Mnemonix.Store` that uses Memcachex to store state in memcached.
 
-        iex> {:ok, store} = Mnemonix.Redix.Store.start_link
+        iex> {:ok, store} = Mnemonix.Memcachex.Store.start_link
         iex> Mnemonix.put(store, :foo, "bar")
         iex> Mnemonix.get(store, :foo)
         "bar"
@@ -15,7 +15,7 @@ if Code.ensure_loaded?(Redix) do
     use Mnemonix.Store
 
     alias Mnemonix.Store
-    alias Mnemonix.Redix.Exception
+    alias Mnemonix.Memcachex.Exception
 
     @typep store  :: Store.t
     @typep opts   :: Store.opts
@@ -25,27 +25,22 @@ if Code.ensure_loaded?(Redix) do
     # @typep ttl    :: Store.ttl # TODO: expiry
 
     @doc """
-    Connects to redis to store data.
+    Connects to memcached to store data.
 
-    ## Options
-
-    - `conn:` The Redis to connect to, as either a string or list of opts w/ host, port, password, and database.
-
-      *Default:* `"redis://localhost:6379"`
-
-    All other options are passed verbatim to `Redix.start_link/2`.
+    All options are passed verbatim to `Memcache.start_link/1`.
     """
     @spec init(opts) :: {:ok, state}
     def init(opts) do
-      {conn, options} = Keyword.get_and_update(opts, :conn, fn _ -> :pop end)
+      options = opts
+      |> Keyword.put(:coder, Memcache.Coder.Erlang)
 
-      Redix.start_link(conn || "redis://localhost:6379", options)
+      Memcache.start_link(options)
     end
 
     @spec delete(store, key) :: {:ok, store}
     def delete(store = %Store{state: conn}, key) do
-      case Redix.command(conn, ~w[DEL #{key}]) do
-        {:ok, 1}         -> {:ok, store}
+      case Memcache.delete(conn, key) do
+        {:ok}            -> {:ok, store}
         {:error, reason} -> {:raise, Exception, reason}
       end
     end
@@ -58,17 +53,17 @@ if Code.ensure_loaded?(Redix) do
 
     @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error}
     def fetch(store = %Store{state: conn}, key) do
-      case Redix.command(conn, ~w[GET #{key}]) do
-        {:ok, nil}       -> {:ok, store, :error}
-        {:ok, value}     -> {:ok, store, {:ok, value}}
-        {:error, reason} -> {:raise, Exception, reason}
+      case Memcache.get(conn, key) do
+        {:error, "Key not found"} -> {:ok, store, :error}
+        {:ok, value}              -> {:ok, store, {:ok, value}}
+        {:error, reason}          -> {:raise, Exception, reason}
       end
     end
 
     @spec put(store, key, Store.value) :: {:ok, store}
     def put(store = %Store{state: conn}, key, value) do
-      case Redix.command(conn, ~w[SET #{key} #{value}]) do
-        {:ok, "OK"}      -> {:ok, store}
+      case Memcache.set(conn, key, value) do
+        {:ok}            -> {:ok, store}
         {:error, reason} -> {:raise, Exception, reason}
       end
     end

@@ -36,7 +36,8 @@ defmodule Mnemonix.Mixfile do
   ]
 
   defp backends, do: [
-    {:redix, ">= 0.0.0", only: [:dev, :test]},
+    {:redix,     ">= 0.0.0", only: [:dev, :test]},
+    {:memcachex, ">= 0.0.0", only: [:dev, :test]},
   ]
 
   defp docs, do: [
