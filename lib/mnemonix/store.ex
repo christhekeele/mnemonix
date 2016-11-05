@@ -37,13 +37,6 @@ defmodule Mnemonix.Store do
   @enforce_keys [:adapter]
   defstruct adapter: nil, opts: [], state: nil
 
-  @doc false
-  defmacro __using__(_) do
-    quote location: :keep do
-      use Mnemonix.Store.Behaviour
-    end
-  end
-
   @typedoc """
   Keys allowed in Mnemonix entries.
   """

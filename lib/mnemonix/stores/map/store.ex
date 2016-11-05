@@ -17,7 +17,7 @@ defmodule Mnemonix.Map.Store do
       nil
   """
 
-  use Mnemonix.Store
+  use Mnemonix.Store.Behaviour
   alias Mnemonix.Store
 
   @typep store  :: Store.t

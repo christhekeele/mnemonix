@@ -11,7 +11,7 @@ defmodule Mnemonix.DETS.Store do
       nil
   """
 
-  use Mnemonix.Store
+  use Mnemonix.Store.Behaviour
 
   alias Mnemonix.Store
   alias Mnemonix.DETS.Exception

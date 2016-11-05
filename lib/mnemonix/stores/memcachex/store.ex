@@ -12,7 +12,7 @@ if Code.ensure_loaded?(Memcache) do
         nil
     """
 
-    use Mnemonix.Store
+    use Mnemonix.Store.Behaviour
 
     alias Mnemonix.Store
     alias Mnemonix.Memcachex.Exception

@@ -5,9 +5,9 @@ defmodule Mnemonix do
   Rather than a map, you can use the `t:GenServer.server/0` reference returned
   by `Mnemonix.Store.start_link/2` to perform operations on Mnemonix stores.
 
-  ## The Map API
+  ## Map Operations
 
-  The core Mnemonix module allows you make calls to `Mnemonix.Store` servers as if they were Maps.
+  You make calls to `Mnemonix.Store` servers as if they were Maps.
 
   Rather than a map, you use the `t:GenServer.server/0` reference returned
   by `Mnemonix.Store.start_link/2` to perform operations on Mnemonix stores.
@@ -51,25 +51,27 @@ defmodule Mnemonix do
   - `to_list(Map.t) :: Map.t`
   - `values(Map.t) :: [values]`
 
-  ## Store utilities
+  ## Expiry Operations
 
-  The Mnemonix interface also adds additional utilities
-  on top of the Map API for common key-value store operations:
+  Mnemonix lets you set entries to expire after a given time-to-live on any store.
 
-  - `Mnemonix.Store.Expiry`:
-    - `expires/3` - Sets a ttl on an entry
-    - `persist/2` - Prevents expiration of an entry
+      # iex> store = Mnemonix.new(fizz: 1)
+      # iex> Mnemonix.expires(store, :fizz, 1)
+      # iex> :timer.sleep(1)
+      # iex> Mnemonix.get(store, :fizz)
+      # nil
 
+  ## Bump Operations
 
+  Mnemonix lets you perform increment/decrement operations on any store.
 
-  - `Mnemonix.Store.Bump`:
-    - `increment/3` - Increments an integer entry within the store
-    - `decrement/3` - Decrements an integer entry within the store
-
-        iex> store = Mnemonix.new(fizz: 1)
-        iex> Mnemonix.increment(store, :fizz)
-        iex> Mnemonix.get(store, :fizz)
-        2
+      iex> store = Mnemonix.new(fizz: 1)
+      iex> Mnemonix.increment(store, :fizz)
+      iex> Mnemonix.get(store, :fizz)
+      2
+      iex> Mnemonix.decrement(store, :fizz)
+      iex> Mnemonix.get(store, :fizz)
+      1
 
   """
 
@@ -722,7 +724,6 @@ defmodule Mnemonix do
       iex> Mnemonix.get(store, :b)
       1
 
-      iex> store = Mnemonix.new
       iex> store = Mnemonix.new(%{c: "foo"})
       iex> Mnemonix.increment!(store, :c)
       ** (ArithmeticError) value at key :c is not an integer
@@ -766,6 +767,142 @@ defmodule Mnemonix do
   @spec increment!(store, key, amount :: term) :: :ok | {:error, :no_integer}
   def increment!(store, key, amount) do
     with {:raise, type, args} <- GenServer.call(store, {:increment!, key, amount}) do
+      raise type, args
+    end
+  end
+
+  @doc """
+  Decrements the value of the integer entry under `key` in `store` by `1`.
+
+  If the `key` does not exist, it is set to `0` before performing the operation.
+
+  If the value under `key` is not an integer, returns `{:error, :no_integer}`, otherwise returns `:ok`.
+
+  ## Examples
+
+      iex> store = Mnemonix.new(%{a: 1})
+      iex> Mnemonix.decrement(store, :a)
+      :ok
+      iex> Mnemonix.get(store, :a)
+      0
+
+      iex> store = Mnemonix.new
+      iex> Mnemonix.decrement(store, :b)
+      :ok
+      iex> Mnemonix.get(store, :b)
+      -1
+
+      iex> store = Mnemonix.new(%{c: "foo"})
+      iex> Mnemonix.decrement(store, :c)
+      {:error, :no_integer}
+  """
+  @spec decrement(store, key) :: :ok | {:error, :no_integer}
+  def decrement(store, key) do
+    with {:raise, type, args} <- GenServer.call(store, {:decrement, key}) do
+      raise type, args
+    end
+  end
+
+  @doc """
+  Decrements the value of the integer entry under `key` in `store` by `amount`.
+
+  If the `key` does not exist, it is set to `0` before performing the operation.
+
+  If the value under `key` is not an integer, returns `{:error, :no_integer}`, otherwise returns `:ok`.
+
+  ## Examples
+
+      iex> store = Mnemonix.new(%{a: 2})
+      iex> Mnemonix.decrement(store, :a, 2)
+      :ok
+      iex> Mnemonix.get(store, :a)
+      0
+
+      iex> store = Mnemonix.new
+      iex> Mnemonix.decrement(store, :b, 2)
+      :ok
+      iex> Mnemonix.get(store, :b)
+      -2
+
+      iex> store = Mnemonix.new(%{c: "foo"})
+      iex> Mnemonix.decrement(store, :c, 2)
+      {:error, :no_integer}
+
+      iex> store = Mnemonix.new
+      iex> Mnemonix.decrement(store, :d, "foo")
+      {:error, :no_integer}
+  """
+  @spec decrement(store, key, amount :: term) :: :ok | {:error, :no_integer}
+  def decrement(store, key, amount) do
+    with {:raise, type, args} <- GenServer.call(store, {:decrement, key, amount}) do
+      raise type, args
+    end
+  end
+
+  @doc """
+  Decrements the value of the integer entry under `key` in `store` by `1`.
+
+  If the `key` does not exist, it is set to `0` before performing the operation.
+
+  If `amount` or the value under `key` is not an integer, raises an `ArithmeticError`.
+
+  ## Examples
+
+      iex> store = Mnemonix.new(%{a: 1})
+      iex> Mnemonix.decrement!(store, :a)
+      :ok
+      iex> Mnemonix.get(store, :a)
+      0
+
+      iex> store = Mnemonix.new
+      iex> Mnemonix.decrement!(store, :b)
+      :ok
+      iex> Mnemonix.get(store, :b)
+      -1
+
+      iex> store = Mnemonix.new(%{c: "foo"})
+      iex> Mnemonix.decrement!(store, :c)
+      ** (ArithmeticError) value at key :c is not an integer
+  """
+  @spec decrement!(store, key) :: :ok | {:error, :no_integer}
+  def decrement!(store, key) do
+    with {:raise, type, args} <- GenServer.call(store, {:decrement!, key}) do
+      raise type, args
+    end
+  end
+
+  @doc """
+  Decrements the value of the integer entry under `key` in `store` by `amount`.
+
+  If the `key` does not exist, it is set to `0` before performing the operation.
+
+  If `amount` or the value under `key` is not an integer, raises an `ArithmeticError`.
+
+  ## Examples
+
+      iex> store = Mnemonix.new(%{a: 2})
+      iex> Mnemonix.decrement!(store, :a, 2)
+      :ok
+      iex> Mnemonix.get(store, :a)
+      0
+
+      iex> store = Mnemonix.new
+      iex> Mnemonix.decrement!(store, :b, 2)
+      :ok
+      iex> Mnemonix.get(store, :b)
+      -2
+
+      iex> store = Mnemonix.new(%{c: "foo"})
+      iex> Mnemonix.decrement!(store, :c, 2)
+      ** (ArithmeticError) value at key :c is not an integer
+
+      iex> store = Mnemonix.new
+      iex> Mnemonix.decrement!(store, :d, "foo")
+      ** (ArithmeticError) value provided to operation is not an integer
+  """
+  @spec decrement!(store, key, amount :: term) :: :ok | {:error, :no_integer}
+  def decrement!(store, key, amount) do
+    with {:raise, type, args} <- GenServer.call(store, {:decrement!, key, amount}) do
       raise type, args
     end
   end

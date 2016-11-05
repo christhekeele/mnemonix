@@ -6,7 +6,6 @@ defmodule Mnemonix.Mnesia.Store do
   and the Mnesia application must have been started:
 
       iex> :mnesia.create_schema([node])
-      iex> Application.ensure_started(:mnesia)
       iex> {:ok, store} = Mnemonix.Mnesia.Store.start_link
       iex> Mnemonix.put(store, :foo, "bar")
       iex> Mnemonix.get(store, :foo)
@@ -16,7 +15,7 @@ defmodule Mnemonix.Mnesia.Store do
       nil
   """
 
-  use Mnemonix.Store
+  use Mnemonix.Store.Behaviour
 
   alias Mnemonix.Store
   alias Mnemonix.Mnesia.Exception

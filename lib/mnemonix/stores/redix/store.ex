@@ -12,7 +12,7 @@ if Code.ensure_loaded?(Redix) do
         nil
     """
 
-    use Mnemonix.Store
+    use Mnemonix.Store.Behaviour
 
     alias Mnemonix.Store
     alias Mnemonix.Redix.Exception

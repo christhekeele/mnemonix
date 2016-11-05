@@ -1,5 +1,22 @@
 defmodule Mnemonix.Store.Behaviour do
-  @moduledoc false
+  @moduledoc """
+  Main point of entry for implementing new Mnemonix.Stores.
+
+  To create new store, you simply use this module.
+
+  It will implement `start_link/1`, `start_link/2`, and `start_link/3` functions and bring in the
+  actual `Mnemonix` behaviours:
+
+  - `Mnemonix.Lifecycle.Behaviour`: support for `c:GenServer:init/1` and `c:GenServer:terminate/2`
+  - `Mnemonix.Map.Behaviour`: support for map operations
+  - `Mnemonix.Bump.Behaviour`: support for increment/decrement operations
+
+      iex> defmodule MyMapStore
+
+  Optional callbacks have default implementations in terms of the required ones,
+  but are overridable so that adapters can offer optimized versions
+  where possible.
+  """
 
   @doc false
   defmacro __using__(_) do
