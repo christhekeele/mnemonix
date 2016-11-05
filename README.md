@@ -49,6 +49,15 @@ Not to be confused with the mnemicode library, [`Mnemonex`](https://github.com/m
 [development-status]: https://img.shields.io/travis/christhekeele/mnemonix/development.svg?maxAge=86400&style=flat-square
 [development-coverage]: https://img.shields.io/coveralls/christhekeele/mnemonix/development.svg?maxAge=86400&style=flat-square
 
+## Utilities
+
+`Mnemonix` offers a standard set of utilities atop stores beyond simple key-value access. Stores that don't naitively support a utility have the capability added through an Elixir polyfill, guaranteeing you can use and switch stores without worrying about what features they support under the hood.
+
+Available utilities are:
+
+- `Mnemonix.Bump` - Increment/decrement integer values
+- `Mnemonix.Expiry` - Set entries to remove themselves from the store with a ttl
+
 ## Installation
 
 - Add `Mnemonix` to your project's dependencies in its `mix.exs`:

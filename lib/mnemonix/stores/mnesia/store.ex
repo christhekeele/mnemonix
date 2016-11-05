@@ -2,11 +2,11 @@ defmodule Mnemonix.Mnesia.Store do
   @moduledoc """
   A `Mnemonix.Store` adapter that uses a Mnesia table to store state.
 
-  Before using, you must have started Mnesia:
+  Before using, your current node should be part of a Mnesia schema
+  and the Mnesia application must have been started:
 
       iex> :mnesia.create_schema([node])
-      iex> :mnesia.start()
-      :ok
+      iex> Application.ensure_started(:mnesia)
       iex> {:ok, store} = Mnemonix.Mnesia.Store.start_link
       iex> Mnemonix.put(store, :foo, "bar")
       iex> Mnemonix.get(store, :foo)

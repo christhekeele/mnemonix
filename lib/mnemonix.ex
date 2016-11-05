@@ -5,9 +5,16 @@ defmodule Mnemonix do
   Rather than a map, you can use the `t:GenServer.server/0` reference returned
   by `Mnemonix.Store.start_link/2` to perform operations on Mnemonix stores.
 
+  ## The Map API
+
+  The core Mnemonix module allows you make calls to `Mnemonix.Store` servers as if they were Maps.
+
+  Rather than a map, you use the `t:GenServer.server/0` reference returned
+  by `Mnemonix.Store.start_link/2` to perform operations on Mnemonix stores.
+
   The `new/0`, `new/1`, and `new/3` functions start links to a
-  `Mnemonix.Map.Store` (mimicing to `Map.new`) to make it easy to play with the
-  `Mnemonix` interface:
+  `Mnemonix.Map.Store` (mimicking `Map.new`) to make it easy to play with the
+  Mnemonix interface:
 
       iex> store = Mnemonix.new(fizz: 1)
       iex> Mnemonix.get(store, :foo)
@@ -43,6 +50,27 @@ defmodule Mnemonix do
   - `take(Map.t, keys) :: Map.t`
   - `to_list(Map.t) :: Map.t`
   - `values(Map.t) :: [values]`
+
+  ## Store utilities
+
+  The Mnemonix interface also adds additional utilities
+  on top of the Map API for common key-value store operations:
+
+  - `Mnemonix.Store.Expiry`:
+    - `expires/3` - Sets a ttl on an entry
+    - `persist/2` - Prevents expiration of an entry
+
+
+
+  - `Mnemonix.Store.Bump`:
+    - `increment/3` - Increments an integer entry within the store
+    - `decrement/3` - Decrements an integer entry within the store
+
+        iex> store = Mnemonix.new(fizz: 1)
+        iex> Mnemonix.increment(store, :fizz)
+        iex> Mnemonix.get(store, :fizz)
+        2
+
   """
 
   alias Mnemonix.Store
@@ -52,9 +80,9 @@ defmodule Mnemonix do
   @typep value  :: Store.value
   # @typep ttl    :: Store.ttl # TODO: expiry
 
-####
-# CORE
-##
+  ####
+  # MAP CORE
+  ##
 
   @doc """
   Removes the entry under `key` in `store`.
@@ -142,9 +170,9 @@ defmodule Mnemonix do
     end
   end
 
-####
-# MAP FUNCTIONS
-##
+  ####
+  # MAP OPTIONAL
+  ##
 
   @doc """
   Fetches the value for specific `key`.
@@ -598,6 +626,147 @@ defmodule Mnemonix do
     case GenServer.call(store, {:update!, key, fun}) do
       :ok                  -> store
       {:raise, type, args} -> raise type, args
+    end
+  end
+
+  ####
+  # BUMP OPTIONAL
+  ##
+
+  @doc """
+  Increments the value of the integer entry under `key` in `store` by `1`.
+
+  If the `key` does not exist, it is set to `0` before performing the operation.
+
+  If the value under `key` is not an integer, returns `{:error, :no_integer}`, otherwise returns `:ok`.
+
+  ## Examples
+
+      iex> store = Mnemonix.new(%{a: 1})
+      iex> Mnemonix.increment(store, :a)
+      :ok
+      iex> Mnemonix.get(store, :a)
+      2
+
+      iex> store = Mnemonix.new
+      iex> Mnemonix.increment(store, :b)
+      :ok
+      iex> Mnemonix.get(store, :b)
+      1
+
+      iex> store = Mnemonix.new(%{c: "foo"})
+      iex> Mnemonix.increment(store, :c)
+      {:error, :no_integer}
+  """
+  @spec increment(store, key) :: :ok | {:error, :no_integer}
+  def increment(store, key) do
+    with {:raise, type, args} <- GenServer.call(store, {:increment, key}) do
+      raise type, args
+    end
+  end
+
+  @doc """
+  Increments the value of the integer entry under `key` in `store` by `amount`.
+
+  If the `key` does not exist, it is set to `0` before performing the operation.
+
+  If the value under `key` is not an integer, returns `{:error, :no_integer}`, otherwise returns `:ok`.
+
+  ## Examples
+
+      iex> store = Mnemonix.new(%{a: 1})
+      iex> Mnemonix.increment(store, :a, 2)
+      :ok
+      iex> Mnemonix.get(store, :a)
+      3
+
+      iex> store = Mnemonix.new
+      iex> Mnemonix.increment(store, :b, 2)
+      :ok
+      iex> Mnemonix.get(store, :b)
+      2
+
+      iex> store = Mnemonix.new(%{c: "foo"})
+      iex> Mnemonix.increment(store, :c, 2)
+      {:error, :no_integer}
+
+      iex> store = Mnemonix.new
+      iex> Mnemonix.increment(store, :d, "foo")
+      {:error, :no_integer}
+  """
+  @spec increment(store, key, amount :: term) :: :ok | {:error, :no_integer}
+  def increment(store, key, amount) do
+    with {:raise, type, args} <- GenServer.call(store, {:increment, key, amount}) do
+      raise type, args
+    end
+  end
+
+  @doc """
+  Increments the value of the integer entry under `key` in `store` by `1`.
+
+  If the `key` does not exist, it is set to `0` before performing the operation.
+
+  If `amount` or the value under `key` is not an integer, raises an `ArithmeticError`.
+
+  ## Examples
+
+      iex> store = Mnemonix.new(%{a: 1})
+      iex> Mnemonix.increment!(store, :a)
+      :ok
+      iex> Mnemonix.get(store, :a)
+      2
+
+      iex> store = Mnemonix.new
+      iex> Mnemonix.increment!(store, :b)
+      :ok
+      iex> Mnemonix.get(store, :b)
+      1
+
+      iex> store = Mnemonix.new
+      iex> store = Mnemonix.new(%{c: "foo"})
+      iex> Mnemonix.increment!(store, :c)
+      ** (ArithmeticError) value at key :c is not an integer
+  """
+  @spec increment!(store, key) :: :ok | {:error, :no_integer}
+  def increment!(store, key) do
+    with {:raise, type, args} <- GenServer.call(store, {:increment!, key}) do
+      raise type, args
+    end
+  end
+
+  @doc """
+  Increments the value of the integer entry under `key` in `store` by `amount`.
+
+  If the `key` does not exist, it is set to `0` before performing the operation.
+
+  If `amount` or the value under `key` is not an integer, raises an `ArithmeticError`.
+
+  ## Examples
+
+      iex> store = Mnemonix.new(%{a: 1})
+      iex> Mnemonix.increment!(store, :a, 2)
+      :ok
+      iex> Mnemonix.get(store, :a)
+      3
+
+      iex> store = Mnemonix.new
+      iex> Mnemonix.increment!(store, :b, 2)
+      :ok
+      iex> Mnemonix.get(store, :b)
+      2
+
+      iex> store = Mnemonix.new(%{c: "foo"})
+      iex> Mnemonix.increment!(store, :c, 2)
+      ** (ArithmeticError) value at key :c is not an integer
+
+      iex> store = Mnemonix.new
+      iex> Mnemonix.increment!(store, :d, "foo")
+      ** (ArithmeticError) value provided to operation is not an integer
+  """
+  @spec increment!(store, key, amount :: term) :: :ok | {:error, :no_integer}
+  def increment!(store, key, amount) do
+    with {:raise, type, args} <- GenServer.call(store, {:increment!, key, amount}) do
+      raise type, args
     end
   end
 
