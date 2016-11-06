@@ -5,10 +5,6 @@ defmodule Mnemonix.Store.Expiry.Callbacks do
   defmacro __using__(_) do
     quote location: :keep do
 
-      ####
-      # OPTIONAL
-      ##
-
       @doc false
       def handle_call({:expires, key, ttl}, _, store = %__MODULE__{impl: impl}) do
         case impl.expires(store, key, ttl) do

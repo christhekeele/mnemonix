@@ -7,6 +7,7 @@ defmodule Mnemonix.Store.Behaviour do
   It will implement `start_link/1`, `start_link/2`, and `start_link/3` functions
   and bring in the actual `Mnemonix` behaviours:
 
+  - `Mnemonix.Core.Behaviour`: required callbacks with no default implementation a store must provide
   - `Mnemonix.Lifecycle.Behaviour`: support for `c:GenServer:init/1` and `c:GenServer:terminate/2`
   - `Mnemonix.Map.Behaviour`: support for map operations
   - `Mnemonix.Expiry.Behaviour`: support for expires/persist operations
@@ -16,35 +17,31 @@ defmodule Mnemonix.Store.Behaviour do
   and optional callbacks with default implementations that leverage the required ones to make
   the store fully featured.
 
-  ## Required Callbacks
+  ## Core Callbacks
 
   Currently the callbacks you must implement for a full-featured store are:
 
-  - `Mnemonix.Lifecycle.Behaviour`
-    - `setup/1`
+  - `c:Mnemonix.Core.Behaviour.setup/1`
+  - `c:Mnemonix.Core.Behaviour.delete/2`
+  - `c:Mnemonix.Core.Behaviour.fetch/2`
+  - `c:Mnemonix.Core.Behaviour.put/3`
 
-  - `Mnemonix.Map.Behaviour`
-    - `put/3`
-    - `fetch/2`
-    - `delete/2`
-
-  All `Mnemonix` functions either correspond to one of these callbacks,
-  or are implemented in terms of them.
-
-  If any these callbacks don't make sense to implement in the context of the store you're developing,
-  feel free to raise an exception when they are used.
-  Most callbacks are expected to return some variant of `{:ok, updated_store, return_value}`,
-  but if they return `{:error, ExceptionModule, args}`,
-  it will raise the exception at the `Mnemonix` call site,
-  keeping the store process alive.
+  All other `Mnemonix` functions can be implemented in terms of them.
 
   ## Optional Callbacks
 
   Every single `Mnemonix` function/arity combo has a corresponding callback.
-  Those that are not required have default implementations, normally in terms of the required ones.
+  Those that are not required have default implementations, normally in terms of the core ones.
   However, these implementations are all marked as overridable,
   so if the store you are building offers native support for an operation,
   you can call it directly to provide a more efficient implementation.
+
+  If any these callbacks don't make sense to implement in the context of the store you're developing,
+  feel free to override them to raise an exception when they are used.
+  Most callbacks are expected to return some variant of `{:ok, updated_store, return_value}`,
+  but if they return `{:error, ExceptionModule, args}`,
+  it will raise the exception at the `Mnemonix` call site,
+  keeping the store process alive.
 
   ## Building a Store
 
@@ -91,6 +88,7 @@ defmodule Mnemonix.Store.Behaviour do
   defmacro __using__(_) do
     quote location: :keep do
 
+      use Mnemonix.Store.Core.Behaviour
       use Mnemonix.Store.Lifecycle.Behaviour
       use Mnemonix.Store.Map.Behaviour
       use Mnemonix.Store.Expiry.Behaviour
@@ -134,22 +132,6 @@ defmodule Mnemonix.Store.Behaviour do
       def start_link(init, opts) do
         Mnemonix.Store.start_link({__MODULE__, init}, opts)
       end
-
-      # @doc """
-      # Prepares the underlying store type for usage with supplied options.
-      #
-      # Invokes the `setup/1` callback and initialization callbacks required by store utilities:
-      #
-      # - `Mnemonix.Expiry.Behaviour.init_expiry/1`
-      # """
-      # @spec init({impl, opts}) :: {:ok, store} | :ignore | {:stop, reason :: term}
-      # def init({impl, opts}) do
-      # #   with {:ok, state} <- impl.setup(opts),
-      # #        store        <- %__MODULE__{impl: impl, opts: opts, state: state},
-      # #        {:ok, store} <- impl.setup_expiry(store),
-      # #   do: store
-      # {:ok, %__MODULE__{impl: impl, opts: opts, state: state}}
-      # end
 
     end
   end

@@ -44,9 +44,14 @@ defmodule Mnemonix.Store do
   end
 
   @typedoc """
+  Adapter and optional initialization options for `start_link/1`.
+  """
+  @type init :: impl | {impl, opts}
+
+  @typedoc """
   Keys allowed in Mnemonix entries.
   """
-  @type key   :: term
+  @type key :: term
 
   @typedoc """
   Values allowed in Mnemonix entries.
@@ -56,12 +61,12 @@ defmodule Mnemonix.Store do
   @typedoc """
   The number of milliseconds an entry will be allowed to exist.
   """
-  @type ttl   :: non_neg_integer | nil
+  @type ttl :: non_neg_integer | nil
 
   @typedoc """
-  Adapter and optional initialization options for `start_link/1`.
+  The return value of a bump operation.
   """
-  @type init :: impl | {impl, opts}
+  @type bump_op :: :ok | {:error, :no_integer}
 
   @doc """
   Starts a new `Mnemonix.Store` using `impl`.
@@ -150,6 +155,7 @@ defmodule Mnemonix.Store do
       reason: term,
       timeout: pos_integer
 
+  use Mnemonix.Store.Core.Callbacks
   use Mnemonix.Store.Map.Callbacks
   use Mnemonix.Store.Expiry.Callbacks
   use Mnemonix.Store.Bump.Callbacks

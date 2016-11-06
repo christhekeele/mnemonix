@@ -5,10 +5,6 @@ defmodule Mnemonix.Store.Lifecycle.Callbacks do
   defmacro __using__(_) do
     quote location: :keep do
 
-      ####
-      # OPTIONAL
-      ##
-
       @doc false
 
       @spec terminate(reason, t) :: reason
