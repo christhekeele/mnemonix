@@ -18,13 +18,9 @@ defmodule Mnemonix.Map.Store do
   """
 
   use Mnemonix.Store.Behaviour
-  alias Mnemonix.Store
+  use Mnemonix.Store.Types, [:store, :opts, :state, :key, :value]
 
-  @typep store  :: Store.t
-  @typep opts   :: Store.opts
-  @typep state  :: Store.state
-  @typep key    :: Store.key
-  @typep value  :: Store.value
+  alias Mnemonix.Store
 
   @doc """
   Constructs a map to store data.

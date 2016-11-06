@@ -16,15 +16,10 @@ defmodule Mnemonix.Mnesia.Store do
   """
 
   use Mnemonix.Store.Behaviour
+  use Mnemonix.Store.Types, [:store, :opts, :state, :key, :value, :exception]
 
   alias Mnemonix.Store
   alias Mnemonix.Mnesia.Exception
-
-  @typep store  :: Store.t
-  @typep opts   :: Store.opts
-  @typep state  :: Store.state
-  @typep key    :: Store.key
-  @typep value  :: Store.value
 
   @doc """
   Creates a Mnesia table to store state in.
@@ -62,23 +57,23 @@ defmodule Mnemonix.Mnesia.Store do
     end
   end
 
-  @spec delete(store, key) :: {:ok, store}
+  @spec delete(store, key) :: {:ok, store} | exception
   def delete(store = %Store{state: table}, key) do
     with :ok <- :mnesia.dirty_delete(table, key) do
       {:ok, store}
     end
   end
 
-  @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error}
+  @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error} | exception
   def fetch(store = %Store{state: table}, key) do
     case :mnesia.dirty_read(table, key) do
       [{^table, ^key, value} | []] -> {:ok, store, {:ok, value}}
       []                           -> {:ok, store, :error}
-      other                        -> {:raise, Exception, other}
+      other                        -> {:raise, Exception, [reason: other]}
     end
   end
 
-  @spec put(store, key, Store.value) :: {:ok, store}
+  @spec put(store, key, Store.value) :: {:ok, store} | exception
   def put(store = %Store{state: table}, key, value) do
     with :ok <- :mnesia.dirty_write({table, key, value}) do
       {:ok, store}

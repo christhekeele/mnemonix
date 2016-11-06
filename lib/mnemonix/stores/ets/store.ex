@@ -12,15 +12,10 @@ defmodule Mnemonix.ETS.Store do
   """
 
   use Mnemonix.Store.Behaviour
+  use Mnemonix.Store.Types, [:store, :opts, :state, :key, :value, :exception]
 
   alias Mnemonix.Store
   alias Mnemonix.ETS.Exception
-
-  @typep store  :: Store.t
-  @typep opts   :: Store.opts
-  @typep state  :: Store.state
-  @typep key    :: Store.key
-  @typep value  :: Store.value
 
   @doc """
   Creates a new ETS table to store state.
@@ -88,33 +83,33 @@ defmodule Mnemonix.ETS.Store do
     end
   end
 
-  @spec delete(store, key) :: {:ok, store}
+  @spec delete(store, key) :: {:ok, store} | exception
   def delete(store = %Store{state: table}, key) do
     if :ets.delete(table, key) do
       {:ok, store}
     else
       {:raise, Exception,
-        "ETS operation failed: `:ets.delete(#{table}, #{key})`"
+        message: "ETS operation failed: `:ets.delete(#{table}, #{key})`"
       }
     end
   end
 
-  @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error}
+  @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error} | exception
   def fetch(store = %Store{state: table}, key) do
     case :ets.lookup(table, key) do
       [{^key, value} | []] -> {:ok, store, {:ok, value}}
       []                   -> {:ok, store, :error}
-      other                -> {:raise, Exception, other}
+      other                -> {:raise, Exception, [reason: other]}
     end
   end
 
-  @spec put(store, key, Store.value) :: {:ok, store}
+  @spec put(store, key, Store.value) :: {:ok, store} | exception
   def put(store = %Store{state: table}, key, value) do
     if :ets.insert(table, {key, value}) do
       {:ok, store}
     else
       {:raise, Exception,
-        "ETS operation failed: `:ets.insert(#{table}, {#{key}, #{value}})`"
+        message: "ETS operation failed: `:ets.insert(#{table}, {#{key}, #{value}})`"
       }
     end
   end

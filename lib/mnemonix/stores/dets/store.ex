@@ -12,16 +12,10 @@ defmodule Mnemonix.DETS.Store do
   """
 
   use Mnemonix.Store.Behaviour
+  use Mnemonix.Store.Types, [:store, :opts, :state, :key, :value, :exception]
 
   alias Mnemonix.Store
   alias Mnemonix.DETS.Exception
-
-  @typep store  :: Store.t
-  @typep opts   :: Store.opts
-  @typep state  :: Store.state
-  @typep key    :: Store.key
-  @typep value  :: Store.value
-  # @typep ttl    :: Store.ttl
 
   @doc """
   Creates a new DETS table to store state.
@@ -47,7 +41,7 @@ defmodule Mnemonix.DETS.Store do
     end
   end
 
-  @spec delete(store, key) :: {:ok, store}
+  @spec delete(store, key) :: {:ok, store} | exception
   def delete(store = %Store{state: table}, key) do
     if :dets.delete(table, key) do
       {:ok, store}
@@ -58,7 +52,7 @@ defmodule Mnemonix.DETS.Store do
     end
   end
 
-  @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error}
+  @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error} | exception
   def fetch(store = %Store{state: table}, key) do
     case :dets.lookup(table, key) do
       [{^key, value} | []] -> {:ok, store, {:ok, value}}
@@ -67,7 +61,7 @@ defmodule Mnemonix.DETS.Store do
     end
   end
 
-  @spec put(store, key, Store.value) :: {:ok, store}
+  @spec put(store, key, Store.value) :: {:ok, store} | exception
   def put(store = %Store{state: table}, key, value) do
     if :dets.insert(table, {key, value}) do
       {:ok, store}
@@ -77,6 +71,9 @@ defmodule Mnemonix.DETS.Store do
       }
     end
   end
+
+  @spec teardown(reason, store) :: {:ok, reason} | {:error, reason}
+    when reason: :normal | :shutdown | {:shutdown, term} | term
 
   def teardown(reason, %Store{state: state}) do
     with :ok <- :dets.close(state) do

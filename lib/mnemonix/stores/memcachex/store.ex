@@ -13,15 +13,10 @@ if Code.ensure_loaded?(Memcache) do
     """
 
     use Mnemonix.Store.Behaviour
+    use Mnemonix.Store.Types, [:store, :opts, :state, :key, :value, :exception]
 
     alias Mnemonix.Store
     alias Mnemonix.Memcachex.Exception
-
-    @typep store  :: Store.t
-    @typep opts   :: Store.opts
-    @typep state  :: Store.state
-    @typep key    :: Store.key
-    @typep value  :: Store.value
 
     @doc """
     Connects to memcached to store data.
@@ -36,28 +31,28 @@ if Code.ensure_loaded?(Memcache) do
       Memcache.start_link(options)
     end
 
-    @spec delete(store, key) :: {:ok, store}
+    @spec delete(store, key) :: {:ok, store} | exception
     def delete(store = %Store{state: conn}, key) do
       case Memcache.delete(conn, key) do
         {:ok}            -> {:ok, store}
-        {:error, reason} -> {:raise, Exception, reason}
+        {:error, reason} -> {:raise, Exception, [reason: reason]}
       end
     end
 
-    @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error}
+    @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error} | exception
     def fetch(store = %Store{state: conn}, key) do
       case Memcache.get(conn, key) do
         {:error, "Key not found"} -> {:ok, store, :error}
         {:ok, value}              -> {:ok, store, {:ok, value}}
-        {:error, reason}          -> {:raise, Exception, reason}
+        {:error, reason}          -> {:raise, Exception, [reason: reason]}
       end
     end
 
-    @spec put(store, key, Store.value) :: {:ok, store}
+    @spec put(store, key, Store.value) :: {:ok, store} | exception
     def put(store = %Store{state: conn}, key, value) do
       case Memcache.set(conn, key, value) do
         {:ok}            -> {:ok, store}
-        {:error, reason} -> {:raise, Exception, reason}
+        {:error, reason} -> {:raise, Exception, [reason: reason]}
       end
     end
 
