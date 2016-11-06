@@ -24,6 +24,10 @@ script:
   - if [ $PULL_REQUEST_ID != false ]; then pronto run -f github_pr github_status; fi
   - mix coveralls.travis
   
+services:
+  - redis-server
+  - memcached
+  
 cache:
  directories:
    - /home/travis/.rvm/
