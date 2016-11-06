@@ -17,7 +17,7 @@ defmodule Mnemonix.Store do
   @typedoc """
   A module implementing `Mnemonix.Store.Behaviour`.
   """
-  @type impl :: Atom.t
+  @type impl :: Module.t
 
   @typedoc """
   Options supplied to `c:Mnemonix.Store.Lifecycle.Behaviour.setup/1` to initialize
@@ -33,9 +33,9 @@ defmodule Mnemonix.Store do
   @typedoc """
   Container for `t:impl/0`, `t:opts/0`, and `t:state/0`.
   """
-  @type t :: %__MODULE__{impl: impl, opts: opts, state: state}
+  @type t :: %__MODULE__{impl: impl, opts: opts, state: state, expiry: :native | pid}
   @enforce_keys [:impl]
-  defstruct impl: nil, opts: [], state: nil
+  defstruct impl: nil, opts: [], state: nil, expiry: :native
 
   @doc false
   @spec new(impl, opts, state) :: t
@@ -54,7 +54,7 @@ defmodule Mnemonix.Store do
   @type value :: term
 
   @typedoc """
-  The number of seconds an entry will be allowed to exist.
+  The number of milliseconds an entry will be allowed to exist.
   """
   @type ttl   :: non_neg_integer | nil
 

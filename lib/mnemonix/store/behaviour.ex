@@ -28,14 +28,10 @@ defmodule Mnemonix.Store.Behaviour do
     - `fetch/2`
     - `delete/2`
 
-  - `Mnemonix.Expiry.Behaviour`
-    - `expires/3`
-    - `persist/2`
-
   All `Mnemonix` functions either correspond to one of these callbacks,
-  or is implemented in terms of them.
+  or are implemented in terms of them.
 
-  If any these callbacks don't make sense to implement in the contenxt of the store you're developing,
+  If any these callbacks don't make sense to implement in the context of the store you're developing,
   feel free to raise an exception when they are used.
   Most callbacks are expected to return some variant of `{:ok, updated_store, return_value}`,
   but if they return `{:error, ExceptionModule, args}`,
@@ -46,7 +42,7 @@ defmodule Mnemonix.Store.Behaviour do
 
   Every single `Mnemonix` function/arity combo has a corresponding callback.
   Those that are not required have default implementations, normally in terms of the required ones.
-  However, these implementations are all marked as overrideable,
+  However, these implementations are all marked as overridable,
   so if the store you are building offers native support for an operation,
   you can call it directly to provide a more efficient implementation.
 
@@ -55,7 +51,7 @@ defmodule Mnemonix.Store.Behaviour do
   `Mnemonix.Map.Store` exists mostly to provide a reference implementation for store developers,
   demonstrating the minimum necessary to get a store working.
 
-  `Mnemonix.ETS.Store` is a good example of a store that requires more complicated lifecycle logic.
+  `Mnemonix.ETS.Store` is a good example of a store that requires more complicated initialization logic.
 
   `Mnemonix.Redix.Store` is a good example of a store that overrides optional callbacks
   with native support for `Mnemonix.Expiry.Behaviour` and `Mnemonix.Bump.Behaviour`.
@@ -84,6 +80,7 @@ defmodule Mnemonix.Store.Behaviour do
   - `impl:` the underlying store module to make calls to
   - `opts:` the options this store was configured with in `init/1`
   - `state:` the store-specific result of `c:Mnemonix.Lifecycle.Behaviour.setup/1`
+  - `expiry:` the store-specific result of `c:Mnemonix.Expiry.Behaviour.setup_expiry/1`
 
   ### `Mnemonix` => `Mnemonix.Store`
 

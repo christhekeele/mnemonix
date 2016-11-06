@@ -17,7 +17,7 @@ defmodule Mnemonix.Store.Bump.Behaviour do
 
   @typep amount :: term
 
-  @typep exception :: Exception.t
+  @typep exception :: Module.t
   @typep info      :: term
 
 

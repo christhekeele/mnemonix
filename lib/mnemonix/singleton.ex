@@ -97,9 +97,8 @@ defmodule Mnemonix.Singleton do
         Mnemonix.delete(@store, key)
       end
 
-      # TODO: expiry
       # @doc """
-      # Sets the entry under `key` to expire in `ttl` seconds.
+      # Sets the entry under `key` to expire in `ttl` milliseconds.
       #
       # If the `key` does not exist, the contents of `#{@store}`
       will be unaffected.

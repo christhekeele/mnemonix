@@ -21,7 +21,6 @@ defmodule Mnemonix.ETS.Store do
   @typep state  :: Store.state
   @typep key    :: Store.key
   @typep value  :: Store.value
-  # @typep ttl    :: Store.ttl # TODO: expiry
 
   @doc """
   Creates a new ETS table to store state.
@@ -99,12 +98,6 @@ defmodule Mnemonix.ETS.Store do
       }
     end
   end
-
-  # TODO: expiry
-  # @spec expires(store, key, ttl) :: {:ok, store}
-  # def expires(store = %Store{state: state}, key, ttl) do
-  #   {:ok, store}
-  # end
 
   @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error}
   def fetch(store = %Store{state: table}, key) do

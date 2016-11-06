@@ -13,14 +13,10 @@ defmodule Mnemonix.Store.Expiry.Behaviour do
 
   @typep store :: Store.t
 
-  @typep opts  :: Store.opts
-  @typep state :: Store.state
-
   @typep key   :: Store.key
-  @typep value :: Store.value
   @typep ttl   :: Store.ttl
 
-  @typep exception :: Exception.t
+  @typep exception :: Module.t
   @typep info      :: term
 
 
@@ -32,12 +28,49 @@ defmodule Mnemonix.Store.Expiry.Behaviour do
   @doc """
   Prepares this store to track the expiration of its entries.
   """
-  @callback setup_expiry(store) :: {:ok, state} | {:error, reason}
+  @callback setup_expiry(store) :: {:ok, store} | {:error, reason}
     when reason: :normal | :shutdown | {:shutdown, term} | term
 
+  @optional_callbacks expires: 3
   @doc """
-  Sets the entry under `key` to expire after `ttl` seconds.
+  Sets the entry under `key` to expire in `ttl` milliseconds.
+
+  If the `key` does not exist, the contents of `store` will be unaffected.
+
+  If the entry under `key` was already set to expire, the new `ttl` will be used instead.
+
+  ## Examples
+
+      iex> store = Mnemonix.new(%{a: 1})
+      iex> Mnemonix.expires(store, :a, 1)
+      iex> :timer.sleep(100)
+      iex> Mnemonix.get(store, :a)
+      nil
+
+      iex> store = Mnemonix.new(%{a: 1})
+      iex> Mnemonix.expires(store, :a, 24 * 60 * 60 * 1000)
+      iex> Mnemonix.expires(store, :a, 1)
+      iex> :timer.sleep(100)
+      iex> Mnemonix.get(store, :a)
+      nil
   """
-  @callback expires(store, key, ttl) :: term
+  @callback expires(store, key, ttl) :: {:ok, store} | {:raise, exception, info}
+
+  @optional_callbacks persist: 2
+  @doc """
+  Prevents the entry under `key` from expiring.
+
+  If the `key` does not exist or is not set to expire, the contents of `store` will be unaffected.
+
+  ## Examples
+
+      iex> store = Mnemonix.new(%{a: 1})
+      iex> Mnemonix.expires(store, :a, 1000)
+      iex> Mnemonix.persist(store, :a)
+      iex> :timer.sleep(1001)
+      iex> Mnemonix.get(store, :a)
+      1
+  """
+  @callback persist(store, key) :: {:ok, store} | {:raise, exception, info}
 
 end

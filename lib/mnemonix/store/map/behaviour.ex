@@ -14,9 +14,8 @@ defmodule Mnemonix.Store.Map.Behaviour do
   @typep store :: Store.t
   @typep key   :: Store.key
   @typep value :: Store.value
-  # @typep ttl   :: Store.ttl # TODO: expiry
 
-  @typep exception :: Exception.t
+  @typep exception :: Module.t
   @typep info      :: term
 
   ####
@@ -31,11 +30,6 @@ defmodule Mnemonix.Store.Map.Behaviour do
   @callback delete(store, key) ::
     {:ok, store} |
     {:raise, exception, info}
-
-  # TODO: expiry
-  # @callback expires(store, key, ttl) ::
-  #   {:ok, store} |
-  #   {:raise, exception, msg}
 
   @doc """
   Retrieves the value of the entry under `key` in `store`.
