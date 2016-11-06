@@ -17,25 +17,31 @@ defmodule Mnemonix.Store do
   @typedoc """
   A module implementing `Mnemonix.Store.Behaviour`.
   """
-  @type adapter :: Atom.t
+  @type impl :: Atom.t
 
   @typedoc """
-  Options supplied to `c:Mnemonix.Store.Behaviour.init/1` to initialize
-  the `t:adapter/0`.
+  Options supplied to `c:Mnemonix.Store.Lifecycle.Behaviour.setup/1` to initialize
+  the `t:impl/0`.
   """
   @type opts :: Keyword.t
 
   @typedoc """
-  Internal state specific to the `t:adapter/0`.
+  Internal state specific to the `t:impl/0`.
   """
   @type state :: term
 
   @typedoc """
-  Container for `t:adapter/0`, `t:opts/0`, and `t:state/0`.
+  Container for `t:impl/0`, `t:opts/0`, and `t:state/0`.
   """
-  @type t :: %__MODULE__{adapter: adapter, opts: opts, state: state}
-  @enforce_keys [:adapter]
-  defstruct adapter: nil, opts: [], state: nil
+  @type t :: %__MODULE__{impl: impl, opts: opts, state: state}
+  @enforce_keys [:impl]
+  defstruct impl: nil, opts: [], state: nil
+
+  @doc false
+  @spec new(impl, opts, state) :: t
+  def new(impl, opts, state) do
+    %__MODULE__{impl: impl, opts: opts, state: state}
+  end
 
   @typedoc """
   Keys allowed in Mnemonix entries.
@@ -47,18 +53,18 @@ defmodule Mnemonix.Store do
   """
   @type value :: term
 
-  # @typedoc """
-  # The number of seconds an entry will be allowed to exist.
-  # """
-  # @type ttl   :: non_neg_integer | nil
+  @typedoc """
+  The number of seconds an entry will be allowed to exist.
+  """
+  @type ttl   :: non_neg_integer | nil
 
   @typedoc """
   Adapter and optional initialization options for `start_link/1`.
   """
-  @type init :: adapter | {adapter, opts}
+  @type init :: impl | {impl, opts}
 
   @doc """
-  Starts a new `Mnemonix.Store` using `adapter`.
+  Starts a new `Mnemonix.Store` using `impl`.
 
   If you wish to pass options to `GenServer.start_link/3`, use `start_link/2`.
 
@@ -76,14 +82,14 @@ defmodule Mnemonix.Store do
     iex> Mnemonix.get(store, :foo)
     :bar
   """
-  @spec start_link(adapter)         :: GenServer.on_start
-  @spec start_link({adapter, opts}) :: GenServer.on_start
+  @spec start_link(impl)         :: GenServer.on_start
+  @spec start_link({impl, opts}) :: GenServer.on_start
   def start_link(init) do
     start_link(init, [])
   end
 
   @doc """
-  Starts a new `Mnemonix.Store` using `adapter` with `opts`.
+  Starts a new `Mnemonix.Store` using `impl` with `opts`.
 
   The returned `t:GenServer.server/0` reference can be used in
   the `Mnemonix` API.
@@ -101,22 +107,36 @@ defmodule Mnemonix.Store do
   """
   def start_link(init, opts)
 
-  @spec start_link({adapter, opts}, GenServer.options) :: GenServer.on_start
-  def start_link(adapter, opts) when not is_tuple adapter do
-    start_link({adapter, []}, opts)
+  @spec start_link({impl, opts}, GenServer.options) :: GenServer.on_start
+  def start_link(impl, opts) when not is_tuple impl do
+    start_link({impl, []}, opts)
   end
 
-  @spec start_link(adapter, GenServer.options) :: GenServer.on_start
+  @spec start_link(impl, GenServer.options) :: GenServer.on_start
   def start_link(init, opts) do
     GenServer.start_link(__MODULE__, init, opts)
   end
 
   use GenServer
 
+  @doc """
+  Prepares the underlying store type for usage with supplied options.
+
+  Invokes the `setup/1` callback and initialization callbacks required by store utilities:
+
+  - `c:Mnemonix.Expiry.Behaviour.setup_expiry/1`
+  """
+  @spec init({impl, opts}) :: {:ok, t} | :ignore | {:stop, reason :: term}
+  def init({impl, opts}) do
+    with {:ok, state} <- impl.setup(opts),
+         store        <- Mnemonix.Store.new(impl, opts, state),
+         {:ok, store} <- impl.setup_expiry(store),
+    do: {:ok, store}
+  end
+
   use Mnemonix.Store.Lifecycle.Callbacks
 
   @doc false
-
   @spec handle_call(request :: term, GenServer.from, t) ::
     {:reply, reply, new_store} |
     {:reply, reply, new_store, timeout | :hibernate} |
@@ -131,6 +151,7 @@ defmodule Mnemonix.Store do
       timeout: pos_integer
 
   use Mnemonix.Store.Map.Callbacks
+  use Mnemonix.Store.Expiry.Callbacks
   use Mnemonix.Store.Bump.Callbacks
 
 end

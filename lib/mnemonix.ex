@@ -672,7 +672,7 @@ defmodule Mnemonix do
 
   If the `key` does not exist, it is set to `0` before performing the operation.
 
-  If the value under `key` is not an integer, returns `{:error, :no_integer}`, otherwise returns `:ok`.
+  If `amount` or the value under `key` is not an integer, returns `{:error, :no_integer}`, otherwise returns `:ok`.
 
   ## Examples
 
@@ -708,7 +708,7 @@ defmodule Mnemonix do
 
   If the `key` does not exist, it is set to `0` before performing the operation.
 
-  If `amount` or the value under `key` is not an integer, raises an `ArithmeticError`.
+  If the value under `key` is not an integer, raises an `ArithmeticError`.
 
   ## Examples
 
@@ -808,7 +808,7 @@ defmodule Mnemonix do
 
   If the `key` does not exist, it is set to `0` before performing the operation.
 
-  If the value under `key` is not an integer, returns `{:error, :no_integer}`, otherwise returns `:ok`.
+  If `amount` or the value under `key` is not an integer, returns `{:error, :no_integer}`, otherwise returns `:ok`.
 
   ## Examples
 
@@ -844,7 +844,7 @@ defmodule Mnemonix do
 
   If the `key` does not exist, it is set to `0` before performing the operation.
 
-  If `amount` or the value under `key` is not an integer, raises an `ArithmeticError`.
+  If the value under `key` is not an integer, raises an `ArithmeticError`.
 
   ## Examples
 

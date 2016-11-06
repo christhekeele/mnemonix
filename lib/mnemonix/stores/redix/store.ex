@@ -35,8 +35,8 @@ if Code.ensure_loaded?(Redix) do
 
     All other options are passed verbatim to `Redix.start_link/2`.
     """
-    @spec init(opts) :: {:ok, state}
-    def init(opts) do
+    @spec setup(opts) :: {:ok, state}
+    def setup(opts) do
       {conn, options} = Keyword.get_and_update(opts, :conn, fn _ -> :pop end)
 
       Redix.start_link(conn || "redis://localhost:6379", options)

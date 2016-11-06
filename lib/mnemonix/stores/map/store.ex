@@ -36,8 +36,8 @@ defmodule Mnemonix.Map.Store do
 
     *Default:* `%{}`
   """
-  @spec init(opts) :: {:ok, state}
-  def init(opts) do
+  @spec setup(opts) :: {:ok, state}
+  def setup(opts) do
     {:ok, Keyword.get(opts, :initial, %{})}
   end
 

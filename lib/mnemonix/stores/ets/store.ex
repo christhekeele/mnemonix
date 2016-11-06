@@ -1,6 +1,6 @@
 defmodule Mnemonix.ETS.Store do
   @moduledoc """
-  A `Mnemonix.Store` adapter that uses an ETS table to store state.
+  A `Mnemonix.Store` module that uses an ETS table to store state.
 
       iex> {:ok, store} = Mnemonix.ETS.Store.start_link
       iex> Mnemonix.put(store, :foo, "bar")
@@ -57,8 +57,8 @@ defmodule Mnemonix.ETS.Store do
 
     *Default:* `false`
   """
-  @spec init(opts) :: {:ok, state} | {:stop, reason :: any}
-  def init(opts) do
+  @spec setup(opts) :: {:ok, state} | {:stop, reason :: any}
+  def setup(opts) do
     table   = Keyword.get(opts, :table) || Module.concat(__MODULE__, Table)
     privacy = Keyword.get(opts, :privacy) || :private
     heir    = Keyword.get(opts, :heir) || :none

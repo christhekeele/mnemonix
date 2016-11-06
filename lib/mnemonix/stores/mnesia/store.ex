@@ -1,6 +1,6 @@
 defmodule Mnemonix.Mnesia.Store do
   @moduledoc """
-  A `Mnemonix.Store` adapter that uses a Mnesia table to store state.
+  A `Mnemonix.Store` module that uses a Mnesia table to store state.
 
   Before using, your current node should be part of a Mnesia schema
   and the Mnesia application must have been started:
@@ -47,8 +47,8 @@ defmodule Mnemonix.Mnesia.Store do
   The rest of the options are passed into `:dets.open_file/2` verbaitm, except
   for `type:`, which will always be `:set`.
   """
-  @spec init(opts) :: {:ok, state} | {:stop, reason :: any}
-  def init(opts) do
+  @spec setup(opts) :: {:ok, state} | {:stop, reason :: any}
+  def setup(opts) do
     {table, opts} = Keyword.get_and_update(opts, :table, fn _ -> :pop end)
     table = if table, do: table, else: Module.concat(__MODULE__, Table)
 

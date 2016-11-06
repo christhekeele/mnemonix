@@ -12,14 +12,14 @@ defmodule Mnemonix.Singleton do
         unquote(__CALLER__.module)
       end
 
-      @typep store   :: Atom.t
-      @typep adapter :: Store.adapter
-      @typep opts    :: Store.opts
-      @typep key     :: Store.key
-      @typep value   :: Store.value
+      @typep store :: Atom.t
+      @typep impl  :: Store.impl
+      @typep opts  :: Store.opts
+      @typep key   :: Store.key
+      @typep value :: Store.value
 
       @doc """
-      Starts a new `Mnemonix.Store` using `adapter`.
+      Starts a new `Mnemonix.Store` using `impl`.
 
       If you wish to pass options to `GenServer.start_link/3`,
       use `start_link/2`.
@@ -38,14 +38,14 @@ defmodule Mnemonix.Singleton do
         iex> Mnemonix.get(store, :foo)
         :bar
       """
-      @spec start_link(adapter)         :: GenServer.on_start
-      @spec start_link({adapter, opts}) :: GenServer.on_start
+      @spec start_link(impl)         :: GenServer.on_start
+      @spec start_link({impl, opts}) :: GenServer.on_start
       def start_link(init) do
         Store.start_link(init, [])
       end
 
       @doc """
-      Starts a new `Mnemonix.Store` using `adapter` with `opts`.
+      Starts a new `Mnemonix.Store` using `impl` with `opts`.
 
       The returned `t:GenServer.server/0` reference can be used in
       the `Mnemonix` API.
@@ -63,12 +63,12 @@ defmodule Mnemonix.Singleton do
       """
       def start_link(init, opts)
 
-      @spec start_link({adapter, opts}, GenServer.options) :: GenServer.on_start
-      def start_link(adapter, opts) when not is_tuple adapter do
-        Store.start_link(__MODULE__, {adapter, []}, opts)
+      @spec start_link({impl, opts}, GenServer.options) :: GenServer.on_start
+      def start_link(impl, opts) when not is_tuple impl do
+        Store.start_link(__MODULE__, {impl, []}, opts)
       end
 
-      @spec start_link(adapter, GenServer.options) :: GenServer.on_start
+      @spec start_link(impl, GenServer.options) :: GenServer.on_start
       def start_link(init, opts) do
         Store.start_link(__MODULE__, init, opts)
       end

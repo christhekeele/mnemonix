@@ -29,8 +29,8 @@ if Code.ensure_loaded?(Memcache) do
 
     All options are passed verbatim to `Memcache.start_link/1`.
     """
-    @spec init(opts) :: {:ok, state}
-    def init(opts) do
+    @spec setup(opts) :: {:ok, state}
+    def setup(opts) do
       options = opts
       |> Keyword.put(:coder, Memcache.Coder.Erlang)
 

@@ -23,12 +23,11 @@ defmodule Mnemonix.Store.Lifecycle.Behaviour do
   @doc """
   Prepares the underlying store type for usage with supplied options.
 
-  Returns internal state the adapter can use to access the underlying
+  Returns internal state the module can use to access the underlying
   store to perform operations on data.
   """
-  @callback init(opts) ::
+  @callback setup(opts) ::
     {:ok, state} |
-    {:ok, state, timeout | :hibernate} |
     :ignore |
     {:stop, reason :: term}
 
