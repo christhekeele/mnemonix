@@ -5,7 +5,7 @@ defmodule Mnemonix.Mixfile do
     name: "Mnemonix",
     app: :mnemonix,
 
-    version: "0.2.0",
+    version: "0.3.0",
     elixir: "~> 1.2",
 
     build_embedded: Mix.env == :prod,
@@ -35,7 +35,10 @@ defmodule Mnemonix.Mixfile do
     {:credo,       "~> 0.4",   only: [:dev, :test]},
   ]
 
-  defp backends, do: []
+  defp backends, do: [
+    {:redix,     ">= 0.0.0", only: [:dev, :test]},
+    {:memcachex, ">= 0.0.0", only: [:dev, :test]},
+  ]
 
   defp docs, do: [
     main: "Mnemonix",

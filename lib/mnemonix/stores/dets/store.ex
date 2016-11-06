@@ -1,6 +1,6 @@
 defmodule Mnemonix.DETS.Store do
   @moduledoc """
-  A `Mnemonix.Store` adapter that uses a DETS table to store state.
+  A `Mnemonix.Store` module that uses a DETS table to store state.
 
       iex> {:ok, store} = Mnemonix.DETS.Store.start_link
       iex> Mnemonix.put(store, :foo, "bar")
@@ -11,17 +11,11 @@ defmodule Mnemonix.DETS.Store do
       nil
   """
 
-  use Mnemonix.Store
+  use Mnemonix.Store.Behaviour
+  use Mnemonix.Store.Types, [:store, :opts, :state, :key, :value, :exception]
 
   alias Mnemonix.Store
   alias Mnemonix.DETS.Exception
-
-  @typep store  :: Store.t
-  @typep opts   :: Store.opts
-  @typep state  :: Store.state
-  @typep key    :: Store.key
-  @typep value  :: Store.value
-  # @typep ttl    :: Store.ttl # TODO: expiry
 
   @doc """
   Creates a new DETS table to store state.
@@ -31,13 +25,14 @@ defmodule Mnemonix.DETS.Store do
   ## Options
 
   - `table:` Name of the table to connect to.
+
     *Default:* `#{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}.Table`
 
   The rest of the options are passed into `:dets.open_file/2` verbaitm, except
   for `type:`, which will always be `:set`.
   """
-  @spec init(opts) :: {:ok, state} | {:stop, reason :: any}
-  def init(opts) do
+  @spec setup(opts) :: {:ok, state} | {:stop, reason :: any}
+  def setup(opts) do
     {table, opts} = Keyword.get_and_update(opts, :table, fn _ -> :pop end)
     table = if table, do: table, else: Module.concat(__MODULE__, Table)
 
@@ -46,7 +41,7 @@ defmodule Mnemonix.DETS.Store do
     end
   end
 
-  @spec delete(store, key) :: {:ok, store}
+  @spec delete(store, key) :: {:ok, store} | exception
   def delete(store = %Store{state: table}, key) do
     if :dets.delete(table, key) do
       {:ok, store}
@@ -57,13 +52,7 @@ defmodule Mnemonix.DETS.Store do
     end
   end
 
-  # TODO: expiry
-  # @spec expires(store, key, ttl) :: {:ok, store}
-  # def expires(store = %Store{state: state}, key, ttl) do
-  #   {:ok, store}
-  # end
-
-  @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error}
+  @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error} | exception
   def fetch(store = %Store{state: table}, key) do
     case :dets.lookup(table, key) do
       [{^key, value} | []] -> {:ok, store, {:ok, value}}
@@ -72,7 +61,7 @@ defmodule Mnemonix.DETS.Store do
     end
   end
 
-  @spec put(store, key, Store.value) :: {:ok, store}
+  @spec put(store, key, Store.value) :: {:ok, store} | exception
   def put(store = %Store{state: table}, key, value) do
     if :dets.insert(table, {key, value}) do
       {:ok, store}
@@ -82,6 +71,9 @@ defmodule Mnemonix.DETS.Store do
       }
     end
   end
+
+  @spec teardown(reason, store) :: {:ok, reason} | {:error, reason}
+    when reason: :normal | :shutdown | {:shutdown, term} | term
 
   def teardown(reason, %Store{state: state}) do
     with :ok <- :dets.close(state) do

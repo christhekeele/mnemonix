@@ -1,28 +1,105 @@
 defmodule Mnemonix.Store.Behaviour do
   @moduledoc """
-  Required and optional functions `Mnemonix.Store` adapters must implement.
+  Main point of entry for implementing new Mnemonix.Stores.
 
-  Optional callbacks have default implementations in terms of the required ones,
-  but are overridable so that adapters can offer optimized versions
-  where possible.
+  To create new store, you simply use this module as a meta-behaviour that brings in many others.
+
+  It will implement `start_link/1`, `start_link/2`, and `start_link/3` functions
+  and bring in the actual `Mnemonix` behaviours:
+
+  - `Mnemonix.Core.Behaviour`: required callbacks with no default implementation a store must provide
+  - `Mnemonix.Lifecycle.Behaviour`: support for `c:GenServer:init/1` and `c:GenServer:terminate/2`
+  - `Mnemonix.Map.Behaviour`: support for map operations
+  - `Mnemonix.Expiry.Behaviour`: support for expires/persist operations
+  - `Mnemonix.Bump.Behaviour`: support for increment/decrement operations
+
+  These behaviours may have required callbacks you need to implement for the store to work,
+  and optional callbacks with default implementations that leverage the required ones to make
+  the store fully featured.
+
+  ## Core Callbacks
+
+  Currently the callbacks you must implement for a full-featured store are:
+
+  - `c:Mnemonix.Core.Behaviour.setup/1`
+  - `c:Mnemonix.Core.Behaviour.delete/2`
+  - `c:Mnemonix.Core.Behaviour.fetch/2`
+  - `c:Mnemonix.Core.Behaviour.put/3`
+
+  All other `Mnemonix` functions can be implemented in terms of them.
+
+  ## Optional Callbacks
+
+  Every single `Mnemonix` function/arity combo has a corresponding callback.
+  Those that are not required have default implementations, normally in terms of the core ones.
+  However, these implementations are all marked as overridable,
+  so if the store you are building offers native support for an operation,
+  you can call it directly to provide a more efficient implementation.
+
+  If any these callbacks don't make sense to implement in the context of the store you're developing,
+  feel free to override them to raise an exception when they are used.
+  Most callbacks are expected to return some variant of `{:ok, updated_store, return_value}`,
+  but if they return `{:error, ExceptionModule, args}`,
+  it will raise the exception at the `Mnemonix` call site,
+  keeping the store process alive.
+
+  ## Building a Store
+
+  `Mnemonix.Map.Store` exists mostly to provide a reference implementation for store developers,
+  demonstrating the minimum necessary to get a store working.
+
+  `Mnemonix.ETS.Store` is a good example of a store that requires more complicated initialization logic.
+
+  `Mnemonix.Redix.Store` is a good example of a store that overrides optional callbacks
+  with native support for `Mnemonix.Expiry.Behaviour` and `Mnemonix.Bump.Behaviour`.
+
+  ## Adding Capabilities to Mnemonix
+
+  Mnemonix is powered by a non-trivial set of interfaces. If you want to contribute functionality
+  to the core `Mnemonix` module, you must understand how they all work. Reading the source code
+  is the best way to do this, but here's a high level overview.
+
+  ### Mnemonix.Store
+
+  Every `Mnemonix.Store` is just a `GenServer` with a very particular interface and state.
+
+  ### Mnemonix.Store.start_link
+
+  When the store is started, it goes through an initialization pipeline provided by `init/1`.
+  First it invokes `c:Mnemonix.Lifecycle.Behaviour.setup/1` to prepare private internal state
+  from user-provided options, then it allows utilities to do feature-specific setup in extra callbacks
+  like `c:Mnemonix.Expiry.Behaviour.setup_expiry/1`.
+
+  ### The Mnemonix.Store struct
+
+  The state of the `Mnemonix.Store` server, and result of `init/1`, is a struct containing:
+
+  - `impl:` the underlying store module to make calls to
+  - `opts:` the options this store was configured with in `init/1`
+  - `state:` the store-specific result of `c:Mnemonix.Lifecycle.Behaviour.setup/1`
+  - `expiry:` the store-specific result of `c:Mnemonix.Expiry.Behaviour.setup_expiry/1`
+
+  ### `Mnemonix` => `Mnemonix.Store`
+
+  `Mnemonix` functions invoke `GenServer.call/3`.
   """
 
   @doc false
   defmacro __using__(_) do
     quote location: :keep do
-      @behaviour unquote __MODULE__
 
-      alias Mnemonix.Store
-      use Store.Behaviour.Default
-
+      use Mnemonix.Store.Core.Behaviour
+      use Mnemonix.Store.Lifecycle.Behaviour
+      use Mnemonix.Store.Map.Behaviour
+      use Mnemonix.Store.Expiry.Behaviour
+      use Mnemonix.Store.Bump.Behaviour
 
       @store __MODULE__ |> Inspect.inspect(%Inspect.Opts{})
 
       @doc """
-      Starts a new `Mnemonix.Store` using the
-      `#{@store}` adapter.
+      Starts a new `Mnemonix.Store` using the `#{@store}` module.
 
-      If you wish to pass configuration options to the adapter instead,
+      If you wish to pass configuration options to the module instead,
       use `start_link/2` with an empty `opts` list.
 
       The returned `t:GenServer.server/0` reference can be used as the primary
@@ -32,257 +109,31 @@ defmodule Mnemonix.Store.Behaviour do
 
           iex> {:ok, store} = #{@store}.start_link
           iex> Mnemonix.put(store, :foo, "bar")
-          iex> Mnemonix.get(store, :foo)
-          "bar"
+          iex> Mnemonix.fetch(store, :foo)
+          {:ok, "bar"}
           iex> Mnemonix.delete(store, :foo)
-          iex> Mnemonix.get(store, :foo)
-          nil
+          iex> Mnemonix.fetch(store, :foo)
+          :error
       """
       @spec start_link()                              :: GenServer.on_start
       @spec start_link(GenServer.options)             :: GenServer.on_start
       def start_link(opts \\ []) do
-        Store.start_link(__MODULE__, opts)
+        Mnemonix.Store.start_link(__MODULE__, opts)
       end
 
       @doc """
-      Starts a new `Mnemonix.Store` using the `#{@store}` adapter
+      Starts a new `Mnemonix.Store` using the `#{@store}` module
        with `init` opts.
 
       The returned `t:GenServer.server/0` reference can be used as the primary
       argument to the `Mnemonix` API.
       """
-      @spec start_link(Store.opts, GenServer.options) :: GenServer.on_start
+      @spec start_link(Mnemonix.Store.opts, GenServer.options) :: GenServer.on_start
       def start_link(init, opts) do
-        Store.start_link({__MODULE__, init}, opts)
+        Mnemonix.Store.start_link({__MODULE__, init}, opts)
       end
+
     end
   end
-
-  alias Mnemonix.Store
-
-  @typep store :: Store.t
-  @typep key   :: Store.key
-  @typep value :: Store.value
-  # @typep ttl   :: Store.ttl # TODO: expiry
-
-  @typep exception :: Exception.t
-  @typep info      :: term
-
-####
-# LIFECYCLE
-##
-
-
-  @doc """
-  Prepares the underlying store type for usage with supplied options.
-
-  Returns internal state the adapter can use to access the underlying
-  store to perform operations on data.
-  """
-  @callback init(Store.opts) ::
-    {:ok, Store.state} |
-    {:ok, Store.state, timeout | :hibernate} |
-    :ignore |
-    {:stop, reason :: term}
-
-  @callback teardown(reason, store) :: {:ok, reason} | {:error, reason}
-    when reason: :normal | :shutdown | {:shutdown, term} | term
-
-####
-# CORE
-##
-
-  @doc """
-  Removes the entry under `key` in `store`.
-
-  If the `key` does not exist, the contents of `store` will be unaffected.
-  """
-  @callback delete(store, key) ::
-    {:ok, store} |
-    {:raise, exception, info}
-
-  # TODO: expiry
-  # @callback expires(store, key, ttl) ::
-  #   {:ok, store} |
-  #   {:raise, exception, msg}
-
-  @doc """
-  Retrievs the value of the entry under `key` in `store`.
-
-  If the `key` does not exist, returns `:error`, otherwise
-  returns `{:ok, value}`.
-  """
-  @callback fetch(store, key) ::
-    {:ok, store, value} |
-    {:raise, exception, info}
-
-  @doc """
-  Creates a new entry for `value` under `key` in `store`.
-  """
-  @callback put(store, key, value) ::
-    {:ok, store} |
-    {:raise, exception, info}
-
-####
-# MAP FUNCTIONS
-##
-
-  @optional_callbacks fetch!: 2
-  @doc """
-  Fetches the value for specific `key`.
-
-  If `key` does not exist, triggers a `KeyError`.
-  """
-  @callback fetch!(store, key) ::
-    {:ok, store, value} |
-    {:raise, exception, info}
-
-  @optional_callbacks get: 2
-  @doc """
-  Gets the value for a specific `key`.
-
-  If `key` does not exist, returns `nil`.
-  """
-  @callback get(store, key) ::
-    {:ok, store, value} |
-    {:raise, exception, info}
-
-  @optional_callbacks get: 3
-  @doc """
-  Gets the value for a specific `key` with `default`.
-
-  If `key` does not exist, returns `default`.
-  """
-  @callback get(store, key, value) ::
-    {:ok, store, value} |
-    {:raise, exception, info}
-
-  @optional_callbacks get_and_update: 3
-  @doc """
-  Gets the value from `key` and updates it, all in one pass.
-
-  This `fun` argument receives the value of `key` (or `nil` if `key`
-  is not present) and must return a two-element tuple: the "get" value
-  (the retrieved value, which can be operated on before being returned)
-  and the new value to be stored under `key`. The `fun` may also
-  return `:pop`, implying the current value shall be removed
-  from `store` and returned.
-
-  The returned value is a tuple with the "get" value returned by
-  `fun` and a reference to the `store` with the updated value under `key`.
-  """
-  @callback get_and_update(store, key, fun) ::
-    {:ok, store, value} |
-    {:raise, exception, info}
-
-  @optional_callbacks get_and_update!: 3
-  @doc """
-  Gets the value from `key` and updates it. Raises if there is no `key`.
-
-  This `fun` argument receives the value of `key` and must return a
-  two-element tuple: the "get" value (the retrieved value, which can be
-  operated on before being returned) and the new value to be stored under
-  `key`.
-
-  The returned value is a tuple with the "get" value returned by `fun` and a
-  a reference to the `store` with the updated value under `key`.
-  """
-  @callback get_and_update!(store, key, fun) ::
-    {:ok, store, value} |
-    {:raise, exception, info}
-
-  @optional_callbacks get_lazy: 3
-  @doc """
-  Gets the value for a specific `key`.
-
-  If `key` does not exist, lazily evaluates `fun` and returns its result.
-
-  This is useful if the default value is very expensive to calculate or
-  generally difficult to setup and teardown again.
-  """
-  @callback get_lazy(store, key, fun) ::
-    {:ok, store, value} |
-    {:raise, exception, info}
-
-  @optional_callbacks has_key?: 2
-  @doc """
-  Returns whether a given `key` exists in the given `store`.
-  """
-  @callback has_key?(store, key) ::
-    {:ok, store, boolean} |
-    {:raise, exception, info}
-
-  @optional_callbacks pop: 2
-  @doc """
-  Returns and removes the value associated with `key` in `store`.
-
-  If no value is associated with the `key`, `nil` is returned.
-  """
-  @callback pop(store, key) ::
-    {:ok, store, value} |
-    {:raise, exception, info}
-
-  @optional_callbacks pop: 3
-  @doc """
-  Returns and removes the value associated with `key` in `store` with `default`.
-
-  If no value is associated with the `key` but `default` is given,
-  that will be returned instead without touching the store.
-  """
-  @callback pop(store, key, value) ::
-    {:ok, store, value} |
-    {:raise, exception, info}
-
-  @optional_callbacks pop_lazy: 3
-  @doc """
-  Lazily returns and removes the value associated with `key` in `store`.
-
-  This is useful if the default value is very expensive to calculate or
-  generally difficult to setup and teardown again.
-  """
-  @callback pop_lazy(store, key, fun) ::
-    {:ok, store, value} |
-    {:raise, exception, info}
-
-  @optional_callbacks put_new: 3
-  @doc """
-  Puts the given `value` under `key` unless the entry `key`
-  already exists.
-  """
-  @callback put_new(store, key, value) ::
-    {:ok, store} |
-    {:raise, exception, info}
-
-  @optional_callbacks put_new_lazy: 3
-  @doc """
-  Evaluates `fun` and puts the result under `key`
-  in `store` unless `key` is already present.
-
-  This is useful if the value is very expensive to calculate or
-  generally difficult to setup and teardown again.
-  """
-  @callback put_new_lazy(store, key, fun) ::
-    {:ok, store} |
-    {:raise, exception, info}
-
-  @optional_callbacks update: 4
-  @doc """
-  Updates the `key` in `store` with the given function.
-
-  If the `key` does not exist, inserts the given `initial` value.
-  """
-  @callback update(store, key, value, fun) ::
-    {:ok, store} |
-    {:raise, exception, info}
-
-  @optional_callbacks update!: 3
-  @doc """
-  Updates the `key` with the given function.
-
-  If the `key` does not exist, triggers a `KeyError`.
-  """
-  @callback update!(store, key, fun) ::
-    {:ok, store} |
-    {:raise, exception, info}
 
 end

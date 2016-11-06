@@ -17,15 +17,10 @@ defmodule Mnemonix.Map.Store do
       nil
   """
 
-  use Mnemonix.Store
-  alias Mnemonix.Store
+  use Mnemonix.Store.Behaviour
+  use Mnemonix.Store.Types, [:store, :opts, :state, :key, :value]
 
-  @typep store  :: Store.t
-  @typep opts   :: Store.opts
-  @typep state  :: Store.state
-  @typep key    :: Store.key
-  @typep value  :: Store.value
-  # @typep ttl    :: Store.ttl # TODO: expiry
+  alias Mnemonix.Store
 
   @doc """
   Constructs a map to store data.
@@ -33,10 +28,11 @@ defmodule Mnemonix.Map.Store do
   ## Options
 
   - `initial:` An existing map to start the store with.
+
     *Default:* `%{}`
   """
-  @spec init(opts) :: {:ok, state}
-  def init(opts) do
+  @spec setup(opts) :: {:ok, state}
+  def setup(opts) do
     {:ok, Keyword.get(opts, :initial, %{})}
   end
 
@@ -44,12 +40,6 @@ defmodule Mnemonix.Map.Store do
   def delete(store = %Store{state: map}, key) do
     {:ok, %{store | state: Map.delete(map, key)}}
   end
-
-  # TODO: expiry
-  # @spec expires(store, key, ttl) :: {:ok, store}
-  # def expires(store = %Store{state: state}, key, ttl) do
-  #   {:ok, store}
-  # end
 
   @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error}
   def fetch(store = %Store{state: map}, key) do

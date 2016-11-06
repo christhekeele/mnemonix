@@ -1,29 +1,15 @@
-defmodule Mnemonix.Store.Behaviour.Default do
+defmodule Mnemonix.Store.Map.Functions do
   @moduledoc false
 
   @doc false
   defmacro __using__(_) do
     quote location: :keep do
 
-    ####
-    # LIFECYCLE
-    ##
-
-    @doc false
-    def teardown(reason, _store) do
-      {:ok, reason}
-    end
-    defoverridable teardown: 2
-
-    ####
-    # MAP FUNCTIONS
-    ##
-
       @doc false
       def fetch!(store, key) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
-            :error -> {:raise, KeyError, [key: key, term: store.adapter]}
+            :error -> {:raise, KeyError, [key: key, term: store.impl]}
             {:ok, value} -> {:ok, store, value}
           end
         end
@@ -65,7 +51,7 @@ defmodule Mnemonix.Store.Behaviour.Default do
       def get_and_update!(store, key, fun) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
-            :error       -> {:raise, KeyError, [key: key, term: store.adapter]}
+            :error       -> {:raise, KeyError, [key: key, term: store.impl]}
             {:ok, value} -> case fun.(value) do
               {return, new} -> with {:ok, store} <- put(store, key, new) do
                 {:ok, store, return}
@@ -154,8 +140,8 @@ defmodule Mnemonix.Store.Behaviour.Default do
       def update(store, key, initial, fun) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
-            :error       -> put(store, key, initial)
             {:ok, value} -> put(store, key, fun.(value))
+            :error       -> put(store, key, initial)
           end
         end
       end
@@ -165,8 +151,8 @@ defmodule Mnemonix.Store.Behaviour.Default do
       def update!(store, key, fun) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
-            :error       -> {:raise, KeyError, [key: key, term: store.adapter]}
             {:ok, value} -> put(store, key, fun.(value))
+            :error       -> {:raise, KeyError, [key: key, term: store.impl]}
           end
         end
       end
