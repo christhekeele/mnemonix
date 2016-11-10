@@ -17,15 +17,15 @@ defmodule Mnemonix.Store.Expiry.Engine do
     {:ok, %__MODULE__{default: default_ttl}}
   end
 
-  def expires(%Store{expiry: engine}, key, ttl \\ nil) do
-    GenServer.call(engine, {:expires, key, ttl})
+  def expire(%Store{expiry: engine}, key, ttl \\ nil) do
+    GenServer.call(engine, {:expire, key, ttl})
   end
 
   def persist(%Store{expiry: engine}, key) do
     GenServer.call(engine, {:persist, key})
   end
 
-  def handle_call({:expires, key, ttl}, {store, _tag}, state = %__MODULE__{}) do
+  def handle_call({:expire, key, ttl}, {store, _tag}, state = %__MODULE__{}) do
     with {:ok, state} <- abort(key, state),
          {:ok, state} <- schedule(store, key, ttl, state),
     do: {:reply, :ok, state}

@@ -106,14 +106,14 @@ defmodule Mnemonix.Singleton do
       # ## Examples
 
       #     iex> #{@store}.start_link({Mnemonix.Map.Store, initial: %{a: 1}})
-      #     iex> #{@store}.expires(:a, 100)
+      #     iex> #{@store}.expire(:a, 100)
       #     iex> :timer.sleep(101)
       #     iex> #{@store}.get(:a)
       #     nil
       # """
-      # @spec expires(key, ttl) :: store | no_return
-      # def expires(key, ttl) do
-      #   Mnemonix.expires(@store, key, ttl)
+      # @spec expire(key, ttl) :: store | no_return
+      # def expire(key, ttl) do
+      #   Mnemonix.expire(@store, key, ttl)
       # end
 
       @doc """

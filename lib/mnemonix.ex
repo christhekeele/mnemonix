@@ -55,11 +55,11 @@ defmodule Mnemonix do
 
   Mnemonix lets you set entries to expire after a given time-to-live on any store.
 
-      # iex> store = Mnemonix.new(fizz: 1)
-      # iex> Mnemonix.expires(store, :fizz, 1)
-      # iex> :timer.sleep(1)
-      # iex> Mnemonix.get(store, :fizz)
-      # nil
+      iex> store = Mnemonix.new(fizz: 1)
+      iex> Mnemonix.expire(store, :fizz, 100)
+      iex> :timer.sleep(1000)
+      iex> Mnemonix.get(store, :fizz)
+      nil
 
   ## Bump Operations
 

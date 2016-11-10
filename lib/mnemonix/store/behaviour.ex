@@ -8,9 +8,9 @@ defmodule Mnemonix.Store.Behaviour do
   and bring in the actual `Mnemonix` behaviours:
 
   - `Mnemonix.Core.Behaviour`: required callbacks with no default implementation a store must provide
-  - `Mnemonix.Lifecycle.Behaviour`: support for `c:GenServer:init/1` and `c:GenServer:terminate/2`
+  - `Mnemonix.Lifecycle.Behaviour`: support for `c:GenServer:terminate/2`
   - `Mnemonix.Map.Behaviour`: support for map operations
-  - `Mnemonix.Expiry.Behaviour`: support for expires/persist operations
+  - `Mnemonix.Expiry.Behaviour`: support for expire/persist operations
   - `Mnemonix.Bump.Behaviour`: support for increment/decrement operations
 
   These behaviours may have required callbacks you need to implement for the store to work,

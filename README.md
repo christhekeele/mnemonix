@@ -19,17 +19,17 @@ Mnemonix
   - Experiment with different key-value store backends for your application
   - Allow end-users of your library liberty to choose their preferred backend
 
-It encodes the behaviour, lifecycle, and feature set of a key-value store behind a common `GenServer` interface, normalizes different store APIs to conform to that interface, polyfill stores lacking features, and exposes access to them through a `Map` inspired API.
+It encodes the behaviour, lifecycle, and feature set of a key-value store behind a common `GenServer` interface, normalizes different store APIs to conform to that interface, polyfill stores lacking features, and exposes access to them through a familiar `Map` API.
 
 Learn more about starting a `Mnemonix.Store` and manipulating it with the `Mnemonix` API in the [documentation](https://hexdocs.pm/mnemonix/index.html).
 
-##### Pronunciation: *`noo-MAHN-icks`*
+##### Pronunciation: **`/nɛˈmɑːnɪks/`** – *`noo-MAHN-icks`*
 
 > Mnemonic systems are techniques or strategies consciously used to improve memory. They help use information already stored in long-term memory to make memorization an easier task.
 >
 > — *[Mnemonics](https://en.wikipedia.org/wiki/Mnemonic)*, **Wikipedia**
 
-Not to be confused with the mnemicode library, [`Mnemonex`](https://github.com/mwmiller/mnemonex).
+Not to be confused with the mnemonicode library, [`Mnemonex`](https://github.com/mwmiller/mnemonex).
 
 ## Status
 
