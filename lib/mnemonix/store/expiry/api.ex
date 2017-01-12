@@ -1,6 +1,6 @@
 defmodule Mnemonix.Store.Expiry.API do
   @moduledoc """
-  Invokes expiry operations on a running Mnemonix.Store server.
+  Invokes expiry operations on a running Mnemonix.Store.Server.
   """
 
   use Mnemonix.Store.Types, [:store, :key, :value, :ttl]
@@ -16,14 +16,14 @@ defmodule Mnemonix.Store.Expiry.API do
 
       iex> store = Mnemonix.new(%{a: 1})
       iex> Mnemonix.expire(store, :a, 1)
-      iex> :timer.sleep(100)
+      iex> :timer.sleep(200)
       iex> Mnemonix.get(store, :a)
       nil
 
       iex> store = Mnemonix.new(%{a: 1})
       iex> Mnemonix.expire(store, :a, 24 * 60 * 60 * 1)
       iex> Mnemonix.expire(store, :a, 1)
-      iex> :timer.sleep(100)
+      iex> :timer.sleep(200)
       iex> Mnemonix.get(store, :a)
       nil
   """
@@ -45,7 +45,7 @@ defmodule Mnemonix.Store.Expiry.API do
       iex> store = Mnemonix.new(%{a: 1})
       iex> Mnemonix.expire(store, :a, 1)
       iex> Mnemonix.persist(store, :a)
-      iex> :timer.sleep(100)
+      iex> :timer.sleep(200)
       iex> Mnemonix.get(store, :a)
       1
   """
@@ -67,7 +67,7 @@ defmodule Mnemonix.Store.Expiry.API do
       iex> Mnemonix.put_and_expire(store, :a, "bar", 1)
       iex> Mnemonix.get(store, :a)
       "bar"
-      iex> :timer.sleep(100)
+      iex> :timer.sleep(200)
       iex> Mnemonix.get(store, :a)
       nil
   """

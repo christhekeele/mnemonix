@@ -1,6 +1,6 @@
 defmodule Mnemonix.Store.Bump.API do
   @moduledoc """
-  Invokes bump operations on a running Mnemonix.Store server.
+  Invokes bump operations on a running Mnemonix.Store.Server.
   """
 
   use Mnemonix.Store.Types, [:store, :key, :bump_op]

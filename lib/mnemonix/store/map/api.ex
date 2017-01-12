@@ -1,6 +1,6 @@
 defmodule Mnemonix.Store.Map.API do
   @moduledoc """
-  Invokes map operations on a running Mnemonix.Store server.
+  Invokes map operations on a running Mnemonix.Store.Server.
   """
 
   use Mnemonix.Store.Types, [:store, :key, :value]
@@ -232,7 +232,7 @@ defmodule Mnemonix.Store.Map.API do
   """
   @spec new() :: store
   def new() do
-    with {:ok, store} <- Mnemonix.Store.start_link(Mnemonix.Map.Store) do
+    with {:ok, store} <- Mnemonix.Store.Server.start_link(Mnemonix.Map.Store) do
       store
     end
   end
@@ -253,7 +253,7 @@ defmodule Mnemonix.Store.Map.API do
   @spec new(Enum.t) :: store
   def new(enumerable) do
     init = {Mnemonix.Map.Store, [initial: Map.new(enumerable)]}
-    with {:ok, store} <- Mnemonix.Store.start_link(init), do: store
+    with {:ok, store} <- Mnemonix.Store.Server.start_link(init), do: store
   end
 
   @doc """
@@ -275,7 +275,7 @@ defmodule Mnemonix.Store.Map.API do
   @spec new(Enum.t, (term -> {key, value})) :: store
   def new(enumerable, transform) do
     init = {Mnemonix.Map.Store, [initial: Map.new(enumerable, transform)]}
-    with {:ok, store} <- Mnemonix.Store.start_link(init), do: store
+    with {:ok, store} <- Mnemonix.Store.Server.start_link(init), do: store
   end
 
   @doc """

@@ -1,6 +1,6 @@
 defmodule Mnemonix.Store.Core.API do
   @moduledoc """
-  Invokes core operations on a running Mnemonix.Store server.
+  Invokes core operations on a running Mnemonix.Store.Server.
   """
 
   use Mnemonix.Store.Types, [:store, :key, :value]

@@ -29,12 +29,12 @@ defmodule Mnemonix.Singleton do
 
       ## Examples
 
-        iex> {:ok, store} = Mnemonix.Store.start_link(Mnemonix.Map.Store)
+        iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Map.Store)
         iex> Mnemonix.put(store, :foo, :bar)
         iex> Mnemonix.get(store, :foo)
         :bar
 
-        iex> {:ok, store} = Mnemonix.Store.start_link({Mnemonix.Map.Store, initial: %{foo: :bar}})
+        iex> {:ok, store} = Mnemonix.Store.Server.start_link({Mnemonix.Map.Store, initial: %{foo: :bar}})
         iex> Mnemonix.get(store, :foo)
         :bar
       """
@@ -52,12 +52,12 @@ defmodule Mnemonix.Singleton do
 
       ## Examples
 
-          iex> {:ok, store} = Mnemonix.Store.start_link(Mnemonix.Map.Store, name: Cache)
+          iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Map.Store, name: Cache)
           iex> Mnemonix.put(Cache, :foo, :bar)
           iex> Mnemonix.get(Cache, :foo)
           :bar
 
-          iex> {:ok, store} = Mnemonix.Store.start_link({Mnemonix.Map.Store, initial: %{foo: :bar}}, name: Cache)
+          iex> {:ok, store} = Mnemonix.Store.Server.start_link({Mnemonix.Map.Store, initial: %{foo: :bar}}, name: Cache)
           iex> Mnemonix.get(Cache, :foo)
           :bar
       """

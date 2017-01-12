@@ -5,6 +5,7 @@ defmodule Mnemonix.Store.Types do
   defmacro __using__(types) do
     for type <- ~w[
       store
+      impl
       opts
       state
       key
@@ -31,6 +32,12 @@ defmodule Mnemonix.Store.Types do
   defp use!(:opts) do
     quote location: :keep do
       @typep opts  :: Mnemonix.Store.opts
+    end
+  end
+
+  defp use!(:impl) do
+    quote location: :keep do
+      @typep impl  :: Mnemonix.Store.impl
     end
   end
 

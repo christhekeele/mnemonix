@@ -7,10 +7,10 @@ defmodule Mnemonix.Store.Lifecycle.Handlers do
 
       @doc false
 
-      @spec terminate(reason, t) :: reason
+      @spec terminate(reason, store) :: reason
         when reason: :normal | :shutdown | {:shutdown, term} | term
 
-      def terminate(reason, store = %__MODULE__{impl: impl}) do
+      def terminate(reason, store = %Mnemonix.Store{impl: impl}) do
         with {:ok, reason} <- impl.teardown(reason, store) do
           reason
         end

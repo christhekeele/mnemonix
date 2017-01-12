@@ -63,7 +63,7 @@ defmodule Mnemonix.Store.Behaviour do
 
   Every `Mnemonix.Store` is just a `GenServer` with a very particular interface and state.
 
-  ### Mnemonix.Store.start_link
+  ### Mnemonix.Store.Server.start_link
 
   When the store is started, it goes through an initialization pipeline provided by `init/1`.
   First it invokes `c:Mnemonix.Lifecycle.Behaviour.setup/1` to prepare private internal state
@@ -118,7 +118,7 @@ defmodule Mnemonix.Store.Behaviour do
       @spec start_link()                              :: GenServer.on_start
       @spec start_link(GenServer.options)             :: GenServer.on_start
       def start_link(opts \\ []) do
-        Mnemonix.Store.start_link(__MODULE__, opts)
+        Mnemonix.Store.Server.start_link(__MODULE__, opts)
       end
 
       @doc """
@@ -130,7 +130,7 @@ defmodule Mnemonix.Store.Behaviour do
       """
       @spec start_link(Mnemonix.Store.opts, GenServer.options) :: GenServer.on_start
       def start_link(init, opts) do
-        Mnemonix.Store.start_link({__MODULE__, init}, opts)
+        Mnemonix.Store.Server.start_link({__MODULE__, init}, opts)
       end
 
     end

@@ -3,14 +3,14 @@ defmodule Mnemonix do
   Easy access to `Mnemonix.Store` servers with a Map-like interface.
 
   Rather than a map, you can use the `t:GenServer.server/0` reference returned
-  by `Mnemonix.Store.start_link/2` to perform operations on Mnemonix stores.
+  by `Mnemonix.Store.Server.start_link/2` to perform operations on Mnemonix stores.
 
   ## Map Operations
 
   You make calls to `Mnemonix.Store` servers as if they were Maps.
 
   Rather than a map, you use the `t:GenServer.server/0` reference returned
-  by `Mnemonix.Store.start_link/2` to perform operations on Mnemonix stores.
+  by `Mnemonix.Store.Server.start_link/2` to perform operations on Mnemonix stores.
 
   The `new/0`, `new/1`, and `new/3` functions start links to a
   `Mnemonix.Map.Store` (mimicking `Map.new`) to make it easy to play with the

@@ -6,7 +6,7 @@ defmodule Mnemonix.Store.Expiry.Handlers do
     quote location: :keep do
 
       @doc false
-      def handle_call({:expire, key, ttl}, _, store = %__MODULE__{impl: impl}) do
+      def handle_call({:expire, key, ttl}, _, store = %Mnemonix.Store{impl: impl}) do
         case impl.expire(store, key, ttl) do
           {:ok, store}         -> {:reply, :ok, store}
           {:raise, type, args} -> {:reply, {:raise, type, args}, store}
@@ -14,7 +14,7 @@ defmodule Mnemonix.Store.Expiry.Handlers do
       end
 
       @doc false
-      def handle_call({:persist, key}, _, store = %__MODULE__{impl: impl}) do
+      def handle_call({:persist, key}, _, store = %Mnemonix.Store{impl: impl}) do
         case impl.persist(store, key) do
           {:ok, store}         -> {:reply, :ok, store}
           {:raise, type, args} -> {:reply, {:raise, type, args}, store}
@@ -22,7 +22,7 @@ defmodule Mnemonix.Store.Expiry.Handlers do
       end
 
       @doc false
-      def handle_call({:put_and_expire, key, value, ttl}, _, store = %__MODULE__{impl: impl}) do
+      def handle_call({:put_and_expire, key, value, ttl}, _, store = %Mnemonix.Store{impl: impl}) do
         case impl.put_and_expire(store, key, value, ttl) do
           {:ok, store}         -> {:reply, :ok, store}
           {:raise, type, args} -> {:reply, {:raise, type, args}, store}
