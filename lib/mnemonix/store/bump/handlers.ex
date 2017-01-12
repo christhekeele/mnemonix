@@ -1,4 +1,4 @@
-defmodule Mnemonix.Store.Bump.Callbacks do
+defmodule Mnemonix.Store.Bump.Handlers do
   @moduledoc false
 
   @doc false

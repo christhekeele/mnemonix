@@ -1,4 +1,4 @@
-defmodule Mnemonix.Store.Core.Callbacks do
+defmodule Mnemonix.Store.Core.Handlers do
   @moduledoc false
 
   @doc false

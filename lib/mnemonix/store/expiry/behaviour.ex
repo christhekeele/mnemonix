@@ -5,7 +5,7 @@ defmodule Mnemonix.Store.Expiry.Behaviour do
   defmacro __using__(_) do
     quote location: :keep do
       @behaviour unquote __MODULE__
-      use Mnemonix.Store.Expiry.Functions
+      use Mnemonix.Store.Expiry.Implementation
     end
   end
 

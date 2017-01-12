@@ -1,4 +1,4 @@
-defmodule Mnemonix.Store.Lifecycle.Functions do
+defmodule Mnemonix.Store.Lifecycle.Implementation do
   @moduledoc false
 
   @doc false

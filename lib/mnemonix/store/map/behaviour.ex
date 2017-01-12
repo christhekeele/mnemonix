@@ -5,7 +5,7 @@ defmodule Mnemonix.Store.Map.Behaviour do
   defmacro __using__(_) do
     quote location: :keep do
       @behaviour unquote __MODULE__
-      use Mnemonix.Store.Map.Functions
+      use Mnemonix.Store.Map.Implementation
     end
   end
 

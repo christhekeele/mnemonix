@@ -5,7 +5,7 @@ defmodule Mnemonix.Store.Bump.Behaviour do
   defmacro __using__(_) do
     quote location: :keep do
       @behaviour unquote __MODULE__
-      use Mnemonix.Store.Bump.Functions
+      use Mnemonix.Store.Bump.Implementation
     end
   end
 

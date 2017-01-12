@@ -1,4 +1,4 @@
-defmodule Mnemonix.Store.Map.Callbacks do
+defmodule Mnemonix.Store.Map.Handlers do
   @moduledoc false
 
   @doc false

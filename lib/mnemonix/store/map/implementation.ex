@@ -1,4 +1,4 @@
-defmodule Mnemonix.Store.Map.Functions do
+defmodule Mnemonix.Store.Map.Implementation do
   @moduledoc false
 
   @doc false

@@ -1,4 +1,4 @@
-defmodule Mnemonix.Store.Lifecycle.Callbacks do
+defmodule Mnemonix.Store.Lifecycle.Handlers do
   @moduledoc false
 
   @doc false

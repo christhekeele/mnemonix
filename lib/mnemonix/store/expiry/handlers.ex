@@ -1,4 +1,4 @@
-defmodule Mnemonix.Store.Expiry.Callbacks do
+defmodule Mnemonix.Store.Expiry.Handlers do
   @moduledoc false
 
   @doc false

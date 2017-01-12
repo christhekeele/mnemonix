@@ -139,7 +139,7 @@ defmodule Mnemonix.Store do
     do: {:ok, store}
   end
 
-  use Mnemonix.Store.Lifecycle.Callbacks
+  use Mnemonix.Store.Lifecycle.Handlers
 
   @doc false
   @spec handle_call(request :: term, GenServer.from, t) ::
@@ -155,9 +155,9 @@ defmodule Mnemonix.Store do
       reason: term,
       timeout: pos_integer
 
-  use Mnemonix.Store.Core.Callbacks
-  use Mnemonix.Store.Map.Callbacks
-  use Mnemonix.Store.Expiry.Callbacks
-  use Mnemonix.Store.Bump.Callbacks
+  use Mnemonix.Store.Core.Handlers
+  use Mnemonix.Store.Map.Handlers
+  use Mnemonix.Store.Expiry.Handlers
+  use Mnemonix.Store.Bump.Handlers
 
 end

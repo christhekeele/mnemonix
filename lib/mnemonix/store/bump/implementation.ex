@@ -1,4 +1,4 @@
-defmodule Mnemonix.Store.Bump.Functions do
+defmodule Mnemonix.Store.Bump.Implementation do
   @moduledoc false
 
   @doc false

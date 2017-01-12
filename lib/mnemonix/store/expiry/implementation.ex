@@ -1,4 +1,4 @@
-defmodule Mnemonix.Store.Expiry.Functions do
+defmodule Mnemonix.Store.Expiry.Implementation do
   @moduledoc false
 
   @doc false
