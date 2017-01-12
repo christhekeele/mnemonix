@@ -12,14 +12,10 @@ defmodule Mnemonix.Singleton do
         unquote(__CALLER__.module)
       end
 
-      @typep store :: Atom.t
-      @typep impl  :: Store.impl
-      @typep opts  :: Store.opts
-      @typep key   :: Store.key
-      @typep value :: Store.value
+      use Mnemonix.Store.Types
 
       @doc """
-      Starts a new `Mnemonix.Store` using `impl`.
+      Starts `#{@store}` using `impl`.
 
       If you wish to pass options to `GenServer.start_link/3`,
       use `start_link/2`.
@@ -29,12 +25,12 @@ defmodule Mnemonix.Singleton do
 
       ## Examples
 
-        iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Map.Store)
+        iex> {:ok, store} = #{@store}.start_link(Mnemonix.Map.Store)
         iex> Mnemonix.put(store, :foo, :bar)
         iex> Mnemonix.get(store, :foo)
         :bar
 
-        iex> {:ok, store} = Mnemonix.Store.Server.start_link({Mnemonix.Map.Store, initial: %{foo: :bar}})
+        iex> {:ok, store} = #{@store}.start_link({Mnemonix.Map.Store, initial: %{foo: :bar}})
         iex> Mnemonix.get(store, :foo)
         :bar
       """
@@ -45,19 +41,19 @@ defmodule Mnemonix.Singleton do
       end
 
       @doc """
-      Starts a new `Mnemonix.Store` using `impl` with `opts`.
+      Starts `#{@store}` using `impl` with `opts`.
 
       The returned `t:GenServer.server/0` reference can be used in
       the `Mnemonix` API.
 
       ## Examples
 
-          iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Map.Store, name: Cache)
+          iex> {:ok, store} = #{@store}.start_link(Mnemonix.Map.Store, name: Cache)
           iex> Mnemonix.put(Cache, :foo, :bar)
           iex> Mnemonix.get(Cache, :foo)
           :bar
 
-          iex> {:ok, store} = Mnemonix.Store.Server.start_link({Mnemonix.Map.Store, initial: %{foo: :bar}}, name: Cache)
+          iex> {:ok, store} = #{@store}.start_link({Mnemonix.Map.Store, initial: %{foo: :bar}}, name: Cache)
           iex> Mnemonix.get(Cache, :foo)
           :bar
       """
@@ -101,7 +97,7 @@ defmodule Mnemonix.Singleton do
       # Sets the entry under `key` to expire in `ttl` milliseconds.
       #
       # If the `key` does not exist, the contents of `#{@store}`
-      will be unaffected.
+      # will be unaffected.
       #
       # ## Examples
 
