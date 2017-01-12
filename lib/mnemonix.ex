@@ -75,6 +75,6 @@ defmodule Mnemonix do
 
   """
 
-  use Mnemonix.API
+  use Mnemonix.Store.API
 
 end

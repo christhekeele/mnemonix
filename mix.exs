@@ -26,7 +26,7 @@ defmodule Mnemonix.Mixfile do
     applications: [:logger],
   ]
 
-  defp deps, do: tools ++ backends
+  defp deps, do: tools() ++ backends()
 
   defp tools, do: [
     {:dialyxir,    "~> 0.3.5", only: :dev},
