@@ -59,7 +59,7 @@ defmodule Mnemonix.Store do
   @type value :: term
 
   @typedoc """
-  The number of milliseconds an entry will be allowed to exist.
+  The number of milliseconds an entry will be allowed to be retreived.
   """
   @type ttl :: non_neg_integer | nil
 

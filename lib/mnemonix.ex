@@ -75,6 +75,41 @@ defmodule Mnemonix do
 
   """
 
+  use Application
+
+  @doc """
+  Starts the Mnemonix Application, supervising the configured `stores`.
+
+  Looks in the application configuration for any stores:
+
+  ```elixir
+  config :mnemonix, stores: [:foo, :bar]
+  ```
+
+  For all stores listed, will check for store-specific configuration:
+
+  ```elixir
+  config :mnemonix, :foo, [
+    impl: Memonix.ETS.Store,
+    opts: [
+      table: :my_ets_table
+    ]
+  ]
+  ```
+
+  If no configuration is found, it will use the value of `default`, which by default is provided by
+  `Mnemonix.Store.Spec.default/0`.
+
+  Finally, it will launch all stores in new `Mnemonix.Store.Server` servers,
+  each registered by the name used in the configuration,
+  all supervised by a simple-one-for-one `Mnemonix.Store.Supervisor`.
+  """
+  def start(_type, default) do
+    :mnemonix
+    |> Application.get_env(:stores, [])
+    |> Mnemonix.Store.Supervisor.start_link
+  end
+
   use Mnemonix.Store.API
 
 end
