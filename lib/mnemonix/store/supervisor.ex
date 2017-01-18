@@ -14,12 +14,9 @@ defmodule Mnemonix.Store.Supervisor do
   end
 
   def specs(stores) do
-    stores |> inspect |> IO.puts
-    specs = stores
+    stores
     |> coerce_specs([])
     |> :lists.reverse
-    specs |> inspect |> IO.puts
-    specs
   end
 
   defp coerce_specs([], specs), do: specs
