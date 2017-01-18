@@ -24,7 +24,7 @@ defmodule Mnemonix.Mixfile do
 
   def application, do: [
     applications: [:logger],
-    mod: {Mnemonix, Mnemonix.Store.Spec.default_opts()},
+    mod: {Mnemonix, Mnemonix.Store.Server.Spec.default_opts()},
   ]
 
   defp deps, do: tools() ++ backends()

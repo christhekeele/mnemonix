@@ -19,14 +19,15 @@ defmodule Mnemonix.Store.Behaviour do
 
   ## Core Callbacks
 
-  Currently the callbacks you must implement for a full-featured store are:
+  Currently the required callbacks you must implement for a full-featured store
+  live in `Mnemonix.Core.Behaviour`:
 
   - `c:Mnemonix.Core.Behaviour.setup/1`
   - `c:Mnemonix.Core.Behaviour.delete/2`
   - `c:Mnemonix.Core.Behaviour.fetch/2`
   - `c:Mnemonix.Core.Behaviour.put/3`
 
-  All other `Mnemonix` functions can be implemented in terms of them.
+  All other `Mnemonix` behaviours can be implemented in terms of them, so are optional.
 
   ## Optional Callbacks
 
@@ -66,7 +67,7 @@ defmodule Mnemonix.Store.Behaviour do
   ### Mnemonix.Store.Server.start_link
 
   When the store is started, it goes through an initialization pipeline provided by `init/1`.
-  First it invokes `c:Mnemonix.Lifecycle.Behaviour.setup/1` to prepare private internal state
+  First it invokes `c:Mnemonix.Core.Behaviour.setup/1` to prepare private internal state
   from user-provided options, then it allows utilities to do feature-specific setup in extra callbacks
   like `c:Mnemonix.Expiry.Behaviour.setup_expiry/1`.
 
@@ -76,7 +77,7 @@ defmodule Mnemonix.Store.Behaviour do
 
   - `impl:` the underlying store module to make calls to
   - `opts:` the options this store was configured with in `init/1`
-  - `state:` the store-specific result of `c:Mnemonix.Lifecycle.Behaviour.setup/1`
+  - `state:` the store-specific result of `c:Mnemonix.Core.Behaviour.setup/1`
   - `expiry:` the store-specific result of `c:Mnemonix.Expiry.Behaviour.setup_expiry/1`
 
   ### `Mnemonix` => `Mnemonix.Store`

@@ -20,7 +20,7 @@ defmodule Mnemonix.Store do
   @type impl :: Module.t
 
   @typedoc """
-  Options supplied to `c:Mnemonix.Store.Lifecycle.Behaviour.setup/1` to initialize
+  Options supplied to `c:Mnemonix.Store.Core.Behaviour.setup/1` to initialize
   the `t:impl/0`.
   """
   @type opts :: Keyword.t
