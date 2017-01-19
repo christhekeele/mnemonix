@@ -22,6 +22,7 @@ defmodule Mnemonix.Store.Behaviours.Expiry do
   defmacro __using__(_) do
     quote location: :keep do
       @behaviour unquote __MODULE__
+
       alias Mnemonix.Store.Expiry
 
       @doc false

@@ -21,6 +21,9 @@ defmodule Mnemonix.Features.Expiry do
 
   If the entry under `key` was already set to expire, the new `ttl` will be used instead.
 
+  If the `ttl` is `nil` or not provided, it will defer to the `ttl` passed into the store's options.
+  If that was also `nil`, the entry will not be set to expire.
+
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
@@ -38,7 +41,7 @@ defmodule Mnemonix.Features.Expiry do
   """
   @spec expire(Mnemonix.store, Mnemonix.key, ttl)
     :: Mnemonix.store | no_return
-  def expire(store, key, ttl) do
+  def expire(store, key, ttl \\ nil) do
     case GenServer.call(store, {:expire, key, ttl}) do
       :ok                  -> store
       {:raise, type, args} -> raise type, args
@@ -72,6 +75,9 @@ defmodule Mnemonix.Features.Expiry do
   Creates a new entry for `value` under `key` in `store`
   and sets it to expire in `ttl` milliseconds.
 
+  If the `ttl` is `nil` or not provided, it will defer to the `ttl` passed into the store's options.
+  If that was also `nil`, the entry will not be set to expire.
+
   ## Examples
 
       iex> store = Mnemonix.new
@@ -84,7 +90,7 @@ defmodule Mnemonix.Features.Expiry do
   """
   @spec put_and_expire(Mnemonix.store, Mnemonix.key, Mnemonix.value, ttl)
     :: Mnemonix.store | no_return
-  def put_and_expire(store, key, value, ttl) do
+  def put_and_expire(store, key, value, ttl \\ nil) do
     case GenServer.call(store, {:put_and_expire, key, value, ttl}) do
       :ok                  -> store
       {:raise, type, args} -> raise type, args

@@ -19,7 +19,9 @@ defmodule Mnemonix.Features.Bump do
 
   If the `key` does not exist, it is set to `0` before performing the operation.
 
-  If the value under `key` is not an integer, returns `{:error, :no_integer}`, otherwise returns `:ok`.
+  If the `amount` or the value under `key` is not an integer,
+  returns `{:error, :no_integer}`, otherwise returns `:ok`,
+  and the value will remain unchanged.
 
   ## Examples
 
@@ -56,7 +58,8 @@ defmodule Mnemonix.Features.Bump do
 
   If the `key` does not exist, it is set to `0` before performing the operation.
 
-  If `amount` or the value under `key` is not an integer, raises an `ArithmeticError`.
+  If the `amount` or the value under `key` is not an integer, raises an `ArithmeticError`,
+  and the value will remain unchanged.
 
   ## Examples
 
@@ -126,7 +129,7 @@ defmodule Mnemonix.Features.Bump do
 
   If the `key` does not exist, it is set to `0` before performing the operation.
 
-  If `amount` or the value under `key` is not an integer, returns store unchanged.
+  If the `amount` or the value under `key` is not an integer, returns store unchanged.
 
   ## Examples
 
