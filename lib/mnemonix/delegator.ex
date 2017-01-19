@@ -1,4 +1,5 @@
 defmodule Mnemonix.Delegator do
+  @moduledoc false
 
   defmacro __using__([module: module]) do
     quote location: :keep, bind_quoted: [module: module] do

@@ -1,4 +1,4 @@
-defmodule Mnemonix.Store.Expiry.API do
+defmodule Mnemonix.Expiry.Functions do
   @moduledoc """
   Invokes expiry operations on a running Mnemonix.Store.Server.
   """

@@ -104,12 +104,75 @@ defmodule Mnemonix do
   each registered by the name used in the configuration,
   all supervised by a simple-one-for-one `Mnemonix.Store.Supervisor`.
   """
-  def start(_type, default) do
+  def start(_type, opts) do
     :mnemonix
     |> Application.get_env(:stores, [])
-    |> Mnemonix.Store.Supervisor.start_link
+    |> Mnemonix.Store.Supervisor.start_link(opts)
   end
 
-  use Mnemonix.Store.API
+  use Mnemonix.Store.Types, [:store, :key, :value]
+
+  @doc """
+  Starts a new `Mnemonix.Map.Store server` with an empty map.
+
+  ## Examples
+
+      iex> store = Mnemonix.new
+      iex> Mnemonix.get(store, :a)
+      nil
+      iex> Mnemonix.get(store, :b)
+      nil
+  """
+  @spec new() :: store
+  def new() do
+    with {:ok, store} <- Mnemonix.Store.Server.start_link(Mnemonix.Map.Store) do
+      store
+    end
+  end
+
+  @doc """
+  Starts a new `Mnemonix.Map.Store` server from the `enumerable`.
+
+  Duplicated keys are removed; the latest one prevails.
+
+  ## Examples
+
+      iex> store = Mnemonix.new(a: 1)
+      iex> Mnemonix.get(store, :a)
+      1
+      iex> Mnemonix.get(store, :b)
+      nil
+  """
+  @spec new(Enum.t) :: store
+  def new(enumerable) do
+    init = {Mnemonix.Map.Store, [initial: Map.new(enumerable)]}
+    with {:ok, store} <- Mnemonix.Store.Server.start_link(init), do: store
+  end
+
+  @doc """
+  Starts a new `Mnemonix.Map.Store` server from the `enumerable` via
+  the `transformation` function.
+
+  Duplicated keys are removed; the latest one prevails.
+
+  ## Examples
+
+      iex> store = Mnemonix.new(%{"A" => 0}, fn {key, value} ->
+      ...>  { String.downcase(key), value + 1 }
+      ...> end )
+      iex> Mnemonix.get(store, "a")
+      1
+      iex> Mnemonix.get(store, "A")
+      nil
+  """
+  @spec new(Enum.t, (term -> {key, value})) :: store
+  def new(enumerable, transform) do
+    init = {Mnemonix.Map.Store, [initial: Map.new(enumerable, transform)]}
+    with {:ok, store} <- Mnemonix.Store.Server.start_link(init), do: store
+  end
+
+  use Mnemonix.API
+
+  # use Mnemonix.API.Map
 
 end

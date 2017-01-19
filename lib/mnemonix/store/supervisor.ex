@@ -1,9 +1,10 @@
 defmodule Mnemonix.Store.Supervisor do
+  @moduledoc false
 
   alias Mnemonix.Store.Server.Spec
 
-  def start_link(stores \\ []) do
-    Supervisor.start_link(__MODULE__, stores)
+  def start_link(stores, opts \\ []) do
+    Supervisor.start_link(__MODULE__, stores, opts)
   end
 
   def init(stores) do

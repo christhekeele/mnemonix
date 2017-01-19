@@ -1,4 +1,4 @@
-defmodule Mnemonix.StoreTest do
+defmodule Mnemonix.Store.Test do
   use ExUnit.Case, async: true
 
   doctest Mnemonix.Store

@@ -1,4 +1,5 @@
 defmodule Mnemonix.Store.Server do
+  @moduledoc false
 
   use Mnemonix.Store.Types, [:store, :impl, :opts]
 

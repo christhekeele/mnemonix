@@ -1,4 +1,4 @@
-defmodule Mnemonix.Store.Core.API do
+defmodule Mnemonix.Core.Functions do
   @moduledoc """
   Invokes core operations on a running Mnemonix.Store.Server.
   """

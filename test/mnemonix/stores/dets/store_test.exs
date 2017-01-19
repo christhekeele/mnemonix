@@ -1,4 +1,4 @@
-defmodule Mnemonix.DETS.StoreTest do
+defmodule Mnemonix.DETS.Store.Test do
   use ExUnit.Case, async: true
 
   setup do

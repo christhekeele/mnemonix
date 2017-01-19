@@ -1,4 +1,4 @@
-defmodule Mnemonix.Store.Bump.API do
+defmodule Mnemonix.Bump.Functions do
   @moduledoc """
   Invokes bump operations on a running Mnemonix.Store.Server.
   """

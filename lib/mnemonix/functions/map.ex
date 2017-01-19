@@ -1,7 +1,13 @@
-defmodule Mnemonix.Store.Map.API do
+defmodule Mnemonix.Map.Functions do
   @moduledoc """
   Invokes map operations on a running Mnemonix.Store.Server.
   """
+
+  # defmacro __using__(_) do
+  #   quote do
+  #     @before_compile unquote(__MODULE__)
+  #   end
+  # end
 
   use Mnemonix.Store.Types, [:store, :key, :value]
 
@@ -217,65 +223,6 @@ defmodule Mnemonix.Store.Map.API do
       {:ok, value}         -> value
       {:raise, type, args} -> raise type, args
     end
-  end
-
-  @doc """
-  Starts a new `Mnemonix.Map.Store server` with an empty map.
-
-  ## Examples
-
-      iex> store = Mnemonix.new
-      iex> Mnemonix.get(store, :a)
-      nil
-      iex> Mnemonix.get(store, :b)
-      nil
-  """
-  @spec new() :: store
-  def new() do
-    with {:ok, store} <- Mnemonix.Store.Server.start_link(Mnemonix.Map.Store) do
-      store
-    end
-  end
-
-  @doc """
-  Starts a new `Mnemonix.Map.Store` server from the `enumerable`.
-
-  Duplicated keys are removed; the latest one prevails.
-
-  ## Examples
-
-      iex> store = Mnemonix.new(a: 1)
-      iex> Mnemonix.get(store, :a)
-      1
-      iex> Mnemonix.get(store, :b)
-      nil
-  """
-  @spec new(Enum.t) :: store
-  def new(enumerable) do
-    init = {Mnemonix.Map.Store, [initial: Map.new(enumerable)]}
-    with {:ok, store} <- Mnemonix.Store.Server.start_link(init), do: store
-  end
-
-  @doc """
-  Starts a new `Mnemonix.Map.Store` server from the `enumerable` via
-  the `transformation` function.
-
-  Duplicated keys are removed; the latest one prevails.
-
-  ## Examples
-
-      iex> store = Mnemonix.new(%{"A" => 0}, fn {key, value} ->
-      ...>  { String.downcase(key), value + 1 }
-      ...> end )
-      iex> Mnemonix.get(store, "a")
-      1
-      iex> Mnemonix.get(store, "A")
-      nil
-  """
-  @spec new(Enum.t, (term -> {key, value})) :: store
-  def new(enumerable, transform) do
-    init = {Mnemonix.Map.Store, [initial: Map.new(enumerable, transform)]}
-    with {:ok, store} <- Mnemonix.Store.Server.start_link(init), do: store
   end
 
   @doc """
