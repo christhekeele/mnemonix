@@ -9,8 +9,6 @@ defmodule Mnemonix.Features.Core do
     end
   end
 
-  use Mnemonix.Store.Types, [:store, :key, :value]
-
   @doc """
   Removes the entry under `key` in `store`.
 
@@ -25,7 +23,8 @@ defmodule Mnemonix.Features.Core do
       iex> Mnemonix.get(store, :a)
       nil
   """
-  @spec delete(store, key) :: store | no_return
+  @spec delete(Mnemonix.store, Mnemonix.key)
+    :: Mnemonix.store | no_return
   def delete(store, key) do
     case GenServer.call(store, {:delete, key}) do
       :ok                  -> store
@@ -47,7 +46,8 @@ defmodule Mnemonix.Features.Core do
       iex> Mnemonix.fetch(store, :b)
       :error
   """
-  @spec fetch(store, key) :: {:ok, value} | :error | no_return
+  @spec fetch(Mnemonix.store, Mnemonix.key)
+    :: {:ok, Mnemonix.value} | :error | no_return
   def fetch(store, key) do
     case GenServer.call(store, {:fetch, key}) do
       {:ok, value}         -> value
@@ -67,7 +67,8 @@ defmodule Mnemonix.Features.Core do
       iex> Mnemonix.get(store, :b)
       2
   """
-  @spec put(store, key, value) :: store | no_return
+  @spec put(Mnemonix.store, Mnemonix.key, Mnemonix.value)
+    :: Mnemonix.store | no_return
   def put(store, key, value) do
     case GenServer.call(store, {:put, key, value}) do
       :ok                  -> store

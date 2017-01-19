@@ -9,7 +9,10 @@ defmodule Mnemonix.Features.Expiry do
     end
   end
 
-  use Mnemonix.Store.Types, [:store, :key, :value, :ttl]
+  @typedoc """
+  The number of milliseconds an entry will be allowed to be retreived.
+  """
+  @type ttl :: non_neg_integer | nil
 
   @doc """
   Sets the entry under `key` to expire in `ttl` milliseconds.
@@ -33,7 +36,8 @@ defmodule Mnemonix.Features.Expiry do
       iex> Mnemonix.get(store, :a)
       nil
   """
-  @spec expire(store, key, ttl) :: store | no_return
+  @spec expire(Mnemonix.store, Mnemonix.key, ttl)
+    :: Mnemonix.store | no_return
   def expire(store, key, ttl) do
     case GenServer.call(store, {:expire, key, ttl}) do
       :ok                  -> store
@@ -55,7 +59,8 @@ defmodule Mnemonix.Features.Expiry do
       iex> Mnemonix.get(store, :a)
       1
   """
-  @spec persist(store, key) :: store | no_return
+  @spec persist(Mnemonix.store, Mnemonix.key)
+    :: Mnemonix.store | no_return
   def persist(store, key) do
     case GenServer.call(store, {:persist, key}) do
       :ok                  -> store
@@ -77,7 +82,8 @@ defmodule Mnemonix.Features.Expiry do
       iex> Mnemonix.get(store, :a)
       nil
   """
-  @spec put_and_expire(store, key, value, ttl) :: store | no_return
+  @spec put_and_expire(Mnemonix.store, Mnemonix.key, Mnemonix.value, ttl)
+    :: Mnemonix.store | no_return
   def put_and_expire(store, key, value, ttl) do
     case GenServer.call(store, {:put_and_expire, key, value, ttl}) do
       :ok                  -> store

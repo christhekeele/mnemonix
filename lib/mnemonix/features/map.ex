@@ -9,8 +9,6 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
-  use Mnemonix.Store.Types, [:store, :key, :value]
-
   @doc """
   Fetches the value for specific `key`.
 
@@ -24,7 +22,8 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.fetch!(store, :b)
       ** (KeyError) key :b not found in: Mnemonix.Stores.Map
   """
-  @spec fetch!(store, key) :: {:ok, value} | :error | no_return
+  @spec fetch!(Mnemonix.store, Mnemonix.key)
+    :: {:ok, Mnemonix.value} | :error | no_return
   def fetch!(store, key) do
     case GenServer.call(store, {:fetch!, key}) do
       {:ok, value}         -> value
@@ -45,7 +44,8 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get(store, :b)
       nil
   """
-  @spec get(store, key) :: value | no_return
+  @spec get(Mnemonix.store, Mnemonix.key)
+    :: Mnemonix.value | no_return
   def get(store, key) do
     case GenServer.call(store, {:get, key}) do
       {:ok, value}         -> value
@@ -66,7 +66,8 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get(store, :b, 2)
       2
   """
-  @spec get(store, key, value) :: value | no_return
+  @spec get(Mnemonix.store, Mnemonix.key, Mnemonix.value)
+    :: Mnemonix.value | no_return
   def get(store, key, default) do
     case GenServer.call(store, {:get, key, default}) do
       {:ok, value}         -> value
@@ -121,8 +122,8 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get(store, :b)
       nil
   """
-  @spec get_and_update(store, key, (value -> {get, value} | :pop))
-    :: {get, store} | no_return when get: term
+  @spec get_and_update(Mnemonix.store, Mnemonix.key, (Mnemonix.value -> {get, Mnemonix.value} | :pop))
+    :: {get, Mnemonix.store} | no_return when get: term
   def get_and_update(store, key, fun) do
     case GenServer.call(store, {:get_and_update, key, fun}) do
       {:ok, value}         -> {value, store}
@@ -169,8 +170,8 @@ defmodule Mnemonix.Features.Map do
       iex> {_value, ^store} = Mnemonix.get_and_update!(store, :b, fn _ -> :pop end)
       ** (KeyError) key :b not found in: Mnemonix.Stores.Map
   """
-  @spec get_and_update!(store, key, (value -> {get, value}))
-    :: {get, store} | no_return when get: term
+  @spec get_and_update!(Mnemonix.store, Mnemonix.key, (Mnemonix.value -> {get, Mnemonix.value}))
+    :: {get, Mnemonix.store} | no_return when get: term
   def get_and_update!(store, key, fun) do
     case GenServer.call(store, {:get_and_update!, key, fun}) do
       {:ok, value}         -> {value, store}
@@ -198,7 +199,8 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get_lazy(store, :b, fun)
       13
   """
-  @spec get_lazy(store, key, (() -> value)) :: value | no_return
+  @spec get_lazy(Mnemonix.store, Mnemonix.key, (() -> Mnemonix.value))
+    :: Mnemonix.value | no_return
   def get_lazy(store, key, fun) when is_function(fun, 0) do
     case GenServer.call(store, {:get_lazy, key, fun}) do
       {:ok, value}         -> value
@@ -217,7 +219,7 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.has_key?(store, :b)
       false
   """
-  @spec has_key?(store, key) :: boolean
+  @spec has_key?(Mnemonix.store, Mnemonix.key) :: boolean
   def has_key?(store, key) do
     case GenServer.call(store, {:has_key?, key}) do
       {:ok, value}         -> value
@@ -242,7 +244,8 @@ defmodule Mnemonix.Features.Map do
       iex> value
       nil
   """
-  @spec pop(store, key) :: {value, store}
+  @spec pop(Mnemonix.store, Mnemonix.key)
+    :: {Mnemonix.value, Mnemonix.store}
   def pop(store, key) do
     case GenServer.call(store, {:pop, key}) do
       {:ok, value}         -> {value, store}
@@ -267,7 +270,8 @@ defmodule Mnemonix.Features.Map do
       iex> value
       2
   """
-  @spec pop(store, key, term) :: {value, store}
+  @spec pop(Mnemonix.store, Mnemonix.key, default :: term)
+    :: {Mnemonix.value, Mnemonix.store}
   def pop(store, key, default) do
     case GenServer.call(store, {:pop, key, default}) do
       {:ok, value}         -> {value, store}
@@ -295,7 +299,8 @@ defmodule Mnemonix.Features.Map do
       iex> value
       13
   """
-  @spec pop_lazy(store, key, (() -> value)) :: {value, store}
+  @spec pop_lazy(Mnemonix.store, Mnemonix.key, (() -> Mnemonix.value))
+    :: {Mnemonix.value, Mnemonix.store}
   def pop_lazy(store, key, fun) when is_function(fun, 0) do
     case GenServer.call(store, {:pop_lazy, key, fun}) do
       {:ok, value}         -> {value, store}
@@ -317,7 +322,7 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get(store, :b)
       2
   """
-  @spec put_new(store, key, value) :: store
+  @spec put_new(Mnemonix.store, Mnemonix.key, Mnemonix.value) :: Mnemonix.store
   def put_new(store, key, value) do
     case GenServer.call(store, {:put_new, key, value}) do
       :ok                  -> store
@@ -346,7 +351,8 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get(store, :a)
       1
   """
-  @spec put_new_lazy(store, key, (() -> value)) :: store | no_return
+  @spec put_new_lazy(Mnemonix.store, Mnemonix.key, (() -> Mnemonix.value))
+    :: Mnemonix.store | no_return
   def put_new_lazy(store, key, fun) when is_function(fun, 0) do
     case GenServer.call(store, {:put_new_lazy, key, fun}) do
       :ok                  -> store
@@ -377,7 +383,8 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get(store, :b)
       13
   """
-  @spec update(store, key, value, (value -> value)) :: store | no_return
+  @spec update(Mnemonix.store, Mnemonix.key, Mnemonix.value, (Mnemonix.value -> Mnemonix.value))
+    :: Mnemonix.store
   def update(store, key, initial, fun) do
     case GenServer.call(store, {:update, key, initial, fun}) do
       :ok                  -> store
@@ -399,7 +406,8 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.update!(store, :b, &(&1 * 2))
       ** (KeyError) key :b not found in: Mnemonix.Stores.Map
   """
-  @spec update!(store, key, (value -> value)) :: store | no_return
+  @spec update!(Mnemonix.store, Mnemonix.key, (Mnemonix.value -> Mnemonix.value))
+    :: Mnemonix.store | no_return
   def update!(store, key, fun) do
     case GenServer.call(store, {:update!, key, fun}) do
       :ok                  -> store

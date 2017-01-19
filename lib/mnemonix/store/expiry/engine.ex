@@ -3,8 +3,6 @@ defmodule Mnemonix.Store.Expiry.Engine do
 
   use GenServer
 
-  alias Mnemonix.Store
-
   @type t :: %__MODULE__{default: Store.ttl, timers: Map.t}
   defstruct default: nil, timers: %{}
 
@@ -17,11 +15,11 @@ defmodule Mnemonix.Store.Expiry.Engine do
     {:ok, %__MODULE__{default: default_ttl}}
   end
 
-  def expire(%Store{expiry: engine}, key, ttl \\ nil) do
+  def expire(%Mnemonix.Store{expiry: engine}, key, ttl \\ nil) do
     GenServer.call(engine, {:expire, key, ttl})
   end
 
-  def persist(%Store{expiry: engine}, key) do
+  def persist(%Mnemonix.Store{expiry: engine}, key) do
     GenServer.call(engine, {:persist, key})
   end
 

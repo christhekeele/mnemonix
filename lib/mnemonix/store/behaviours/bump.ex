@@ -1,25 +1,29 @@
 defmodule Mnemonix.Store.Behaviours.Bump do
   @moduledoc false
 
-  use Mnemonix.Store.Types, [:store, :key, :bump_op, :exception]
-
   @optional_callbacks bump: 3
-  @callback bump(store, key, amount :: term) :: {:ok, store, bump_op} | exception
+  @callback bump(Mnemonix.Store.t, Mnemonix.key, Mnemonix.amount :: term)
+    :: {:ok, Mnemonix.Store.t, Mnemonix.Features.Bump.bump_op} | Mnemonix.Store.Behaviour.exception
 
   @optional_callbacks bump!: 3
-  @callback bump!(store, key, amount :: term) :: {:ok, store} | exception
+  @callback bump!(Mnemonix.Store.t, Mnemonix.key, amount :: term)
+    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
   @optional_callbacks increment: 2
-  @callback increment(store, key) :: {:ok, store} | exception
+  @callback increment(Mnemonix.Store.t, Mnemonix.key)
+    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
   @optional_callbacks increment: 3
-  @callback increment(store, key, amount :: term) :: {:ok, store} | exception
+  @callback increment(Mnemonix.Store.t, Mnemonix.key, amount :: term)
+    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
   @optional_callbacks decrement: 2
-  @callback decrement(store, key) :: {:ok, store} | exception
+  @callback decrement(Mnemonix.Store.t, Mnemonix.key)
+    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
   @optional_callbacks decrement: 3
-  @callback decrement(store, key, amount :: term) :: {:ok, store} | exception
+  @callback decrement(Mnemonix.Store.t, Mnemonix.key, amount :: term)
+    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
   @doc false
   defmacro __using__(_) do

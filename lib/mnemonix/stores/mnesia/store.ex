@@ -16,7 +16,6 @@ defmodule Mnemonix.Stores.Mnesia do
   """
 
   use Mnemonix.Store.Behaviour
-  use Mnemonix.Store.Types, [:store, :opts, :state, :key, :value, :exception]
 
   alias Mnemonix.Store
   alias Mnemonix.Mnesia.Exception
@@ -41,7 +40,8 @@ defmodule Mnemonix.Stores.Mnesia do
   The rest of the options are passed into `:dets.open_file/2` verbaitm, except
   for `type:`, which will always be `:set`.
   """
-  @spec setup(opts) :: {:ok, state} | {:stop, reason :: any}
+  @spec setup(Mnemonix.Store.options)
+    :: {:ok, state :: term} | {:stop, reason :: any}
   def setup(opts) do
     {table, opts} = Keyword.get_and_update(opts, :table, fn _ -> :pop end)
     table = if table, do: table, else: Module.concat(__MODULE__, Table)
@@ -57,14 +57,16 @@ defmodule Mnemonix.Stores.Mnesia do
     end
   end
 
-  @spec delete(store, key) :: {:ok, store} | exception
+  @spec delete(Mnemonix.Store.t, Mnemonix.key)
+    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
   def delete(store = %Store{state: table}, key) do
     with :ok <- :mnesia.dirty_delete(table, key) do
       {:ok, store}
     end
   end
 
-  @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error} | exception
+  @spec fetch(Mnemonix.Store.t, Mnemonix.key)
+    :: {:ok, Mnemonix.Store.t, {:ok, Mnemonix.value} | :error} | Mnemonix.Store.Behaviour.exception
   def fetch(store = %Store{state: table}, key) do
     case :mnesia.dirty_read(table, key) do
       [{^table, ^key, value} | []] -> {:ok, store, {:ok, value}}
@@ -73,7 +75,8 @@ defmodule Mnemonix.Stores.Mnesia do
     end
   end
 
-  @spec put(store, key, Store.value) :: {:ok, store} | exception
+  @spec put(Mnemonix.Store.t, Mnemonix.key, Store.value)
+    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
   def put(store = %Store{state: table}, key, value) do
     with :ok <- :mnesia.dirty_write({table, key, value}) do
       {:ok, store}

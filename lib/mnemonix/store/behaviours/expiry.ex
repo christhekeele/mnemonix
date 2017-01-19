@@ -1,20 +1,22 @@
 defmodule Mnemonix.Store.Behaviours.Expiry do
   @moduledoc false
 
-  use Mnemonix.Store.Types, [:store, :key, :value, :ttl, :exception]
-
   @optional_callbacks setup_expiry: 1
-  @callback setup_expiry(store) :: {:ok, store} | {:error, reason}
-    when reason: :normal | :shutdown | {:shutdown, term} | term
+  @callback setup_expiry(Mnemonix.Store.t)
+    :: {:ok, Mnemonix.Store.t} | {:error, reason}
+      when reason: :normal | :shutdown | {:shutdown, term} | term
 
   @optional_callbacks expire: 3
-  @callback expire(store, key, ttl) :: {:ok, store} | exception
+  @callback expire(Mnemonix.Store.t, Mnemonix.key, Mnemonix.Features.Bump.ttl)
+    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
   @optional_callbacks persist: 2
-  @callback persist(store, key) :: {:ok, store} | exception
+  @callback persist(Mnemonix.Store.t, Mnemonix.key)
+    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
   @optional_callbacks put_and_expire: 4
-  @callback put_and_expire(store, key, value, ttl) :: {:ok, store} | exception
+  @callback put_and_expire(Mnemonix.Store.t, Mnemonix.key, Mnemonix.value, Mnemonix.Features.Bump.ttl)
+    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
   @doc false
   defmacro __using__(_) do

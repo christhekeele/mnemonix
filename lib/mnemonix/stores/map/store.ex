@@ -18,7 +18,6 @@ defmodule Mnemonix.Stores.Map do
   """
 
   use Mnemonix.Store.Behaviour
-  use Mnemonix.Store.Types, [:store, :opts, :state, :key, :value]
 
   alias Mnemonix.Store
 
@@ -31,22 +30,26 @@ defmodule Mnemonix.Stores.Map do
 
     *Default:* `%{}`
   """
-  @spec setup(opts) :: {:ok, state}
+  @spec setup(Mnemonix.Store.options)
+    :: {:ok, state :: term} | {:stop, reason :: any}
   def setup(opts) do
     {:ok, Keyword.get(opts, :initial, %{})}
   end
 
-  @spec delete(store, key) :: {:ok, store}
+  @spec delete(Mnemonix.Store.t, Mnemonix.key)
+    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
   def delete(store = %Store{state: map}, key) do
     {:ok, %{store | state: Map.delete(map, key)}}
   end
 
-  @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error}
+  @spec fetch(Mnemonix.Store.t, Mnemonix.key)
+    :: {:ok, Mnemonix.Store.t, {:ok, Mnemonix.value} | :error} | Mnemonix.Store.Behaviour.exception
   def fetch(store = %Store{state: map}, key) do
     {:ok, store, Map.fetch(map, key)}
   end
 
-  @spec put(store, key, Store.value) :: {:ok, store}
+  @spec put(Mnemonix.Store.t, Mnemonix.key, Store.value)
+    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
   def put(store = %Store{state: map}, key, value) do
     {:ok, %{store | state: Map.put(map, key, value)}}
   end

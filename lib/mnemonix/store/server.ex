@@ -1,9 +1,18 @@
 defmodule Mnemonix.Store.Server do
   @moduledoc """
-  Bridges Mnemonix.Features with Mnemonix.Store.Behaviour implementations.
+  Bridges `Mnemonix.Features` with Mnemonix.Store.Behaviour implementations.
   """
 
-  use Mnemonix.Store.Types, [:store, :impl, :opts]
+  @typedoc """
+  Adapter and optional initialization options for `Mnemonix.Store.Server.start_link/1`.
+  """
+  @type init :: Mnemonix.Store.Behaviour.t | {Mnemonix.Store.Behaviour.t, options}
+
+  @typedoc """
+  Options supplied to `c:Mnemonix.Store.Behaviours.Core.setup/1` to initialize
+  the `t:impl/0`.
+  """
+  @type options :: Keyword.t
 
   @doc """
   Starts a new `Mnemonix.Store.Server` using `impl`.
@@ -24,8 +33,7 @@ defmodule Mnemonix.Store.Server do
     iex> Mnemonix.get(store, :foo)
     :bar
   """
-  @spec start_link(impl)         :: GenServer.on_start
-  @spec start_link({impl, opts}) :: GenServer.on_start
+  @spec start_link(init) :: GenServer.on_start
   def start_link(init) do
     start_link(init, [])
   end
@@ -47,14 +55,13 @@ defmodule Mnemonix.Store.Server do
       iex> Mnemonix.get(OtherCache, :foo)
       :bar
   """
+  @spec start_link(init, GenServer.options) :: GenServer.on_start
   def start_link(init, opts)
 
-  @spec start_link({impl, opts}, GenServer.options) :: GenServer.on_start
   def start_link(impl, opts) when not is_tuple impl do
     start_link({impl, []}, opts)
   end
 
-  @spec start_link(impl, GenServer.options) :: GenServer.on_start
   def start_link(init, opts) do
     GenServer.start_link(__MODULE__, init, opts)
   end
@@ -67,7 +74,8 @@ defmodule Mnemonix.Store.Server do
   Invokes the `c:Mnemonix.Core.Behaviour.setup/1` and `c:Mnemonix.Expiry.Behaviour.setup_expiry/1`
   callbacks.
   """
-  @spec init({impl, opts}) :: {:ok, store} | :ignore | {:stop, reason :: term}
+  @spec init({Mnemonix.Store.Behaviour.t, options})
+    :: {:ok, Mnemonix.Store.t} | :ignore | {:stop, reason :: term}
   def init({impl, opts}) do
     with {:ok, state} <- impl.setup(opts),
          store        <- Mnemonix.Store.new(impl, opts, state),
@@ -81,7 +89,7 @@ defmodule Mnemonix.Store.Server do
 
   Invokes the `c:Mnemonix.Lifecycle.Behaviour.teardown/2` callback.
   """
-  @spec terminate(reason, store) :: reason
+  @spec terminate(reason, Mnemonix.Store.t) :: reason
     when reason: :normal | :shutdown | {:shutdown, term} | term
   def terminate(reason, store = %Mnemonix.Store{impl: impl}) do
     with {:ok, reason} <- impl.teardown(reason, store) do
@@ -92,7 +100,7 @@ defmodule Mnemonix.Store.Server do
   @doc """
   Delegates Mnemonix.API functions to the underlying store behaviours.
   """
-  @spec handle_call(request :: term, GenServer.from, store) ::
+  @spec handle_call(request :: term, GenServer.from, Mnemonix.Store.t) ::
     {:reply, reply, new_store} |
     {:reply, reply, new_store, timeout | :hibernate} |
     {:noreply, new_store} |
@@ -101,9 +109,11 @@ defmodule Mnemonix.Store.Server do
     {:stop, reason, new_store}
     when
       reply: term,
-      new_store: store,
+      new_store: Mnemonix.Store.t,
       reason: term,
       timeout: pos_integer
+
+  def handle_call(request, from, store)
 
   ####
   # Mnemonix.Store.Behaviours.Core

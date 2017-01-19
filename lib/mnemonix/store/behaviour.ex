@@ -1,16 +1,21 @@
 defmodule Mnemonix.Store.Behaviour do
-  @moduledoc """
-  The functions a module must implement to operate as a Mnemonix.Store.
+  @moduledoc false
 
-  Also provides default implementations for everything but the `Mnemonix.Store.Behaviours.Core` functions.
+  @typedoc """
+  A module implementing `Mnemonix.Store.Behaviour`.
   """
+  @type t :: Module.t
+
+  @typedoc """
+  An instruction to the Mnemonix.Store.server to rais an error in the client.
+  """
+  @type exception :: {:raise, Module.t, raise_opts :: Keyword.t}
 
   @doc false
   defmacro __using__(_) do
     quote location: :keep do
 
       use Mnemonix.Store.Behaviours.Core
-      use Mnemonix.Store.Behaviours.Lifecycle
       use Mnemonix.Store.Behaviours.Map
       use Mnemonix.Store.Behaviours.Expiry
       use Mnemonix.Store.Behaviours.Bump
@@ -36,8 +41,8 @@ defmodule Mnemonix.Store.Behaviour do
           iex> Mnemonix.fetch(store, :foo)
           :error
       """
-      @spec start_link()                              :: GenServer.on_start
-      @spec start_link(GenServer.options)             :: GenServer.on_start
+      @spec start_link()                  :: GenServer.on_start
+      @spec start_link(GenServer.options) :: GenServer.on_start
       def start_link(opts \\ []) do
         Mnemonix.Store.Server.start_link(__MODULE__, opts)
       end
@@ -49,7 +54,7 @@ defmodule Mnemonix.Store.Behaviour do
       The returned `t:GenServer.server/0` reference can be used as the primary
       argument to the `Mnemonix` API.
       """
-      @spec start_link(Mnemonix.Store.opts, GenServer.options) :: GenServer.on_start
+      @spec start_link(Mnemonix.Store.Server.options, GenServer.options) :: GenServer.on_start
       def start_link(init, opts) do
         Mnemonix.Store.Server.start_link({__MODULE__, init}, opts)
       end

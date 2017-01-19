@@ -9,7 +9,10 @@ defmodule Mnemonix.Features.Bump do
     end
   end
 
-  use Mnemonix.Store.Types, [:store, :key, :bump_op]
+  @typedoc """
+  The return value of a bump operation.
+  """
+  @type bump_op :: :ok | {:error, :no_integer}
 
   @doc """
   Adds `amount` to the value of the integer entry under `key` in `store`.
@@ -40,7 +43,8 @@ defmodule Mnemonix.Features.Bump do
       iex> Mnemonix.bump(store, :c, "foo")
       {:error, :no_integer}
   """
-  @spec bump(store, key, amount :: term) :: bump_op | no_return
+  @spec bump(Mnemonix.store, Mnemonix.key, amount :: term)
+    :: bump_op | no_return
   def bump(store, key, amount) do
     with {:raise, type, args} <- GenServer.call(store, {:bump, key, amount}) do
       raise type, args
@@ -76,7 +80,8 @@ defmodule Mnemonix.Features.Bump do
       iex> Mnemonix.bump!(store, :d, "foo")
       ** (ArithmeticError) value provided to operation is not an integer
   """
-  @spec bump!(store, key, amount :: term) :: :ok | no_return
+  @spec bump!(Mnemonix.store, Mnemonix.key, amount :: term)
+    :: :ok | no_return
   def bump!(store, key, amount) do
     with {:raise, type, args} <- GenServer.call(store, {:bump!, key, amount}) do
       raise type, args
@@ -107,7 +112,8 @@ defmodule Mnemonix.Features.Bump do
       iex> Mnemonix.get(store, :c)
       "foo"
   """
-  @spec increment(store, key) :: store | no_return
+  @spec increment(Mnemonix.store, Mnemonix.key)
+    :: Mnemonix.store | no_return
   def increment(store, key) do
     case GenServer.call(store, {:increment, key}) do
       :ok                  -> store
@@ -144,7 +150,8 @@ defmodule Mnemonix.Features.Bump do
       iex> Mnemonix.get(store, :d)
       0
   """
-  @spec increment(store, key, amount :: term) :: store | no_return
+  @spec increment(Mnemonix.store, Mnemonix.key, amount :: term)
+    :: Mnemonix.store | no_return
   def increment(store, key, amount) do
     case GenServer.call(store, {:increment, key, amount}) do
       :ok                  -> store
@@ -176,7 +183,8 @@ defmodule Mnemonix.Features.Bump do
       iex> Mnemonix.get(store, :c)
       "foo"
   """
-  @spec decrement(store, key) :: store | no_return
+  @spec decrement(Mnemonix.store, Mnemonix.key)
+    :: Mnemonix.store | no_return
   def decrement(store, key) do
     case GenServer.call(store, {:decrement, key}) do
       :ok                  -> store
@@ -213,7 +221,8 @@ defmodule Mnemonix.Features.Bump do
       iex> Mnemonix.get(store, :d)
       0
   """
-  @spec decrement(store, key, amount :: term) :: store | no_return
+  @spec decrement(Mnemonix.store, Mnemonix.key, amount :: term)
+    :: Mnemonix.store | no_return
   def decrement(store, key, amount) do
     case GenServer.call(store, {:decrement, key, amount}) do
       :ok                  -> store

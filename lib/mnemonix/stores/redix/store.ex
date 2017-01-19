@@ -13,7 +13,6 @@ if Code.ensure_loaded?(Redix) do
     """
 
     use Mnemonix.Store.Behaviour
-    use Mnemonix.Store.Types, [:store, :opts, :state, :key, :value, :exception]
 
     alias Mnemonix.Store
     alias Mnemonix.Redix.Exception
@@ -29,14 +28,16 @@ if Code.ensure_loaded?(Redix) do
 
     All other options are passed verbatim to `Redix.start_link/2`.
     """
-    @spec setup(opts) :: {:ok, state}
+    @spec setup(Mnemonix.Store.options)
+      :: {:ok, state :: term} | {:stop, reason :: any}
     def setup(opts) do
       {conn, options} = Keyword.get_and_update(opts, :conn, fn _ -> :pop end)
 
       Redix.start_link(conn || "redis://localhost:6379", options)
     end
 
-    @spec delete(store, key) :: {:ok, store} | exception
+    @spec delete(Mnemonix.Store.t, Mnemonix.key)
+      :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
     def delete(store = %Store{state: conn}, key) do
       case Redix.command(conn, ~w[DEL #{key}]) do
         {:ok, 1}         -> {:ok, store}
@@ -44,7 +45,8 @@ if Code.ensure_loaded?(Redix) do
       end
     end
 
-    @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error} | exception
+    @spec fetch(Mnemonix.Store.t, Mnemonix.key)
+      :: {:ok, Mnemonix.Store.t, {:ok, Mnemonix.value} | :error} | Mnemonix.Store.Behaviour.exception
     def fetch(store = %Store{state: conn}, key) do
       case Redix.command(conn, ~w[GET #{key}]) do
         {:ok, nil}       -> {:ok, store, :error}
@@ -53,7 +55,8 @@ if Code.ensure_loaded?(Redix) do
       end
     end
 
-    @spec put(store, key, Store.value) :: {:ok, store} | exception
+    @spec put(Mnemonix.Store.t, Mnemonix.key, Store.value)
+      :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
     def put(store = %Store{state: conn}, key, value) do
       case Redix.command(conn, ~w[SET #{key} #{value}]) do
         {:ok, "OK"}      -> {:ok, store}

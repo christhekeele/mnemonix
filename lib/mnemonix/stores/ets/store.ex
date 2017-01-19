@@ -12,7 +12,6 @@ defmodule Mnemonix.Stores.ETS do
   """
 
   use Mnemonix.Store.Behaviour
-  use Mnemonix.Store.Types, [:store, :opts, :state, :key, :value, :exception]
 
   alias Mnemonix.Store
   alias Mnemonix.ETS.Exception
@@ -51,7 +50,8 @@ defmodule Mnemonix.Stores.ETS do
 
     *Default:* `false`
   """
-  @spec setup(opts) :: {:ok, state} | {:stop, reason :: any}
+  @spec setup(Mnemonix.Store.options)
+    :: {:ok, state :: term} | {:stop, reason :: any}
   def setup(opts) do
     table   = Keyword.get(opts, :table) || Module.concat(__MODULE__, Table)
     privacy = Keyword.get(opts, :privacy) || :private
@@ -83,7 +83,8 @@ defmodule Mnemonix.Stores.ETS do
     end
   end
 
-  @spec delete(store, key) :: {:ok, store} | exception
+  @spec delete(Mnemonix.Store.t, Mnemonix.key)
+    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
   def delete(store = %Store{state: table}, key) do
     if :ets.delete(table, key) do
       {:ok, store}
@@ -94,7 +95,8 @@ defmodule Mnemonix.Stores.ETS do
     end
   end
 
-  @spec fetch(store, key) :: {:ok, store, {:ok, value} | :error} | exception
+  @spec fetch(Mnemonix.Store.t, Mnemonix.key)
+    :: {:ok, Mnemonix.Store.t, {:ok, Mnemonix.value} | :error} | Mnemonix.Store.Behaviour.exception
   def fetch(store = %Store{state: table}, key) do
     case :ets.lookup(table, key) do
       [{^key, value} | []] -> {:ok, store, {:ok, value}}
@@ -103,7 +105,8 @@ defmodule Mnemonix.Stores.ETS do
     end
   end
 
-  @spec put(store, key, Store.value) :: {:ok, store} | exception
+  @spec put(Mnemonix.Store.t, Mnemonix.key, Store.value)
+    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
   def put(store = %Store{state: table}, key, value) do
     if :ets.insert(table, {key, value}) do
       {:ok, store}

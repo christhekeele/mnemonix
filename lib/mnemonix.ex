@@ -1,6 +1,6 @@
 defmodule Mnemonix do
   @moduledoc """
-  Easy access to `Mnemonix.Store` servers with a Map-like interface.
+  Provides easy access to a `Mnemonix.Store.Server` through a Map-like interface.
 
   Rather than a map, you can use the `t:GenServer.server/0` reference returned
   by `Mnemonix.Store.Server.start_link/2` to perform operations on Mnemonix stores.
@@ -14,13 +14,10 @@ defmodule Mnemonix do
 
   ## Map Features
 
-  You make calls to `Mnemonix.Store` servers as if they were Maps.
-
-  Rather than a map, you use the `t:GenServer.server/0` reference returned
-  by `Mnemonix.Store.Server.start_link/2` to perform operations on Mnemonix stores.
+  Most of the functions available in the `Map` module are implemented through `Mnemonix.Features.Map`.
 
   The `new/0`, `new/1`, and `new/3` functions start links to a
-  `Mnemonix.Stores.Map` (mimicking `Map.new`) to make it easy to play with the
+  `Mnemonix.Stores.Map` (mimicking `Map.new`) and make it easy to play with the
   Mnemonix interface:
 
       iex> store = Mnemonix.new(fizz: 1)
@@ -84,6 +81,21 @@ defmodule Mnemonix do
 
   use Application
 
+  @typedoc """
+  Keys allowed in Mnemonix entries.
+  """
+  @type key :: term
+
+  @typedoc """
+  Values allowed in Mnemonix entries.
+  """
+  @type value :: term
+
+  @typedoc """
+  Values representing a store that Mnemonix functions can operate on.
+  """
+  @type store :: pid | GenServer.name
+
   @doc """
   Starts the Mnemonix Application, supervising the configured `stores`.
 
@@ -111,13 +123,13 @@ defmodule Mnemonix do
   each registered by the name used in the configuration,
   all supervised by a simple-one-for-one `Mnemonix.Store.Supervisor`.
   """
+  @spec start(Application.start_type, opts :: term) ::
+    {:ok, store} | {:error, reason :: term}
   def start(_type, opts) do
     :mnemonix
     |> Application.get_env(:stores, [])
     |> Mnemonix.Store.Supervisor.start_link(opts)
   end
-
-  use Mnemonix.Store.Types, [:store, :key, :value]
 
   @doc """
   Starts a new `Mnemonix.Stores.Map server` with an empty map.
