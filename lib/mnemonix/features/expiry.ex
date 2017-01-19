@@ -1,6 +1,6 @@
 defmodule Mnemonix.Features.Expiry do
   @moduledoc """
-  Invokes expiry operations on a running Mnemonix.Store.Server.
+  Functions to manage the time-to-live of entries within a `Mnemonix.Store.Server`.
   """
 
   defmacro __using__(opts) do

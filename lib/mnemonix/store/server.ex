@@ -1,6 +1,6 @@
 defmodule Mnemonix.Store.Server do
   @moduledoc """
-  Bridges `Mnemonix.Features` with Mnemonix.Store.Behaviour implementations.
+  Bridges `Mnemonix.Features` with underlying `Mnemonix.Stores`.
   """
 
   @typedoc """

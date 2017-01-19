@@ -1,6 +1,6 @@
 defmodule Mnemonix.Stores.ETS do
   @moduledoc """
-  A `Mnemonix.Store` module that uses an ETS table to store state.
+  A `Mnemonix.Store` that uses an ETS table to store state.
 
       iex> {:ok, store} = Mnemonix.Stores.ETS.start_link
       iex> Mnemonix.put(store, :foo, "bar")
@@ -11,10 +11,13 @@ defmodule Mnemonix.Stores.ETS do
       nil
   """
 
+  defmodule Exception do
+    defexception [:message]
+  end
+
   use Mnemonix.Store.Behaviour
 
   alias Mnemonix.Store
-  alias Mnemonix.ETS.Exception
 
   @doc """
   Creates a new ETS table to store state.

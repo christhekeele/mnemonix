@@ -24,7 +24,6 @@ defmodule Mnemonix.Builder do
 
   defmacro __using__(opts) do
     quote location: :keep do
-      use Mnemonix.Features.Core, unquote(opts)
       use Mnemonix.Features.Map, unquote(opts)
       use Mnemonix.Features.Bump, unquote(opts)
       use Mnemonix.Features.Expiry, unquote(opts)

@@ -1,9 +1,9 @@
-if Code.ensure_loaded?(Redix) do
-  defmodule Mnemonix.Stores.Redix do
+if Code.ensure_loaded?(Memcache) do
+  defmodule Mnemonix.Stores.Memcachex do
     @moduledoc """
-    A `Mnemonix.Store` that uses Redix to store state in redis.
+    A `Mnemonix.Store` that uses Memcachex to store state in memcached.
 
-        iex> {:ok, store} = Mnemonix.Stores.Redix.start_link
+        iex> {:ok, store} = Mnemonix.Stores.Memcachex.start_link
         iex> Mnemonix.put(store, :foo, "bar")
         iex> Mnemonix.get(store, :foo)
         "bar"
@@ -12,35 +12,33 @@ if Code.ensure_loaded?(Redix) do
         nil
     """
 
+    defmodule Exception do
+      defexception [:message]
+    end
+
     use Mnemonix.Store.Behaviour
 
     alias Mnemonix.Store
-    alias Mnemonix.Redix.Exception
 
     @doc """
-    Connects to redis to store data.
+    Connects to memcached to store data.
 
-    ## Options
-
-    - `conn:` The Redis to connect to, as either a string or list of opts w/ host, port, password, and database.
-
-      *Default:* `"redis://localhost:6379"`
-
-    All other options are passed verbatim to `Redix.start_link/2`.
+    All options are passed verbatim to `Memcache.start_link/1`.
     """
     @spec setup(Mnemonix.Store.options)
       :: {:ok, state :: term} | {:stop, reason :: any}
     def setup(opts) do
-      {conn, options} = Keyword.get_and_update(opts, :conn, fn _ -> :pop end)
+      options = opts
+      |> Keyword.put(:coder, Memcache.Coder.Erlang)
 
-      Redix.start_link(conn || "redis://localhost:6379", options)
+      Memcache.start_link(options)
     end
 
     @spec delete(Mnemonix.Store.t, Mnemonix.key)
       :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
     def delete(store = %Store{state: conn}, key) do
-      case Redix.command(conn, ~w[DEL #{key}]) do
-        {:ok, 1}         -> {:ok, store}
+      case Memcache.delete(conn, key) do
+        {:ok}            -> {:ok, store}
         {:error, reason} -> {:raise, Exception, [reason: reason]}
       end
     end
@@ -48,18 +46,18 @@ if Code.ensure_loaded?(Redix) do
     @spec fetch(Mnemonix.Store.t, Mnemonix.key)
       :: {:ok, Mnemonix.Store.t, {:ok, Mnemonix.value} | :error} | Mnemonix.Store.Behaviour.exception
     def fetch(store = %Store{state: conn}, key) do
-      case Redix.command(conn, ~w[GET #{key}]) do
-        {:ok, nil}       -> {:ok, store, :error}
-        {:ok, value}     -> {:ok, store, {:ok, value}}
-        {:error, reason} -> {:raise, Exception, [reason: reason]}
+      case Memcache.get(conn, key) do
+        {:error, "Key not found"} -> {:ok, store, :error}
+        {:ok, value}              -> {:ok, store, {:ok, value}}
+        {:error, reason}          -> {:raise, Exception, [reason: reason]}
       end
     end
 
     @spec put(Mnemonix.Store.t, Mnemonix.key, Store.value)
       :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
     def put(store = %Store{state: conn}, key, value) do
-      case Redix.command(conn, ~w[SET #{key} #{value}]) do
-        {:ok, "OK"}      -> {:ok, store}
+      case Memcache.set(conn, key, value) do
+        {:ok}            -> {:ok, store}
         {:error, reason} -> {:raise, Exception, [reason: reason]}
       end
     end

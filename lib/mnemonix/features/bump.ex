@@ -1,6 +1,6 @@
 defmodule Mnemonix.Features.Bump do
   @moduledoc """
-  Invokes bump operations on a running Mnemonix.Store.Server.
+  Functions to increment/decrement integer values within a `Mnemonix.Store.Server`.
   """
 
   defmacro __using__(opts) do
