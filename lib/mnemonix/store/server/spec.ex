@@ -1,7 +1,6 @@
 defmodule Mnemonix.Store.Server.Spec do
-  @moduledoc """
-  Utilities for building standardized representations of `Mnemonix.Store.Server`s for `Supervisor`s.
-  """
+  @moduledoc false
+  # Utilities for building standardized representations of `Mnemonix.Store.Server`s for `Supervisor`s.
 
   @keys ~w[name impl opts]a
   @enforce_keys @keys
@@ -34,7 +33,7 @@ defmodule Mnemonix.Store.Server.Spec do
   end
 
   def default_opts do
-    [impl: Mnemonix.Map.Store, opts: []]
+    [impl: Mnemonix.Stores.Map, opts: []]
   end
 
 end

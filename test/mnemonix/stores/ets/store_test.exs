@@ -1,6 +1,6 @@
-defmodule Mnemonix.ETS.Store.Test do
+defmodule Mnemonix.Stores.ETS.Test do
   use ExUnit.Case, async: true
 
-  doctest Mnemonix.ETS.Store
+  doctest Mnemonix.Stores.ETS
 
 end

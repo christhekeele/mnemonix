@@ -1,7 +1,13 @@
-defmodule Mnemonix.Bump.Functions do
+defmodule Mnemonix.Features.Bump do
   @moduledoc """
   Invokes bump operations on a running Mnemonix.Store.Server.
   """
+
+  defmacro __using__(_) do
+    quote do
+      use Mnemonix.Feature, module: unquote(__MODULE__)
+    end
+  end
 
   use Mnemonix.Store.Types, [:store, :key, :bump_op]
 

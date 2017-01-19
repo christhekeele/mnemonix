@@ -1,6 +1,6 @@
-defmodule Mnemonix.Map.Store.Test do
+defmodule Mnemonix.Stores.Map.Test do
   use ExUnit.Case, async: true
 
-  doctest Mnemonix.Map.Store
+  doctest Mnemonix.Stores.Map
 
 end

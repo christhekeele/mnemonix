@@ -13,12 +13,12 @@ defmodule Mnemonix.Store.Server do
 
   ## Examples
 
-    iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Map.Store)
+    iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map)
     iex> Mnemonix.put(store, :foo, :bar)
     iex> Mnemonix.get(store, :foo)
     :bar
 
-    iex> {:ok, store} = Mnemonix.Store.Server.start_link({Mnemonix.Map.Store, initial: %{foo: :bar}})
+    iex> {:ok, store} = Mnemonix.Store.Server.start_link({Mnemonix.Stores.Map, initial: %{foo: :bar}})
     iex> Mnemonix.get(store, :foo)
     :bar
   """
@@ -36,12 +36,12 @@ defmodule Mnemonix.Store.Server do
 
   ## Examples
 
-      iex> {:ok, _store} = Mnemonix.Store.Server.start_link(Mnemonix.Map.Store, name: StoreCache)
+      iex> {:ok, _store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, name: StoreCache)
       iex> Mnemonix.put(StoreCache, :foo, :bar)
       iex> Mnemonix.get(StoreCache, :foo)
       :bar
 
-      iex> {:ok, _store} = Mnemonix.Store.Server.start_link({Mnemonix.Map.Store, initial: %{foo: :bar}}, name: OtherCache)
+      iex> {:ok, _store} = Mnemonix.Store.Server.start_link({Mnemonix.Stores.Map, initial: %{foo: :bar}}, name: OtherCache)
       iex> Mnemonix.get(OtherCache, :foo)
       :bar
   """

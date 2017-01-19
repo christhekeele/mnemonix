@@ -1,6 +1,6 @@
-defmodule Mnemonix.Redix.Store.Test do
+defmodule Mnemonix.Stores.Redix.Test do
   use ExUnit.Case, async: true
 
-  doctest Mnemonix.Redix.Store
+  doctest Mnemonix.Stores.Redix
 
 end

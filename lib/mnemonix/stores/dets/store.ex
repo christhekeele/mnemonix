@@ -1,8 +1,8 @@
-defmodule Mnemonix.DETS.Store do
+defmodule Mnemonix.Stores.DETS do
   @moduledoc """
   A `Mnemonix.Store` module that uses a DETS table to store state.
 
-      iex> {:ok, store} = Mnemonix.DETS.Store.start_link
+      iex> {:ok, store} = Mnemonix.Stores.DETS.start_link
       iex> Mnemonix.put(store, :foo, "bar")
       iex> Mnemonix.get(store, :foo)
       "bar"

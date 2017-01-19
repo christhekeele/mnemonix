@@ -1,13 +1,13 @@
-defmodule Mnemonix.Map.Functions do
+defmodule Mnemonix.Features.Map do
   @moduledoc """
   Invokes map operations on a running Mnemonix.Store.Server.
   """
 
-  # defmacro __using__(_) do
-  #   quote do
-  #     @before_compile unquote(__MODULE__)
-  #   end
-  # end
+  defmacro __using__(_) do
+    quote do
+      use Mnemonix.Feature, module: unquote(__MODULE__)
+    end
+  end
 
   use Mnemonix.Store.Types, [:store, :key, :value]
 
@@ -22,7 +22,7 @@ defmodule Mnemonix.Map.Functions do
       iex> Mnemonix.fetch!(store, :a)
       1
       iex> Mnemonix.fetch!(store, :b)
-      ** (KeyError) key :b not found in: Mnemonix.Map.Store
+      ** (KeyError) key :b not found in: Mnemonix.Stores.Map
   """
   @spec fetch!(store, key) :: {:ok, value} | :error | no_return
   def fetch!(store, key) do
@@ -156,7 +156,7 @@ defmodule Mnemonix.Map.Functions do
       iex> {_value, ^store} = Mnemonix.get_and_update!(store, :b, fn current ->
       ...>   {current, "new value!"}
       ...> end)
-      ** (KeyError) key :b not found in: Mnemonix.Map.Store
+      ** (KeyError) key :b not found in: Mnemonix.Stores.Map
 
       iex> store = Mnemonix.new(%{a: 1})
       iex> {value, ^store} = Mnemonix.get_and_update!(store, :a, fn _ -> :pop end)
@@ -167,7 +167,7 @@ defmodule Mnemonix.Map.Functions do
 
       iex> store = Mnemonix.new(%{a: 1})
       iex> {_value, ^store} = Mnemonix.get_and_update!(store, :b, fn _ -> :pop end)
-      ** (KeyError) key :b not found in: Mnemonix.Map.Store
+      ** (KeyError) key :b not found in: Mnemonix.Stores.Map
   """
   @spec get_and_update!(store, key, (value -> {get, value}))
     :: {get, store} | no_return when get: term
@@ -397,7 +397,7 @@ defmodule Mnemonix.Map.Functions do
       iex> Mnemonix.get(store, :a)
       2
       iex> Mnemonix.update!(store, :b, &(&1 * 2))
-      ** (KeyError) key :b not found in: Mnemonix.Map.Store
+      ** (KeyError) key :b not found in: Mnemonix.Stores.Map
   """
   @spec update!(store, key, (value -> value)) :: store | no_return
   def update!(store, key, fun) do

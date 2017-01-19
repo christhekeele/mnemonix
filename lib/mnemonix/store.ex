@@ -1,18 +1,17 @@
 defmodule Mnemonix.Store do
-  @moduledoc """
-  Normalizes access to different key-value stores behind a `GenServer`.
-
-  Once a store [has been started](Mnemonix.Store.Server#start_link/1), you can use `Mnemonix`
-  methods to manipulate it:
-
-      iex> Mnemonix.Store.Server.start_link(Mnemonix.Map.Store, name: Store)
-      iex> Mnemonix.put(Store, :foo, "bar")
-      iex> Mnemonix.fetch(Store, :foo)
-      {:ok, "bar"}
-      iex> Mnemonix.delete(Store, :foo)
-      iex> Mnemonix.fetch(Store, :foo)
-      :error
-  """
+  @moduledoc false
+  # Normalizes access to different key-value stores behind a `GenServer`.
+  #
+  # Once a store [has been started](Mnemonix.Store.Server#start_link/1), you can use `Mnemonix`
+  # methods to manipulate it:
+  #
+  #     iex> Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, name: Store)
+  #     iex> Mnemonix.put(Store, :foo, "bar")
+  #     iex> Mnemonix.fetch(Store, :foo)
+  #     {:ok, "bar"}
+  #     iex> Mnemonix.delete(Store, :foo)
+  #     iex> Mnemonix.fetch(Store, :foo)
+  #     :error
 
   @typedoc """
   A module implementing `Mnemonix.Store.Behaviour`.

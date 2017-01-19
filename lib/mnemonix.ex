@@ -13,7 +13,7 @@ defmodule Mnemonix do
   by `Mnemonix.Store.Server.start_link/2` to perform operations on Mnemonix stores.
 
   The `new/0`, `new/1`, and `new/3` functions start links to a
-  `Mnemonix.Map.Store` (mimicking `Map.new`) to make it easy to play with the
+  `Mnemonix.Stores.Map` (mimicking `Map.new`) to make it easy to play with the
   Mnemonix interface:
 
       iex> store = Mnemonix.new(fizz: 1)
@@ -113,7 +113,7 @@ defmodule Mnemonix do
   use Mnemonix.Store.Types, [:store, :key, :value]
 
   @doc """
-  Starts a new `Mnemonix.Map.Store server` with an empty map.
+  Starts a new `Mnemonix.Stores.Map server` with an empty map.
 
   ## Examples
 
@@ -125,13 +125,13 @@ defmodule Mnemonix do
   """
   @spec new() :: store
   def new() do
-    with {:ok, store} <- Mnemonix.Store.Server.start_link(Mnemonix.Map.Store) do
+    with {:ok, store} <- Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map) do
       store
     end
   end
 
   @doc """
-  Starts a new `Mnemonix.Map.Store` server from the `enumerable`.
+  Starts a new `Mnemonix.Stores.Map` server from the `enumerable`.
 
   Duplicated keys are removed; the latest one prevails.
 
@@ -145,12 +145,12 @@ defmodule Mnemonix do
   """
   @spec new(Enum.t) :: store
   def new(enumerable) do
-    init = {Mnemonix.Map.Store, [initial: Map.new(enumerable)]}
+    init = {Mnemonix.Stores.Map, [initial: Map.new(enumerable)]}
     with {:ok, store} <- Mnemonix.Store.Server.start_link(init), do: store
   end
 
   @doc """
-  Starts a new `Mnemonix.Map.Store` server from the `enumerable` via
+  Starts a new `Mnemonix.Stores.Map` server from the `enumerable` via
   the `transformation` function.
 
   Duplicated keys are removed; the latest one prevails.
@@ -167,12 +167,10 @@ defmodule Mnemonix do
   """
   @spec new(Enum.t, (term -> {key, value})) :: store
   def new(enumerable, transform) do
-    init = {Mnemonix.Map.Store, [initial: Map.new(enumerable, transform)]}
+    init = {Mnemonix.Stores.Map, [initial: Map.new(enumerable, transform)]}
     with {:ok, store} <- Mnemonix.Store.Server.start_link(init), do: store
   end
 
-  use Mnemonix.API
-
-  # use Mnemonix.API.Map
+  use Mnemonix.Builder
 
 end

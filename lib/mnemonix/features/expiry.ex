@@ -1,7 +1,13 @@
-defmodule Mnemonix.Expiry.Functions do
+defmodule Mnemonix.Features.Expiry do
   @moduledoc """
   Invokes expiry operations on a running Mnemonix.Store.Server.
   """
+
+  defmacro __using__(_) do
+    quote do
+      use Mnemonix.Feature, module: unquote(__MODULE__)
+    end
+  end
 
   use Mnemonix.Store.Types, [:store, :key, :value, :ttl]
 

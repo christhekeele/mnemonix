@@ -1,4 +1,4 @@
-defmodule Mnemonix.Mnesia.Store.Test do
+defmodule Mnemonix.Stores.Mnesia.Test do
   use ExUnit.Case, async: true
 
   setup do
@@ -9,9 +9,9 @@ defmodule Mnemonix.Mnesia.Store.Test do
   end
 
   # Intermittent failures:
-  # test doc at Mnemonix.Mnesia.Store.start_link/1 (2) (Mnemonix.Mnesia.StoreTest)
+  # test doc at Mnemonix.Stores.Mnesia.start_link/1 (2) (Mnemonix.Stores.MnesiaTest)
   #    test/mnemonix/stores/mnesia/store_test.exs:11
   #    ** (EXIT from #PID<0.xxx.0>) {:node_not_running, :nonode@nohost}
-  # doctest Mnemonix.Mnesia.Store
+  # doctest Mnemonix.Stores.Mnesia
 
 end

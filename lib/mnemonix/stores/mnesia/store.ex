@@ -1,4 +1,4 @@
-defmodule Mnemonix.Mnesia.Store do
+defmodule Mnemonix.Stores.Mnesia do
   @moduledoc """
   A `Mnemonix.Store` module that uses a Mnesia table to store state.
 
@@ -6,7 +6,7 @@ defmodule Mnemonix.Mnesia.Store do
   and the Mnesia application must have been started:
 
       iex> :mnesia.create_schema([node])
-      iex> {:ok, store} = Mnemonix.Mnesia.Store.start_link
+      iex> {:ok, store} = Mnemonix.Stores.Mnesia.start_link
       iex> Mnemonix.put(store, :foo, "bar")
       iex> Mnemonix.get(store, :foo)
       "bar"

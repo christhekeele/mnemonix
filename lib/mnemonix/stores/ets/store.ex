@@ -1,8 +1,8 @@
-defmodule Mnemonix.ETS.Store do
+defmodule Mnemonix.Stores.ETS do
   @moduledoc """
   A `Mnemonix.Store` module that uses an ETS table to store state.
 
-      iex> {:ok, store} = Mnemonix.ETS.Store.start_link
+      iex> {:ok, store} = Mnemonix.Stores.ETS.start_link
       iex> Mnemonix.put(store, :foo, "bar")
       iex> Mnemonix.get(store, :foo)
       "bar"

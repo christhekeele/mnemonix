@@ -1,9 +1,9 @@
 if Code.ensure_loaded?(Redix) do
-  defmodule Mnemonix.Redix.Store do
+  defmodule Mnemonix.Stores.Redix do
     @moduledoc """
     A `Mnemonix.Store` that uses Redix to store state in redis.
 
-        iex> {:ok, store} = Mnemonix.Redix.Store.start_link
+        iex> {:ok, store} = Mnemonix.Stores.Redix.start_link
         iex> Mnemonix.put(store, :foo, "bar")
         iex> Mnemonix.get(store, :foo)
         "bar"

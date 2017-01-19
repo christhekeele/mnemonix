@@ -1,9 +1,9 @@
 if Code.ensure_loaded?(Memcache) do
-  defmodule Mnemonix.Memcachex.Store do
+  defmodule Mnemonix.Stores.Memcachex do
     @moduledoc """
     A `Mnemonix.Store` that uses Memcachex to store state in memcached.
 
-        iex> {:ok, store} = Mnemonix.Memcachex.Store.start_link
+        iex> {:ok, store} = Mnemonix.Stores.Memcachex.start_link
         iex> Mnemonix.put(store, :foo, "bar")
         iex> Mnemonix.get(store, :foo)
         "bar"

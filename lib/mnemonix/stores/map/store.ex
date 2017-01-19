@@ -1,4 +1,4 @@
-defmodule Mnemonix.Map.Store do
+defmodule Mnemonix.Stores.Map do
   @moduledoc """
   A `Mnemonix.Store` that uses a map to store state.
 
@@ -8,7 +8,7 @@ defmodule Mnemonix.Map.Store do
   It intentionally doesn't override any optional callback with native versions
   so that the default implementations can be easily tested.
 
-      iex> {:ok, store} = Mnemonix.Map.Store.start_link
+      iex> {:ok, store} = Mnemonix.Stores.Map.start_link
       iex> Mnemonix.put(store, :foo, "bar")
       iex> Mnemonix.get(store, :foo)
       "bar"
