@@ -1,5 +1,7 @@
 defmodule Mnemonix.Store.Server do
-  @moduledoc false
+  @moduledoc """
+  Bridges Mnemonix.Features with Mnemonix.Store.Behaviour implementations.
+  """
 
   use Mnemonix.Store.Types, [:store, :impl, :opts]
 
@@ -104,7 +106,7 @@ defmodule Mnemonix.Store.Server do
       timeout: pos_integer
 
   ####
-  # Mnemonix.Store.Core.Behaviour
+  # Mnemonix.Store.Behaviours.Core
   ##
 
   def handle_call({:delete, key}, _, store = %Mnemonix.Store{impl: impl}) do
@@ -129,7 +131,7 @@ defmodule Mnemonix.Store.Server do
   end
 
   ####
-  # Mnemonix.Store.Map.Behaviour
+  # Mnemonix.Store.Behaviours.Map
   ##
 
   def handle_call({:fetch!, key}, _, store = %Mnemonix.Store{impl: impl}) do
@@ -231,7 +233,7 @@ defmodule Mnemonix.Store.Server do
   end
 
   ####
-  # Mnemonix.Store.Expiry.Behaviour
+  # Mnemonix.Store.Behaviours.Expiry
   ##
 
   def handle_call({:expire, key, ttl}, _, store = %Mnemonix.Store{impl: impl}) do
@@ -256,7 +258,7 @@ defmodule Mnemonix.Store.Server do
   end
 
   ####
-  # Mnemonix.Store.Bump.Behaviour
+  # Mnemonix.Store.Behaviours.Bump
   ##
 
   def handle_call({:bump, key, amount}, _, store = %Mnemonix.Store{impl: impl}) do

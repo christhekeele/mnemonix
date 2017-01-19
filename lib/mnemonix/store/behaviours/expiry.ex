@@ -1,4 +1,4 @@
-defmodule Mnemonix.Store.Expiry.Behaviour do
+defmodule Mnemonix.Store.Behaviours.Expiry do
   @moduledoc false
 
   use Mnemonix.Store.Types, [:store, :key, :value, :ttl, :exception]

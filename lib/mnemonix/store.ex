@@ -1,5 +1,5 @@
 defmodule Mnemonix.Store do
-  @moduledoc false
+  @moduledoc """
   # Normalizes access to different key-value stores behind a `GenServer`.
   #
   # Once a store [has been started](Mnemonix.Store.Server#start_link/1), you can use `Mnemonix`
@@ -12,6 +12,7 @@ defmodule Mnemonix.Store do
   #     iex> Mnemonix.delete(Store, :foo)
   #     iex> Mnemonix.fetch(Store, :foo)
   #     :error
+  """
 
   @typedoc """
   A module implementing `Mnemonix.Store.Behaviour`.
@@ -19,7 +20,7 @@ defmodule Mnemonix.Store do
   @type impl :: Module.t
 
   @typedoc """
-  Options supplied to `c:Mnemonix.Store.Core.Behaviour.setup/1` to initialize
+  Options supplied to `c:Mnemonix.Store.Behaviours.Core.setup/1` to initialize
   the `t:impl/0`.
   """
   @type opts :: Keyword.t

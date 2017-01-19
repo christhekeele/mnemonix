@@ -1,4 +1,4 @@
-defmodule Mnemonix.Store.Lifecycle.Behaviour do
+defmodule Mnemonix.Store.Behaviours.Lifecycle do
   @moduledoc false
 
   use Mnemonix.Store.Types, [:store]

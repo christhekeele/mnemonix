@@ -3,9 +3,9 @@ defmodule Mnemonix.Features.Expiry do
   Invokes expiry operations on a running Mnemonix.Store.Server.
   """
 
-  defmacro __using__(_) do
+  defmacro __using__(opts) do
     quote do
-      use Mnemonix.Feature, module: unquote(__MODULE__)
+      use Mnemonix.Feature, [unquote_splicing(opts), module: unquote(__MODULE__)]
     end
   end
 
@@ -49,7 +49,7 @@ defmodule Mnemonix.Features.Expiry do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> Mnemonix.expire(store, :a, 1)
+      iex> Mnemonix.expire(store, :a, 200)
       iex> Mnemonix.persist(store, :a)
       iex> :timer.sleep(200)
       iex> Mnemonix.get(store, :a)

@@ -1,4 +1,4 @@
-defmodule Mnemonix.Store.Bump.Behaviour do
+defmodule Mnemonix.Store.Behaviours.Bump do
   @moduledoc false
 
   use Mnemonix.Store.Types, [:store, :key, :bump_op, :exception]

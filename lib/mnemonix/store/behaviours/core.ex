@@ -1,4 +1,4 @@
-defmodule Mnemonix.Store.Core.Behaviour do
+defmodule Mnemonix.Store.Behaviours.Core do
   @moduledoc false
 
   @doc false

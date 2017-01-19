@@ -3,9 +3,9 @@ defmodule Mnemonix.Features.Map do
   Invokes map operations on a running Mnemonix.Store.Server.
   """
 
-  defmacro __using__(_) do
+  defmacro __using__(opts) do
     quote do
-      use Mnemonix.Feature, module: unquote(__MODULE__)
+      use Mnemonix.Feature, [unquote_splicing(opts), module: unquote(__MODULE__)]
     end
   end
 

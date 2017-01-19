@@ -1,4 +1,4 @@
-defmodule Mnemonix.Store.Map.Behaviour do
+defmodule Mnemonix.Store.Behaviours.Map do
   @moduledoc false
 
   use Mnemonix.Store.Types, [:store, :key, :value, :exception]
