@@ -1,20 +1,23 @@
 defmodule Mnemonix do
   @moduledoc """
-  Easy access to `Mnemonix.Store` servers with a Map-like interface.
+  Provides easy access to a `Mnemonix.Store.Server` through a Map-like interface.
 
   Rather than a map, you can use the `t:GenServer.server/0` reference returned
-  by `Mnemonix.Store.start_link/2` to perform operations on Mnemonix stores.
+  by `Mnemonix.Store.Server.start_link/2` to perform operations on Mnemonix stores.
 
-  ## Map Operations
+  All functions defined in the `Mnemonix.Features` modules are available on the `Mnemonix` module:
 
-  You make calls to `Mnemonix.Store` servers as if they were Maps.
+  - `Mnemonix.Features.Map`
+  - `Mnemonix.Features.Bump`
+  - `Mnemonix.Features.Expiry`
 
-  Rather than a map, you use the `t:GenServer.server/0` reference returned
-  by `Mnemonix.Store.start_link/2` to perform operations on Mnemonix stores.
+  ## Map Features
 
-  The `new/0`, `new/1`, and `new/3` functions start links to a
-  `Mnemonix.Map.Store` (mimicking `Map.new`) to make it easy to play with the
-  Mnemonix interface:
+  `Mnemonix.Features.Map` lets you manipulate a `Mnemonix.Store.Server` just like a `Map`.
+
+  The `new/0`, `new/1`, and `new/2` functions start links to a
+  `Mnemonix.Stores.Map` (mimicking `Map.new`) and make it easy to play with the
+  Mnemonix functions:
 
       iex> store = Mnemonix.new(fizz: 1)
       iex> Mnemonix.get(store, :foo)
@@ -37,44 +40,167 @@ defmodule Mnemonix do
       iex> Mnemonix.get(store, :fizz)
       4
 
-  These functions behave exactly like their Map counterparts. However, `Mnemonix`
+  These functions behave exactly like their `Map` counterparts. However, `Mnemonix`
   doesn't supply analogs for functions that assume a store can be exhaustively
   iterated or fit into a specific shape:
 
-  - `equal?(Map.t, Map.t) :: boolean`
-  - `from_struct(Struct.t) :: Map.t`
-  - `keys(Map.t) :: [keys]`
-  - `merge(Map.t, Map.t) :: Map.t`
-  - `merge(Map.t, Map.t, callback) :: Map.t`
-  - `split(Map.t, keys) :: Map.t`
-  - `take(Map.t, keys) :: Map.t`
-  - `to_list(Map.t) :: Map.t`
-  - `values(Map.t) :: [values]`
+  - `Map.equal?/2`
+  - `Map.from_struct/1`
+  - `Map.keys/1`
+  - `Map.merge/2`
+  - `Map.merge/3`
+  - `Map.split/2`
+  - `Map.take/2`
+  - `Map.to_list/1`
+  - `Map.values/1`
 
-  ## Expiry Operations
+## Bump Features
 
-  Mnemonix lets you set entries to expire after a given time-to-live on any store.
+`Mnemonix.Features.Bump` lets you perform increment/decrement operations on any store.
 
-      # iex> store = Mnemonix.new(fizz: 1)
-      # iex> Mnemonix.expires(store, :fizz, 1)
-      # iex> :timer.sleep(1)
-      # iex> Mnemonix.get(store, :fizz)
-      # nil
+  iex> store = Mnemonix.new(fizz: 1)
+  iex> Mnemonix.increment(store, :fizz)
+  iex> Mnemonix.get(store, :fizz)
+  2
+  iex> Mnemonix.decrement(store, :fizz)
+  iex> Mnemonix.get(store, :fizz)
+  1
 
-  ## Bump Operations
+  ## Expiry Features
 
-  Mnemonix lets you perform increment/decrement operations on any store.
+  `Mnemonix.Features.Expiry` lets you set entries to expire after a given time-to-live on any store.
 
       iex> store = Mnemonix.new(fizz: 1)
-      iex> Mnemonix.increment(store, :fizz)
+      iex> Mnemonix.expire(store, :fizz, 100)
+      iex> :timer.sleep(1000)
       iex> Mnemonix.get(store, :fizz)
-      2
-      iex> Mnemonix.decrement(store, :fizz)
-      iex> Mnemonix.get(store, :fizz)
-      1
+      nil
 
   """
 
-  use Mnemonix.API
+  @typedoc """
+  Keys allowed in Mnemonix entries.
+  """
+  @type key :: term
+
+  @typedoc """
+  Values allowed in Mnemonix entries.
+  """
+  @type value :: term
+
+  @typedoc """
+  Values representing a store that Mnemonix functions can operate on.
+  """
+  @type store :: pid | GenServer.name
+
+  use Application
+
+  @doc """
+  Starts the `:mnemonix` application, supervising stores declared in your application configuration.
+
+  Mnemonix can manage your stores for you. To do so, it looks in your config files for named stores:
+
+  ```elixir
+  config :mnemonix, stores: [:foo, :bar]
+  ```
+
+  For all stores so listed, it will check for store-specific configuration:
+
+  ```elixir
+  config :mnemonix, :foo, [
+    impl: Memonix.ETS.Store,
+    opts: [
+      table: :my_ets_table
+    ]
+  ]
+  ```
+
+  If no configuration is found, it will use the `default` configuration provided to the application.
+  Applications started through mix refer to `Mnemonix.Store.Spec.default/0` to determine this
+  default, which currently uses `Mnemonix.Stores.Map` to create your configured stores.
+
+  The name of the store in your config will be the reference you pass to `Mnemonix` to interact with it.
+
+  Given the config above, `:foo` would refer to an ETS-backed store,
+  and `:bar` to a default Map-backed store,
+  both available to you at boot time without writing a line of code.
+
+  ```elixir
+  Mnemonix.put(:foo, :a, :b)
+  Mnemonix.get(:foo, :a)
+  #=> :b
+
+  Mnemonix.put(:bar, :a, :b)
+  Mnemonix.get(:bar, :a)
+  #=> :b
+  ```
+  """
+  @spec start(Application.start_type, opts :: term) ::
+    {:ok, store} | {:error, reason :: term}
+  def start(_type, default) do
+    :mnemonix
+    |> Application.get_env(:stores, default)
+    |> Mnemonix.Store.Supervisor.start_link
+  end
+
+  @doc """
+  Starts a new empty `Mnemonix.Stores.Map`-powered `Mnemonix.Store.Server`.
+
+  ## Examples
+
+      iex> store = Mnemonix.new
+      iex> Mnemonix.get(store, :a)
+      nil
+      iex> Mnemonix.get(store, :b)
+      nil
+  """
+  @spec new() :: store
+  def new() do
+    with {:ok, store} <- Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map) do
+      store
+    end
+  end
+
+  @doc """
+  Starts a new `Mnemonix.Stores.Map`-powered `Mnemonix.Store.Server` using `enumerable` for initial data.
+
+  Duplicated keys in the `enumerable` are removed; the last mentioned one prevails.
+
+  ## Examples
+
+      iex> store = Mnemonix.new(a: 1)
+      iex> Mnemonix.get(store, :a)
+      1
+      iex> Mnemonix.get(store, :b)
+      nil
+  """
+  @spec new(Enum.t) :: store
+  def new(enumerable) do
+    init = {Mnemonix.Stores.Map, [initial: Map.new(enumerable)]}
+    with {:ok, store} <- Mnemonix.Store.Server.start_link(init), do: store
+  end
+
+  @doc """
+  Starts a new `Mnemonix.Stores.Map`-powered `Mnemonix.Store.Server` applying a `transformation` to `enumerable` for initial data.
+
+  Duplicated keys are removed; the latest one prevails.
+
+  ## Examples
+
+      iex> store = Mnemonix.new(%{"A" => 0}, fn {key, value} ->
+      ...>  { String.downcase(key), value + 1 }
+      ...> end )
+      iex> Mnemonix.get(store, "a")
+      1
+      iex> Mnemonix.get(store, "A")
+      nil
+  """
+  @spec new(Enum.t, (term -> {key, value})) :: store
+  def new(enumerable, transform) do
+    init = {Mnemonix.Stores.Map, [initial: Map.new(enumerable, transform)]}
+    with {:ok, store} <- Mnemonix.Store.Server.start_link(init), do: store
+  end
+
+  use Mnemonix.Builder
 
 end

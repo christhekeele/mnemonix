@@ -24,9 +24,10 @@ defmodule Mnemonix.Mixfile do
 
   def application, do: [
     applications: [:logger],
+    mod: {Mnemonix, Mnemonix.Store.Server.Spec.default_opts()},
   ]
 
-  defp deps, do: tools ++ backends
+  defp deps, do: tools() ++ backends()
 
   defp tools, do: [
     {:dialyxir,    "~> 0.3.5", only: :dev},

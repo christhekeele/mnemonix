@@ -1,4 +1,4 @@
-defmodule MnemonixTest do
+defmodule Mnemonix.Test do
   use ExUnit.Case, async: true
 
   doctest Mnemonix
@@ -12,8 +12,8 @@ defmodule MnemonixTest do
       merge: 2,
       merge: 3,
       size: 1,
-      split: 2, # TODO
-      take: 2, # TODO
+      split: 2,
+      take: 2,
       to_list: 1,
       values: 1,
     ]
