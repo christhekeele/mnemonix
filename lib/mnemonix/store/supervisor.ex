@@ -1,34 +1,54 @@
 defmodule Mnemonix.Store.Supervisor do
-  @moduledoc false
 
-  alias Mnemonix.Store.Server.Spec
+  use Supervisor
 
-  def start_link(stores, opts \\ []) do
-    Supervisor.start_link(__MODULE__, stores, opts)
+  alias Mnemonix.Store.Server
+
+  @moduledoc """
+  A pre-rolled supervisor to complement `Mnemonix.Store.Server`.
+  """
+
+  # alias Mnemonix.Store.Server.Spec
+
+  @doc """
+  Creates and supervises a `Mnemonix.Store.Server` from each entry in `config`.
+
+  `options` are passed verbatim into `Supervisor.start_link/3`.
+
+  `config` is expected to be a list of lists, where item is a worker specification for a
+  `Mnemonix.Store.Server`. A specification should contain:
+
+  - an `impl` - a `Mnemonix.Stores` module to use in the worker
+  - some `opts` - a value to provide to the worker store module's `setup/1` function
+  - a `name` - an optional name for the worker to register itself under so you can access it later
+
+  The format of this specification is very fluid:
+
+  - `{otp_app, name}`
+
+    Looks in the application configuration of `otp_app` for configuration options under `name` to use.
+
+  - `{name, [impl: impl, opts: opts]}`
+
+    Allows you to furnish a `Keyword` list of `Keyword` lists to build workers from.
+
+  - `[impl: impl, opts: opts, name: name]`
+
+    A simple `Keyword` list of the required data.
+  """
+  @spec start_link(Server.config | [Server.config], Supervisor.options) :: Supervisor.on_start
+  def start_link(config, opts \\ []) do
+    Supervisor.start_link(__MODULE__, config, opts)
   end
 
-  def init(stores) do
-    stores
-    |> specs
-    |> Enum.map(&Spec.worker/1)
+  @doc false
+  def init(config) do
+    config
+    |> List.wrap
+    |> Enum.map(fn {impl, opts} ->
+      Supervisor.Spec.worker(Server, [impl, opts], id: make_ref())
+    end)
     |> Supervisor.Spec.supervise(strategy: :one_for_one)
-  end
-
-  def specs(stores) do
-    stores
-    |> coerce_specs([])
-    |> :lists.reverse
-  end
-
-  defp coerce_specs([], specs), do: specs
-  defp coerce_specs([spec = {_, %Spec{}} | rest], specs) do
-    coerce_specs(rest, [spec | specs])
-  end
-  defp coerce_specs([{name, opts} | rest], specs) do
-    coerce_specs(rest, [Spec.new({name, opts}) | specs])
-  end
-  defp coerce_specs([name | rest], specs) do
-    coerce_specs([{name, Spec.default_opts()} | rest], specs)
   end
 
 end

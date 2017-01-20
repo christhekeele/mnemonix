@@ -12,7 +12,7 @@ defmodule Mnemonix.Builder do
   iex> defmodule My.Store do
   ...>   use Mnemonix.Builder
   ...>   def start_link do
-  ...>     Mnemonix.Store.Server.start_link(Mnemonix.Stores.ETS, name: __MODULE__)
+  ...>     Mnemonix.Store.Server.start_link(Mnemonix.Stores.ETS, server: [name: __MODULE__])
   ...>   end
   ...> end
   iex> {:ok, store} = My.Store.start_link
@@ -25,7 +25,7 @@ defmodule Mnemonix.Builder do
   iex> defmodule My.Singleton do
   ...>   use Mnemonix.Builder, singleton: true
   ...>   def start_link do
-  ...>     Mnemonix.Store.Server.start_link(Mnemonix.Stores.ETS, name: __MODULE__)
+  ...>     Mnemonix.Store.Server.start_link(Mnemonix.Stores.ETS, server: [name: __MODULE__])
   ...>   end
   ...> end
   iex> My.Singleton.start_link

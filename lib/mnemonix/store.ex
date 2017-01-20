@@ -2,7 +2,7 @@ defmodule Mnemonix.Store do
   @moduledoc false
 
   @typedoc """
-  Container `Mnemonix.Store.Server` state.
+  Container for `Mnemonix.Store.Server` state.
   """
   @type t :: %__MODULE__{
     impl: Mnemonix.Store.Behaviour.t,

@@ -107,12 +107,10 @@ defmodule Mnemonix do
   For all stores so listed, it will check for store-specific configuration:
 
   ```elixir
-  config :mnemonix, :foo, [
-    impl: Memonix.ETS.Store,
-    opts: [
-      table: :my_ets_table
-    ]
-  ]
+  config :mnemonix, :foo, {Memonix.ETS.Store, [
+    store: [table: :my_ets_table],
+    server: []
+  ]}
   ```
 
   If no configuration is found, it will use the `default` configuration provided to the application.
@@ -137,10 +135,23 @@ defmodule Mnemonix do
   """
   @spec start(Application.start_type, opts :: term) ::
     {:ok, store} | {:error, reason :: term}
-  def start(_type, default) do
+  def start(_type, [default]) do
     :mnemonix
-    |> Application.get_env(:stores, default)
+    |> Application.get_env(:stores, [])
+    |> Enum.map(fn name ->
+      :mnemonix
+      |> Application.get_env(name, default)
+      |> start_defaults(name)
+    end)
     |> Mnemonix.Store.Supervisor.start_link
+  end
+
+  defp start_defaults({module, opts}, name) do
+    {module, opts
+      |> Keyword.put(:otp_app, :mnemonix)
+      |> Keyword.put_new(:server, [])
+      |> Kernel.put_in([:server, :name], name)
+    }
   end
 
   @doc """
@@ -176,8 +187,7 @@ defmodule Mnemonix do
   """
   @spec new(Enum.t) :: store
   def new(enumerable) do
-    init = {Mnemonix.Stores.Map, [initial: Map.new(enumerable)]}
-    with {:ok, store} <- Mnemonix.Store.Server.start_link(init), do: store
+    do_new Map.new(enumerable)
   end
 
   @doc """
@@ -197,8 +207,12 @@ defmodule Mnemonix do
   """
   @spec new(Enum.t, (term -> {key, value})) :: store
   def new(enumerable, transform) do
-    init = {Mnemonix.Stores.Map, [initial: Map.new(enumerable, transform)]}
-    with {:ok, store} <- Mnemonix.Store.Server.start_link(init), do: store
+    do_new Map.new(enumerable, transform)
+  end
+
+  defp do_new(map) do
+    options = [store: [initial: map]]
+    with {:ok, store} <- Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, options), do: store
   end
 
   use Mnemonix.Builder

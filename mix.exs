@@ -5,7 +5,7 @@ defmodule Mnemonix.Mixfile do
     name: "Mnemonix",
     app: :mnemonix,
 
-    version: "0.5.0",
+    version: "0.5.1",
     elixir: "~> 1.3",
 
     build_embedded: Mix.env == :prod,
@@ -24,7 +24,7 @@ defmodule Mnemonix.Mixfile do
 
   def application, do: [
     applications: [:logger],
-    mod: {Mnemonix, Mnemonix.Store.Server.Spec.default_opts()},
+    mod: {Mnemonix, [{Mnemonix.Stores.Map, []}]},
   ]
 
   defp deps, do: tools() ++ backends()

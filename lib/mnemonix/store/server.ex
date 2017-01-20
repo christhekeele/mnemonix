@@ -3,24 +3,42 @@ defmodule Mnemonix.Store.Server do
   Bridges `Mnemonix.Features` with underlying `Mnemonix.Stores`.
   """
 
-  @typedoc """
-  Adapter and optional initialization options for `Mnemonix.Store.Server.start_link/1`.
-  """
-  @type init :: Mnemonix.Store.Behaviour.t | {Mnemonix.Store.Behaviour.t, options}
+  use GenServer
 
   @typedoc """
-  Options supplied to `c:Mnemonix.Store.Behaviours.Core.setup/1` to initialize
-  the `t:impl/0`.
+  Options used to start a `Mnemonix.Store.Server`.
   """
-  @type options :: Keyword.t
+  @type options :: [
+    otp_app: atom,
+    store: Mnemonix.Store.options,
+    server: GenServer.opts,
+  ]
+
+  @typedoc """
+  A two-tuple describing a store type and options to start it.
+  """
+  @type config :: {Module.t, options}
 
   @doc """
-  Starts a new `Mnemonix.Store.Server` using `impl`.
+  Starts a new `Mnemonix.Store.Server` using the provided `module` and `options`.
 
-  If you wish to pass options to `GenServer.start_link/3`, use `start_link/2`.
+  Available `options` are:
 
-  The returned `t:GenServer.server/0` reference can be used in
-  the `Mnemonix` API.
+  - `:store`
+
+    Options to be given to the store on setup. Study the store `module` for more information.
+
+  - `:server`
+
+    A keyword list of options to be given to `GenServer`.
+
+  - `:otp_app`
+
+    Fetches more options for the above from `config otp_app, module, options`, and merges them together.
+    If no otp_app is specified, will check under `config :mnemonix, module, options`.
+    Options supplied directly to this function will override any found in the configuration.
+
+  The returned `t:GenServer.server/0` reference can be used in the `Mnemonix` API.
 
   ## Examples
 
@@ -29,44 +47,50 @@ defmodule Mnemonix.Store.Server do
     iex> Mnemonix.get(store, :foo)
     :bar
 
-    iex> {:ok, store} = Mnemonix.Store.Server.start_link({Mnemonix.Stores.Map, initial: %{foo: :bar}})
-    iex> Mnemonix.get(store, :foo)
+    iex> options = [store: [initial: %{foo: :bar}], server: [name: StoreCache]]
+    iex> {:ok, _store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, options)
+    iex> Mnemonix.get(StoreCache, :foo)
     :bar
   """
-  @spec start_link(init) :: GenServer.on_start
-  def start_link(init) do
-    start_link(init, [])
+  @spec start_link(Mnemonix.Store.Behaviour.t, options) :: GenServer.on_start
+  def start_link(impl, options \\ []) do
+    config = options
+      |> Keyword.get(:otp_app, :mnemonix)
+      |> Application.get_env(impl, [])
+    [store, server] = for option <- [:store, :server] do
+      config
+      |> Keyword.get(option, [])
+      |> Keyword.merge(Keyword.get(options, option, []))
+    end
+    start_link impl, store, server
   end
 
   @doc """
-  Starts a new `Mnemonix.Store.Server` using `impl` with `opts`.
+  Starts a new `Mnemonix.Store.Server` using `module`, and `store` options, and `server` options.
 
-  The returned `t:GenServer.server/0` reference can be used in
-  the `Mnemonix` API.
+  `store` will be given to the store on setup. Study the store `module` for more information.
+
+  `server` options be given to `GenServer.start_link/3`.
+
+  No application configuration checking option merging is performed.
 
   ## Examples
 
-      iex> {:ok, _store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, name: StoreCache)
-      iex> Mnemonix.put(StoreCache, :foo, :bar)
-      iex> Mnemonix.get(StoreCache, :foo)
-      :bar
+    iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, [], [])
+    iex> Mnemonix.put(store, :foo, :bar)
+    iex> Mnemonix.get(store, :foo)
+    :bar
 
-      iex> {:ok, _store} = Mnemonix.Store.Server.start_link({Mnemonix.Stores.Map, initial: %{foo: :bar}}, name: OtherCache)
-      iex> Mnemonix.get(OtherCache, :foo)
-      :bar
+    iex> store = [initial: %{foo: :bar}]
+    iex> server = [name: StoreCache]
+    iex> {:ok, _store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, store, server)
+    iex> Mnemonix.get(StoreCache, :foo)
+    :bar
   """
-  @spec start_link(init, GenServer.options) :: GenServer.on_start
-  def start_link(init, opts)
-
-  def start_link(impl, opts) when not is_tuple impl do
-    start_link({impl, []}, opts)
+  @spec start_link(Mnemonix.Store.Behaviour.t, Mnemonix.Store.options, GenServer.opts) :: GenServer.on_start
+  def start_link(impl, store, server) do
+    GenServer.start_link(__MODULE__, {impl, store}, server)
   end
-
-  def start_link(init, opts) do
-    GenServer.start_link(__MODULE__, init, opts)
-  end
-
-  use GenServer
 
   @doc """
   Prepares the underlying store type for usage with supplied options.
@@ -74,7 +98,7 @@ defmodule Mnemonix.Store.Server do
   Invokes the `c:Mnemonix.Core.Behaviour.setup/1` and `c:Mnemonix.Expiry.Behaviour.setup_expiry/1`
   callbacks.
   """
-  @spec init({Mnemonix.Store.Behaviour.t, options})
+  @spec init({Mnemonix.Store.Behaviour.t, Mnemonix.Store.options})
     :: {:ok, Mnemonix.Store.t} | :ignore | {:stop, reason :: term}
   def init({impl, opts}) do
     with {:ok, state} <- impl.setup(opts),
