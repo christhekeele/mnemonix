@@ -15,7 +15,7 @@ defmodule Mnemonix.Store.Supervisor do
 
   `options` are passed verbatim into `Supervisor.start_link/3`.
 
-  `config` can be a single `t:Mnemonix.Store.Server.config` or a list of them.
+  `config` can be a single `t:Mnemonix.Store.Server.config/0` or a list of them.
   """
   @spec start_link(Server.config | [Server.config], Supervisor.options) :: Supervisor.on_start
   def start_link(config, options \\ []) do

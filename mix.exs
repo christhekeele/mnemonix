@@ -27,7 +27,7 @@ defmodule Mnemonix.Mixfile do
     mod: {Mnemonix, [{Mnemonix.Stores.Map, []}]},
   ]
 
-  defp deps, do: tools() ++ backends()
+  defp deps, do: tools() ++ backends() ++ integrations()
 
   defp tools, do: [
     {:dialyxir,    "~> 0.3.5", only: :dev},
@@ -39,6 +39,10 @@ defmodule Mnemonix.Mixfile do
   defp backends, do: [
     {:redix,     ">= 0.0.0", only: [:dev, :test]},
     {:memcachex, ">= 0.0.0", only: [:dev, :test]},
+  ]
+
+  defp integrations, do: [
+    {:plug, ">= 0.0.0", only: [:dev, :test]},
   ]
 
   defp docs, do: [

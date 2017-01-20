@@ -3,8 +3,7 @@ Mnemonix
 
 > *A unified interface to key-value stores.*
 
-
-[hex]:                 https://hex.pm/packages/mnemonix
+[hex]: https://hex.pm/packages/mnemonix
 [hex-version-badge]:   https://img.shields.io/hexpm/v/mnemonix.svg?maxAge=86400&style=flat-square
 [hex-downloads-badge]: https://img.shields.io/hexpm/dt/mnemonix.svg?maxAge=86400&style=flat-square
 [hex-license-badge]:   https://img.shields.io/badge/license-MIT-7D26CD.svg?maxAge=86400&style=flat-square
@@ -41,11 +40,11 @@ Learn more about starting a `Mnemonix.Store.Server` and manipulating it with the
 [status]: https://travis-ci.org/christhekeele/mnemonix
 [coverage]: https://coveralls.io/github/christhekeele/mnemonix
 
-[master]:              https://github.com/christhekeele/mnemonix/tree/master
+[master]: https://github.com/christhekeele/mnemonix/tree/master
 [master-status]: https://img.shields.io/travis/christhekeele/mnemonix/master.svg?maxAge=86400&style=flat-square
 [master-coverage]: https://img.shields.io/coveralls/christhekeele/mnemonix/master.svg?maxAge=86400&style=flat-square
 
-[development]:              https://github.com/christhekeele/mnemonix/tree/development
+[development]: https://github.com/christhekeele/mnemonix/tree/development
 [development-status]: https://img.shields.io/travis/christhekeele/mnemonix/development.svg?maxAge=86400&style=flat-square
 [development-coverage]: https://img.shields.io/coveralls/christhekeele/mnemonix/development.svg?maxAge=86400&style=flat-square
 
@@ -55,8 +54,9 @@ Obviously, `Mnemonix` gives you `Map`-style functions to manipulate various key-
 
 Available features are:
 
-- `Mnemonix.Bump` - Increment/decrement integer values
-- `Mnemonix.Expiry` - Set entries to remove themselves from the store with a ttl
+- `Mnemonix.Features.Map` - The key-value manipulation you know and love
+- `Mnemonix.Features.Bump` - Increment/decrement integer values
+- `Mnemonix.Features.Expiry` - Set entries to remove themselves from the store with a ttl
 
 ## Installation
 
@@ -64,7 +64,7 @@ Available features are:
 
   ```elixir
   def deps do
-    [{:mnemonix, "~> 0.6.1"}]
+    [{:mnemonix, "~> 0.6.2"}]
   end
   ```
 
