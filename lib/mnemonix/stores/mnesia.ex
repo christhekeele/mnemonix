@@ -3,15 +3,14 @@ defmodule Mnemonix.Stores.Mnesia do
   A `Mnemonix.Store` that uses a Mnesia table to store state.
 
   Before using, your current node should be part of a Mnesia schema
-  and the Mnesia application must have been started:
+  and the Mnesia application must have been started.
 
-      iex> :mnesia.create_schema([node])
       iex> {:ok, store} = Mnemonix.Stores.Mnesia.start_link
-      iex> Mnemonix.put(store, :foo, "bar")
-      iex> Mnemonix.get(store, :foo)
+      iex> Mnemonix.put(store, "foo", "bar")
+      iex> Mnemonix.get(store, "foo")
       "bar"
-      iex> Mnemonix.delete(store, :foo)
-      iex> Mnemonix.get(store, :foo)
+      iex> Mnemonix.delete(store, "foo")
+      iex> Mnemonix.get(store, "foo")
       nil
   """
 

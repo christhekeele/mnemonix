@@ -3,11 +3,11 @@ defmodule Mnemonix.Stores.ETS do
   A `Mnemonix.Store` that uses an ETS table to store state.
 
       iex> {:ok, store} = Mnemonix.Stores.ETS.start_link
-      iex> Mnemonix.put(store, :foo, "bar")
-      iex> Mnemonix.get(store, :foo)
+      iex> Mnemonix.put(store, "foo", "bar")
+      iex> Mnemonix.get(store, "foo")
       "bar"
-      iex> Mnemonix.delete(store, :foo)
-      iex> Mnemonix.get(store, :foo)
+      iex> Mnemonix.delete(store, "foo")
+      iex> Mnemonix.get(store, "foo")
       nil
   """
 

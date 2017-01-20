@@ -9,11 +9,11 @@ defmodule Mnemonix.Stores.Map do
   so that the default implementations can be easily tested.
 
       iex> {:ok, store} = Mnemonix.Stores.Map.start_link
-      iex> Mnemonix.put(store, :foo, "bar")
-      iex> Mnemonix.get(store, :foo)
+      iex> Mnemonix.put(store, "foo", "bar")
+      iex> Mnemonix.get(store, "foo")
       "bar"
-      iex> Mnemonix.delete(store, :foo)
-      iex> Mnemonix.get(store, :foo)
+      iex> Mnemonix.delete(store, "foo")
+      iex> Mnemonix.get(store, "foo")
       nil
   """
 

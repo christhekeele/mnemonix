@@ -4,11 +4,11 @@ if Code.ensure_loaded?(Redix) do
     A `Mnemonix.Store` that uses Redix to store state in redis.
 
         iex> {:ok, store} = Mnemonix.Stores.Redix.start_link
-        iex> Mnemonix.put(store, :foo, "bar")
-        iex> Mnemonix.get(store, :foo)
+        iex> Mnemonix.put(store, "foo", "bar")
+        iex> Mnemonix.get(store, "foo")
         "bar"
-        iex> Mnemonix.delete(store, :foo)
-        iex> Mnemonix.get(store, :foo)
+        iex> Mnemonix.delete(store, "foo")
+        iex> Mnemonix.get(store, "foo")
         nil
     """
 

@@ -23,7 +23,7 @@ defmodule Mnemonix.Store.Behaviour do
       @store __MODULE__ |> Inspect.inspect(%Inspect.Opts{})
 
       @doc """
-      Starts a new `Mnemonix.Store` using the `#{@store}` module with `options`.
+      Starts a new `Mnemonix.Store.Server` using the `#{@store}` module with `options`.
 
       The `options` are the same as described in `Mnemonix.Store.Server.start_link/2`.
 
@@ -37,9 +37,9 @@ defmodule Mnemonix.Store.Behaviour do
           iex> Mnemonix.get(store, "foo")
           "bar"
 
-          iex> {:ok, _store} = #{@store}.start_link([], [name: StoreCache])
-          iex> Mnemonix.put(StoreCache, "foo", "bar")
-          iex> Mnemonix.get(StoreCache, "foo")
+          iex> {:ok, _store} = #{@store}.start_link([], [name: My.#{@store}])
+          iex> Mnemonix.put(My.#{@store}, "foo", "bar")
+          iex> Mnemonix.get(My.#{@store}, "foo")
           "bar"
       """
       @spec start_link()                              :: GenServer.on_start
@@ -49,7 +49,7 @@ defmodule Mnemonix.Store.Behaviour do
       end
 
       @doc """
-      Starts a new `Mnemonix.Store` using the `#{@store}` with `store` and `server` options.
+      Starts a new `Mnemonix.Store.Server` using the `#{@store}` with `store` and `server` options.
 
       The options are the same as described in `Mnemonix.Store.Server.start_link/3`.
 
@@ -63,9 +63,9 @@ defmodule Mnemonix.Store.Behaviour do
           iex> Mnemonix.get(store, "foo")
           "bar"
 
-          iex> {:ok, _store} = #{@store}.start_link([], [name: StoreCache])
-          iex> Mnemonix.put(StoreCache, "foo", "bar")
-          iex> Mnemonix.get(StoreCache, "foo")
+          iex> {:ok, _store} = #{@store}.start_link([], [name: My.#{@store}])
+          iex> Mnemonix.put(My.#{@store}, "foo", "bar")
+          iex> Mnemonix.get(My.#{@store}, "foo")
           "bar"
       """
       @spec start_link(Mnemonix.Store.Server.options, GenServer.options) :: GenServer.on_start
