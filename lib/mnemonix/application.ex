@@ -17,8 +17,8 @@ defmodule Mnemonix.Application do
   ]}
   ```
 
-  If no configuration is found for a named store, it will use the a default configuration.
-  Applications started through mix use `Mnemonix.Stores.Map` as their default.
+  If no configuration is found for a named store, it will use a default configuration
+  of `{Mnemonix.Stores.Map, []}`.
 
   The name of the store in your config will be the reference you pass to `Mnemonix`
   to interact with it.
@@ -27,7 +27,7 @@ defmodule Mnemonix.Application do
   both available to you at boot time without writing a line of code:
 
   ```elixir
-  Application.start(:mnemonix)
+  Application.ensure_started(:mnemonix)
 
   Mnemonix.put(:foo, :a, :b)
   Mnemonix.get(:foo, :a)

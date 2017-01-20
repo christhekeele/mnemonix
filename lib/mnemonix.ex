@@ -58,17 +58,17 @@ defmodule Mnemonix do
 
 `Mnemonix.Features.Bump` lets you perform increment/decrement operations on any store.
 
-  iex> store = Mnemonix.new(fizz: 1)
-  iex> Mnemonix.increment(store, :fizz)
-  iex> Mnemonix.get(store, :fizz)
-  2
-  iex> Mnemonix.decrement(store, :fizz)
-  iex> Mnemonix.get(store, :fizz)
-  1
+      iex> store = Mnemonix.new(fizz: 1)
+      iex> Mnemonix.increment(store, :fizz)
+      iex> Mnemonix.get(store, :fizz)
+      2
+      iex> Mnemonix.decrement(store, :fizz)
+      iex> Mnemonix.get(store, :fizz)
+      1
 
-  ## Expiry Features
+## Expiry Features
 
-  `Mnemonix.Features.Expiry` lets you set entries to expire after a given time-to-live on any store.
+`Mnemonix.Features.Expiry` lets you set entries to expire after a given time-to-live on any store.
 
       iex> store = Mnemonix.new(fizz: 1)
       iex> Mnemonix.expire(store, :fizz, 100)
