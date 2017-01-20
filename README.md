@@ -8,7 +8,7 @@ Mnemonix
 [hex-downloads-badge]: https://img.shields.io/hexpm/dt/mnemonix.svg?maxAge=86400&style=flat-square
 [hex-license-badge]:   https://img.shields.io/badge/license-MIT-7D26CD.svg?maxAge=86400&style=flat-square
 
-[![Version][hex-version-badge] ![Hex][hex-downloads-badge] ![License][hex-license-badge]][hex]
+![Version][hex-version-badge] ![Downloads][hex-downloads-badge] ![License][hex-license-badge]
 
 ## Synopsis
 
