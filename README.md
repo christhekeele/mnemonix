@@ -51,7 +51,7 @@ Learn more about starting a `Mnemonix.Store` and manipulating it with the `Mnemo
 
 ## Features
 
-Obviously, `Mnemonix` gives you `Map`-style functions to manipulate various key-value stores. However, `Mnemonix` also offers extra features beyond simple Map functions. Stores that don't naitively support these features have the capability added through an Elixir polyfill, guaranteeing you can use and switch stores without worrying about what features they support under the hood.
+Obviously, `Mnemonix` gives you `Map`-style functions to manipulate various key-value stores. However, `Mnemonix` also offers extra features beyond simple Map functions. Stores that don't natively support these features have the capability added through an Elixir polyfill, guaranteeing you can use and switch stores without worrying about what features they support under the hood.
 
 Available features are:
 

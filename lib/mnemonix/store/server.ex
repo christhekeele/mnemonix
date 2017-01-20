@@ -35,22 +35,23 @@ defmodule Mnemonix.Store.Server do
   - `:otp_app`
 
     Fetches more options for the above from `config otp_app, module, options`, and merges them together.
-    If no otp_app is specified, will check under `config :mnemonix, module, options`.
-    Options supplied directly to this function will override any found in the configuration.
+    If no `otp_app` is specified, will check under `config :mnemonix, module, options` for default
+    options. Options supplied directly to this function always take precedence over any found in
+    your configuration.
 
   The returned `t:GenServer.server/0` reference can be used in the `Mnemonix` API.
 
   ## Examples
 
-    iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map)
-    iex> Mnemonix.put(store, :foo, :bar)
-    iex> Mnemonix.get(store, :foo)
-    :bar
+      iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map)
+      iex> Mnemonix.put(store, :foo, :bar)
+      iex> Mnemonix.get(store, :foo)
+      :bar
 
-    iex> options = [store: [initial: %{foo: :bar}], server: [name: StoreCache]]
-    iex> {:ok, _store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, options)
-    iex> Mnemonix.get(StoreCache, :foo)
-    :bar
+      iex> options = [store: [initial: %{foo: :bar}], server: [name: StoreCache]]
+      iex> {:ok, _store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, options)
+      iex> Mnemonix.get(StoreCache, :foo)
+      :bar
   """
   @spec start_link(Mnemonix.Store.Behaviour.t, options) :: GenServer.on_start
   def start_link(impl, options \\ []) do
@@ -76,16 +77,16 @@ defmodule Mnemonix.Store.Server do
 
   ## Examples
 
-    iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, [], [])
-    iex> Mnemonix.put(store, :foo, :bar)
-    iex> Mnemonix.get(store, :foo)
-    :bar
+      iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, [], [])
+      iex> Mnemonix.put(store, :foo, :bar)
+      iex> Mnemonix.get(store, :foo)
+      :bar
 
-    iex> store = [initial: %{foo: :bar}]
-    iex> server = [name: StoreCache]
-    iex> {:ok, _store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, store, server)
-    iex> Mnemonix.get(StoreCache, :foo)
-    :bar
+      iex> store = [initial: %{foo: :bar}]
+      iex> server = [name: StoreCache]
+      iex> {:ok, _store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, store, server)
+      iex> Mnemonix.get(StoreCache, :foo)
+      :bar
   """
   @spec start_link(Mnemonix.Store.Behaviour.t, Mnemonix.Store.options, GenServer.opts) :: GenServer.on_start
   def start_link(impl, store, server) do

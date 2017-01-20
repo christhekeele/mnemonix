@@ -23,10 +23,9 @@ defmodule Mnemonix.Store.Behaviour do
       @store __MODULE__ |> Inspect.inspect(%Inspect.Opts{})
 
       @doc """
-      Starts a new `Mnemonix.Store` using the `#{@store}` module.
+      Starts a new `Mnemonix.Store` using the `#{@store}` module with `options`.
 
-      If you wish to pass configuration options to the module instead,
-      use `start_link/2` with an empty `opts` list.
+      The `options` are the same as described in `Mnemonix.Store.Server.start_link/2`.
 
       The returned `t:GenServer.server/0` reference can be used as the primary
       argument to the `Mnemonix` API.
@@ -42,21 +41,9 @@ defmodule Mnemonix.Store.Behaviour do
           :error
       """
       @spec start_link()                  :: GenServer.on_start
-      @spec start_link(GenServer.options) :: GenServer.on_start
-      def start_link(opts \\ []) do
-        Mnemonix.Store.Server.start_link(__MODULE__, opts)
-      end
-
-      @doc """
-      Starts a new `Mnemonix.Store` using the `#{@store}` module
-       with `init` opts.
-
-      The returned `t:GenServer.server/0` reference can be used as the primary
-      argument to the `Mnemonix` API.
-      """
-      @spec start_link(Mnemonix.Store.Server.options, GenServer.options) :: GenServer.on_start
-      def start_link(init, opts) do
-        Mnemonix.Store.Server.start_link({__MODULE__, init}, opts)
+      @spec start_link(Mnemonix.Store.Server.options) :: GenServer.on_start
+      def start_link(options \\ []) do
+        Mnemonix.Store.Server.start_link(__MODULE__, options)
       end
 
     end
