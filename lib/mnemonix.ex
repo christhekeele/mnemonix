@@ -96,62 +96,15 @@ defmodule Mnemonix do
   use Application
 
   @doc """
-  Starts the `:mnemonix` application, supervising stores declared in your application configuration.
+  Starts the `:mnemonix` application.
 
-  Mnemonix can manage your stores for you. To do so, it looks in your config files for named stores:
-
-  ```elixir
-  config :mnemonix, stores: [:foo, :bar]
-  ```
-
-  For all stores so listed, it will check for store-specific configuration:
-
-  ```elixir
-  config :mnemonix, :foo, {Memonix.ETS.Store, [
-    store: [table: :my_ets_table],
-    server: []
-  ]}
-  ```
-
-  If no configuration is found, it will use the `default` configuration provided to the application.
-  Applications started through mix refer to `Mnemonix.Store.Spec.default/0` to determine this
-  default, which currently uses `Mnemonix.Stores.Map` to create your configured stores.
-
-  The name of the store in your config will be the reference you pass to `Mnemonix` to interact with it.
-
-  Given the config above, `:foo` would refer to an ETS-backed store,
-  and `:bar` to a default Map-backed store,
-  both available to you at boot time without writing a line of code.
-
-  ```elixir
-  Mnemonix.put(:foo, :a, :b)
-  Mnemonix.get(:foo, :a)
-  #=> :b
-
-  Mnemonix.put(:bar, :a, :b)
-  Mnemonix.get(:bar, :a)
-  #=> :b
-  ```
+  Finds stores in your application configuration and brings them up when your app starts.
+  See `Mnemonix.Application` for more.
   """
-  @spec start(Application.start_type, opts :: term) ::
-    {:ok, store} | {:error, reason :: term}
+  @spec start(Application.start_type, [Mnemonix.Store.Server.config])
+    :: {:ok, store} | {:error, reason :: term}
   def start(_type, [default]) do
-    :mnemonix
-    |> Application.get_env(:stores, [])
-    |> Enum.map(fn name ->
-      :mnemonix
-      |> Application.get_env(name, default)
-      |> start_defaults(name)
-    end)
-    |> Mnemonix.Store.Supervisor.start_link
-  end
-
-  defp start_defaults({module, opts}, name) do
-    {module, opts
-      |> Keyword.put(:otp_app, :mnemonix)
-      |> Keyword.put_new(:server, [])
-      |> Kernel.put_in([:server, :name], name)
-    }
+    Mnemonix.Application.start_link(default)
   end
 
   @doc """
