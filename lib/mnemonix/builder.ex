@@ -19,7 +19,7 @@ defmodule Mnemonix.Builder do
   1
   ```
 
-  You can pass in the option `singleton: true` to create a module that uses its own name
+  You can pass in the `:singleton` option to create a module that uses its own name
   as a `Mnemonix.Store.Server` reference, omitting the need for the first argument to all
   `Mnemonix.Feature` functions:
 
@@ -54,6 +54,22 @@ defmodule Mnemonix.Builder do
   nil
   iex> Mnemonix.put(My.Other.Singleton, :a, 1)
   iex> My.Other.Singleton.get(:a)
+  1
+  ```
+
+  You can pass a name into `:singleton` to use a different named store:
+
+  ```elixir
+  iex> Mnemonix.Stores.Map.start_link(server: [name: :store])
+  iex> defmodule My.Singleton.Interface do
+  ...>   use Mnemonix.Builder, singleton: :store
+  ...> end
+  iex> My.Singleton.Interface.get(:a)
+  nil
+  iex> Mnemonix.get(:store, :a)
+  nil
+  iex> Mnemonix.put(:store, :a, 1)
+  iex> My.Singleton.Interface.get(:a)
   1
   ```
   """
