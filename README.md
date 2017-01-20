@@ -49,11 +49,11 @@ Learn more about starting a `Mnemonix.Store` and manipulating it with the `Mnemo
 [development-status]: https://img.shields.io/travis/christhekeele/mnemonix/development.svg?maxAge=86400&style=flat-square
 [development-coverage]: https://img.shields.io/coveralls/christhekeele/mnemonix/development.svg?maxAge=86400&style=flat-square
 
-## Utilities
+## Features
 
-`Mnemonix` offers a standard set of utilities atop stores beyond simple key-value access. Stores that don't naitively support a utility have the capability added through an Elixir polyfill, guaranteeing you can use and switch stores without worrying about what features they support under the hood.
+Obviously, `Mnemonix` gives you `Map`-style functions to manipulate various key-value stores. However, `Mnemonix` also offers extra features beyond simple Map functions. Stores that don't naitively support these features have the capability added through an Elixir polyfill, guaranteeing you can use and switch stores without worrying about what features they support under the hood.
 
-Available utilities are:
+Available features are:
 
 - `Mnemonix.Bump` - Increment/decrement integer values
 - `Mnemonix.Expiry` - Set entries to remove themselves from the store with a ttl
