@@ -20,13 +20,13 @@ defmodule Mnemonix.Store.Server do
   @type config :: {Module.t, options}
 
   @doc """
-  Starts a new `Mnemonix.Store.Server` using the provided `module` and `options`.
+  Starts a new `Mnemonix.Store.Server` using the provided store `impl` and `options`.
 
   Available `options` are:
 
   - `:store`
 
-    Options to be given to the store on setup. Study the store `module` for more information.
+    Options to be given to the store on setup. Study the store `impl` for more information.
 
   - `:server`
 
@@ -66,9 +66,9 @@ defmodule Mnemonix.Store.Server do
   end
 
   @doc """
-  Starts a new `Mnemonix.Store.Server` using `module`, and `store` options, and `server` options.
+  Starts a new `Mnemonix.Store.Server` using store `impl`, `store` options, and `server` options.
 
-  `store` will be given to the store on setup. Study the store `module` for more information.
+  `store` will be given to the store on setup. Study the store `impl` for more information.
 
   `server` options be given to `GenServer.start_link/3`.
 
@@ -93,16 +93,16 @@ defmodule Mnemonix.Store.Server do
   end
 
   @doc """
-  Prepares the underlying store type for usage with supplied options.
+  Prepares the underlying store `impl` for usage with supplied `options`.
 
   Invokes the `c:Mnemonix.Core.Behaviour.setup/1` and `c:Mnemonix.Expiry.Behaviour.setup_expiry/1`
   callbacks.
   """
   @spec init({Mnemonix.Store.Behaviour.t, Mnemonix.Store.options})
     :: {:ok, Mnemonix.Store.t} | :ignore | {:stop, reason :: term}
-  def init({impl, opts}) do
-    with {:ok, state} <- impl.setup(opts),
-         store        <- Mnemonix.Store.new(impl, opts, state),
+  def init({impl, options}) do
+    with {:ok, state} <- impl.setup(options),
+         store        <- Mnemonix.Store.new(impl, options, state),
          {:ok, store} <- impl.setup_expiry(store),
     do: {:ok, store}
   end
@@ -122,7 +122,7 @@ defmodule Mnemonix.Store.Server do
   end
 
   @doc """
-  Delegates Mnemonix.API functions to the underlying store behaviours.
+  Delegates Mnemonix.Feature functions to the underlying store behaviours.
   """
   @spec handle_call(request :: term, GenServer.from, Mnemonix.Store.t) ::
     {:reply, reply, new_store} |
