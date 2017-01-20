@@ -33,17 +33,44 @@ defmodule Mnemonix.Store.Behaviour do
       ## Examples
 
           iex> {:ok, store} = #{@store}.start_link
-          iex> Mnemonix.put(store, :foo, "bar")
-          iex> Mnemonix.fetch(store, :foo)
-          {:ok, "bar"}
-          iex> Mnemonix.delete(store, :foo)
-          iex> Mnemonix.fetch(store, :foo)
-          :error
+          iex> Mnemonix.put(store, "foo", "bar")
+          iex> Mnemonix.get(store, "foo")
+          "bar"
+
+          iex> {:ok, _store} = #{@store}.start_link([], [name: StoreCache])
+          iex> Mnemonix.put(StoreCache, "foo", "bar")
+          iex> Mnemonix.get(StoreCache, "foo")
+          "bar"
       """
-      @spec start_link()                  :: GenServer.on_start
+      @spec start_link()                              :: GenServer.on_start
       @spec start_link(Mnemonix.Store.Server.options) :: GenServer.on_start
       def start_link(options \\ []) do
         Mnemonix.Store.Server.start_link(__MODULE__, options)
+      end
+
+      @doc """
+      Starts a new `Mnemonix.Store` using the `#{@store}` with `store` and `server` options.
+
+      The options are the same as described in `Mnemonix.Store.Server.start_link/3`.
+
+      The returned `t:GenServer.server/0` reference can be used as the primary
+      argument to the `Mnemonix` API.
+
+      ## Examples
+
+          iex> {:ok, store} = #{@store}.start_link([], [])
+          iex> Mnemonix.put(store, "foo", "bar")
+          iex> Mnemonix.get(store, "foo")
+          "bar"
+
+          iex> {:ok, _store} = #{@store}.start_link([], [name: StoreCache])
+          iex> Mnemonix.put(StoreCache, "foo", "bar")
+          iex> Mnemonix.get(StoreCache, "foo")
+          "bar"
+      """
+      @spec start_link(Mnemonix.Store.Server.options, GenServer.options) :: GenServer.on_start
+      def start_link(store, server) do
+        Mnemonix.Store.Server.start_link(__MODULE__, store, server)
       end
 
     end
