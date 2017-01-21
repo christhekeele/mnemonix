@@ -54,7 +54,7 @@ defmodule Mnemonix.Store.Behaviours.Bump do
       defoverridable bump!: 3
 
       defp msg_for(:amount, _key), do: "value provided to operation is not an integer"
-      defp msg_for(:value, key),   do: "value at key #{Inspect.inspect(key, %Inspect.Opts{})} is not an integer"
+      defp msg_for(:value, key),   do: "value at key #{key |> Inspect.inspect(%Inspect.Opts{})} is not an integer"
 
       @doc false
       def increment(store, key, amount \\ 1) do
@@ -98,7 +98,7 @@ defmodule Mnemonix.Store.Behaviours.Bump do
         if raise? do
           message = case no_integer do
             :amount -> "value provided to operation is not an integer"
-            :value  -> "value at key #{Inspect.inspect(key, %Inspect.Opts{})} is not an integer"
+            :value  -> "value at key #{key |> Inspect.inspect(%Inspect.Opts{})} is not an integer"
           end
           {:raise, ArithmeticError, [message: message]}
         else
