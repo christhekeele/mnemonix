@@ -7,7 +7,7 @@ defmodule Mnemonix.Store.Behaviour do
   @type t :: Module.t
 
   @typedoc """
-  An instruction to the Mnemonix.Store.server to rais an error in the client.
+  An instruction to the Mnemonix.Store.server to raise an error in the client.
   """
   @type exception :: {:raise, Module.t, raise_opts :: Keyword.t}
 

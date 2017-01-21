@@ -1,6 +1,9 @@
 defmodule Mnemonix.Feature do
   @moduledoc false
 
+  # For an synopsis of this mechanism, refer to:
+  # https://gist.github.com/christhekeele/e858881d0ca2053295c6e10d8692e6ea
+
   defmodule Registry do
     @moduledoc false
     defmacro __before_compile__(env) do

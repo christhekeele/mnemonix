@@ -1,6 +1,9 @@
 defmodule Mnemonix.Delegator do
   @moduledoc false
 
+  # For a synopsis of this mechanism, refer to:
+  # https://gist.github.com/josevalim/e0dae4d0cb568e142861
+
   defmacro __using__(opts) do
     module = Keyword.fetch!(opts, :module)
     singleton = opts[:singleton]
