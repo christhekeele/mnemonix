@@ -6,6 +6,7 @@ defmodule Mnemonix.Application do
 
   ```elixir
   config :mnemonix, stores: [:foo, :bar]
+
   ```
 
   For all stores so listed, it will check for store-specific configuration:
@@ -15,6 +16,7 @@ defmodule Mnemonix.Application do
     store: [table: :my_ets_table],
     server: []
   ]}
+
   ```
 
   If no configuration is found for a named store, it will use a default configuration
@@ -36,6 +38,7 @@ defmodule Mnemonix.Application do
   Mnemonix.put(:bar, :a, :b)
   Mnemonix.get(:bar, :a)
   #=> :b
+
   ```
   """
 
