@@ -32,8 +32,8 @@ defmodule Mnemonix.Stores.Map do
   """
   @spec setup(Mnemonix.Store.options)
     :: {:ok, state :: term} | {:stop, reason :: any}
-  def setup(opts) do
-    {:ok, Keyword.get(opts, :initial, %{})}
+  def setup(_opts) do
+    {:ok, %{}}
   end
 
   @spec delete(Mnemonix.Store.t, Mnemonix.key)
