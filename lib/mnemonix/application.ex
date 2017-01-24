@@ -4,20 +4,14 @@ defmodule Mnemonix.Application do
 
   Mnemonix can manage your stores for you. To do so, it looks in your config files for named stores:
 
-  ```elixir
-  config :mnemonix, stores: [:foo, :bar]
-
-  ```
+      config :mnemonix, stores: [:foo, :bar]
 
   For all stores so listed, it will check for store-specific configuration:
 
-  ```elixir
-  config :mnemonix, :foo, {Memonix.ETS.Store, [
-    store: [table: :my_ets_table],
-    server: []
-  ]}
-
-  ```
+      config :mnemonix, :foo, {Memonix.ETS.Store, [
+        store: [table: :my_ets_table],
+        server: []
+      ]}
 
   If no configuration is found for a named store, it will use a default configuration
   of `{Mnemonix.Stores.Map, []}`.
@@ -28,18 +22,15 @@ defmodule Mnemonix.Application do
   and `:bar` to a default Map-backed store,
   both available to you at boot time without writing a line of code:
 
-  ```elixir
-  Application.ensure_started(:mnemonix)
+      Application.ensure_started(:mnemonix)
 
-  Mnemonix.put(:foo, :a, :b)
-  Mnemonix.get(:foo, :a)
-  #=> :b
+      Mnemonix.put(:foo, :a, :b)
+      Mnemonix.get(:foo, :a)
+      #=> :b
 
-  Mnemonix.put(:bar, :a, :b)
-  Mnemonix.get(:bar, :a)
-  #=> :b
-
-  ```
+      Mnemonix.put(:bar, :a, :b)
+      Mnemonix.get(:bar, :a)
+      #=> :b
   """
 
   @doc """
