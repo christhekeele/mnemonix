@@ -30,6 +30,10 @@ defmodule Mnemonix.Stores.DETS do
 
     *Default:* `#{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}.Table`
 
+  - `initial:` A map of key/value pairs to ensure are set on the ETS table at boot.
+
+    *Default:* `%{}`
+
   The rest of the options are passed into `:dets.open_file/2` verbaitm, except
   for `type:`, which will always be `:set`.
   """

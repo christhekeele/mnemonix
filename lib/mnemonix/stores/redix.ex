@@ -29,6 +29,10 @@ if Code.ensure_loaded?(Redix) do
 
       *Default:* `"redis://localhost:6379"`
 
+    - `initial:` A map of key/value pairs to ensure are set in redis at boot.
+
+      *Default:* `%{}`
+
     All other options are passed verbatim to `Redix.start_link/2`.
     """
     @spec setup(Mnemonix.Store.options)

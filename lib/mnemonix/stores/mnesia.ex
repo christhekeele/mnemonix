@@ -39,6 +39,10 @@ defmodule Mnemonix.Stores.Mnesia do
 
     *Default:* `:both`
 
+  - `initial:` A map of key/value pairs to ensure are set on the table at boot.
+
+    *Default:* `%{}`
+
   The rest of the options are passed into `:dets.open_file/2` verbaitm, except
   for `type:`, which will always be `:set`.
   """

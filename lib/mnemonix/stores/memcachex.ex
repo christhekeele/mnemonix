@@ -23,7 +23,11 @@ if Code.ensure_loaded?(Memcache) do
     @doc """
     Connects to memcached to store data.
 
-    All options are passed verbatim to `Memcache.start_link/1`.
+  - `initial:` A map of key/value pairs to ensure are set in memcached at boot.
+
+    *Default:* `%{}`
+
+    All other options are passed verbatim to `Memcache.start_link/1`.
     """
     @spec setup(Mnemonix.Store.options)
       :: {:ok, state :: term} | {:stop, reason :: any}

@@ -52,6 +52,10 @@ defmodule Mnemonix.Stores.ETS do
   - `compressed`: Whether or not to compress the values being stored.
 
     *Default:* `false`
+
+  - `initial:` A map of key/value pairs to ensure are set on the DETS table at boot.
+
+    *Default:* `%{}`
   """
   @spec setup(Mnemonix.Store.options)
     :: {:ok, state :: term} | {:stop, reason :: any}
