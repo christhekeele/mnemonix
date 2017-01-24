@@ -5,15 +5,14 @@ defmodule Mnemonix.Adapter do
     @moduledoc false
 
     defmacro compile_adapter(env) do
-      for {identifier, code} <- Module.get_attribute(env.module, :transforms) do
-        IO.puts identifier
-        build_adapter(identifier, code)
+      for {action, code} <- Module.get_attribute(env.module, :transforms) do
+        build_adapter(action, code)
       end ++ [default_transform()]
     end
 
-    def build_adapter(identifier, code) do
+    def build_adapter(action, code) do
       quote do
-        def transform(value, unquote(identifier), options) do
+        def transform(value, unquote(action), options) do
           case {value, options}, do: unquote(code)
         end
       end
@@ -21,8 +20,11 @@ defmodule Mnemonix.Adapter do
 
     def default_transform do
       quote do
-        def transform(value, identifier, _) do
-          IO.warn "could not find transformation for #{inspect identifier} in adapter #{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}"
+        def transform(value, action, _) do
+          IO.warn """
+            could not find transformation for #{action} in adapter
+            #{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}, moving on...
+          """
           value
         end
       end
@@ -30,30 +32,35 @@ defmodule Mnemonix.Adapter do
 
     defmacro compile_pipeline(env) do
       for {adapter, transforms} <- Module.get_attribute(env.module, :adapters),
-          {identifier, code} <- transforms
+          {action, code} <- transforms
       do
-        build_pipeline(adapter, identifier, code)
+        build_pipeline(adapter, action, code)
       end ++ [default_pipeline()]
     end
 
-    def build_pipeline(adapter, identifier, code) do
-      IO.puts "building #{inspect adapter} #{inspect identifier}"
+    def build_pipeline(adapter, action, code) do
       quote do
-        def transform(value, unquote(identifier), [{unquote(adapter), options} | rest]) do
-          transform (case {value, options}, do: unquote(code)), unquote(identifier), rest # TCO'd!
+        def transform(value, unquote(action), [{unquote(adapter), options} | rest]) do
+          transform (case {value, options}, do: unquote(code)), unquote(action), rest # TCO'd!
         end
-        def transform(value, identifier, [unquote(adapter) | rest]) do
-          IO.warn "no options provided to adapter #{inspect unquote(adapter)} to #{inspect identifier} with in pipeline #{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}"
-          transform(value, identifier, rest)
+        def transform(value, action, [unquote(adapter) | rest]) do
+          IO.warn """
+            no options provided to adapter #{unquote(adapter |> Inspect.inspect(%Inspect.Opts{}))}
+            to #{action} with in pipeline #{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}, moving on...
+          """
+          transform(value, action, rest)
         end
       end
     end
 
     def default_pipeline do
       quote do
-        def transform(value, identifier, [{adapter, _} | rest]) do
-          IO.warn "could not find adapter #{inspect adapter} to #{inspect identifier} with in pipeline #{__MODULE__}"
-          transform(value, identifier, rest)
+        def transform(value, action, [{adapter, _} | rest]) do
+          IO.warn """
+            could not find adapter #{adapter |> Inspect.inspect(%Inspect.Opts{})} to #{action} with
+            in pipeline #{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}, moving on...
+          """
+          transform(value, action, rest)
         end
         def transform(value, _, _), do: value
       end
@@ -63,9 +70,9 @@ defmodule Mnemonix.Adapter do
 
   defmodule Transformer do
     @moduledoc false
-    defmacro transform(identifier, [do: code]) do
+    defmacro transform(action, [do: code]) do
       Module.register_attribute(__CALLER__.module, :transforms, accumulate: true)
-      Module.put_attribute(__CALLER__.module, :transforms, {identifier, code})
+      Module.put_attribute(__CALLER__.module, :transforms, {action, code})
     end
 
     defmacro serialize(do: code) do
@@ -110,14 +117,14 @@ end
 
 defmodule Mnemonix.Adapters.Term do
   @moduledoc false
-  use Mnemonix.Adapter
+  use Mnemonix.Adapter, default_options: [compression: 9]
 
   serialize do
-    {thing, options} -> :erlang.term_to_binary(thing, options)
+    {thing, options} -> :erlang.term_to_binary(thing, compressed: Keyword.get(options, :compression, 0))
   end
 
   deserialize do
-    {thing, _} -> :erlang.binary_to_term(thing, [:safe])
+    {thing, options} -> :erlang.binary_to_term(thing, (if options[:safe], do: [:safe], else: []))
   end
 end
 
