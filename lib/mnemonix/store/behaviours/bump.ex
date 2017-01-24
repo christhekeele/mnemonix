@@ -47,14 +47,14 @@ defmodule Mnemonix.Store.Behaviours.Bump do
         with {:ok, store, result} <- do_bump(store, :increment, key, amount) do
           case result do
             :ok                  -> {:ok, store}
-            {:error, no_integer} -> {:raise, ArithmeticError, [message: msg_for(no_integer, key)]}
+            {:error, no_integer} -> {:raise, ArithmeticError, [message: msg_for(no_integer, store.impl.deserialize_key(key, store))]}
           end
         end
       end
       defoverridable bump!: 3
 
       defp msg_for(:amount, _key), do: "value provided to operation is not an integer"
-      defp msg_for(:value, key),   do: "value at key #{Inspect.inspect(key, %Inspect.Opts{})} is not an integer"
+      defp msg_for(:value, key),   do: "value at key #{key |> Inspect.inspect(%Inspect.Opts{})} is not an integer"
 
       @doc false
       def increment(store, key, amount \\ 1) do
@@ -75,11 +75,11 @@ defmodule Mnemonix.Store.Behaviours.Bump do
       defp do_bump(store, operation, key, amount) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
-            :error -> with {:ok, store} <- put(store, key, 0) do
+            :error -> with {:ok, store} <- put(store, key, store.impl.serialize_value(0, store)) do
               do_bump(store, operation, key, amount)
             end
-            {:ok, value} -> case do_bump_calculation(operation, value, amount) do
-              {:ok, result} -> with {:ok, store} <- put(store, key, result) do
+            {:ok, value} -> case do_bump_calculation(operation, store.impl.deserialize_value(value, store), amount) do
+              {:ok, result} -> with {:ok, store} <- put(store, key, store.impl.serialize_value(result, store)) do
                 {:ok, store, :ok}
               end
               {:error, no_integer} -> {:ok, store, {:error, no_integer}}
@@ -93,18 +93,6 @@ defmodule Mnemonix.Store.Behaviours.Bump do
 
       defp do_bump_calculation(:increment, value, amount), do: {:ok, value + amount}
       defp do_bump_calculation(:decrement, value, amount), do: {:ok, value - amount}
-
-      defp do_bump_error(store, key, no_integer, raise?) do
-        if raise? do
-          message = case no_integer do
-            :amount -> "value provided to operation is not an integer"
-            :value  -> "value at key #{Inspect.inspect(key, %Inspect.Opts{})} is not an integer"
-          end
-          {:raise, ArithmeticError, [message: message]}
-        else
-          {:ok, store, {:error, :no_integer}}
-        end
-      end
 
     end
   end

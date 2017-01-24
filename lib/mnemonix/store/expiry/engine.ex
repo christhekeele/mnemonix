@@ -15,36 +15,23 @@ defmodule Mnemonix.Store.Expiry.Engine do
     {:ok, %__MODULE__{default: default_ttl}}
   end
 
-  def expire(%Mnemonix.Store{expiry: engine}, key, ttl \\ nil) do
-    GenServer.call(engine, {:expire, key, ttl})
+  def expire(store = %Mnemonix.Store{expiry: engine}, key, ttl \\ nil) do
+    GenServer.call(engine, {:expire, store, key, ttl})
   end
 
-  def persist(%Mnemonix.Store{expiry: engine}, key) do
-    GenServer.call(engine, {:persist, key})
+  def persist(store = %Mnemonix.Store{expiry: engine}, key) do
+    GenServer.call(engine, {:persist, store, key})
   end
 
-  def handle_call({:expire, key, ttl}, {store, _tag}, state = %__MODULE__{}) do
+  def handle_call({:expire, store, key, ttl}, {server, _tag}, state = %__MODULE__{}) do
     with {:ok, state} <- abort(key, state),
-         {:ok, state} <- schedule(store, key, ttl, state),
+         {:ok, state} <- schedule(store, server, key, ttl, state),
     do: {:reply, :ok, state}
   end
 
-  def handle_call({:persist, key}, _, state = %__MODULE__{}) do
+  def handle_call({:persist, _, key}, _, state = %__MODULE__{}) do
     with {:ok, state} <- abort(key, state) do
       {:reply, :ok, state}
-    end
-  end
-
-  defp schedule(store, key, nil, state = %__MODULE__{default: ttl}) do
-    if ttl do
-      schedule(store, key, ttl, state)
-    else
-      {:ok, store}
-    end
-  end
-  defp schedule(store, key, ttl, state = %__MODULE__{timers: timers}) do
-    with {:ok, timer} <- :timer.apply_after(ttl, Mnemonix, :delete, [store, key]) do
-      {:ok, %{state | timers: Map.put(timers, key, timer)}}
     end
   end
 
@@ -54,6 +41,20 @@ defmodule Mnemonix.Store.Expiry.Engine do
         {:ok, %{state | timers: Map.delete(timers, key)}}
       end
       :error -> {:ok, state}
+    end
+  end
+
+  defp schedule(store, server, key, nil, state = %__MODULE__{default: ttl}) do
+    if ttl do
+      schedule(store, server, key, ttl, state)
+    else
+      {:ok, server}
+    end
+  end
+  defp schedule(store, server, key, ttl, state = %__MODULE__{timers: timers}) do
+    apparent_key = store.impl.deserialize_key(key, store)
+    with {:ok, timer} <- :timer.apply_after(ttl, Mnemonix, :delete, [server, apparent_key]) do
+      {:ok, %{state | timers: Map.put(timers, key, timer)}}
     end
   end
 

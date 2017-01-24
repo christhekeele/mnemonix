@@ -8,7 +8,7 @@ defmodule Mnemonix.Store do
     impl: Mnemonix.Store.Behaviour.t,
     opts: Mnemonix.Store.Server.options,
     state: state :: term,
-    expiry: :native | pid
+    expiry: :native | pid,
   }
   @enforce_keys [:impl, :opts, :state]
   defstruct [:impl, :opts, :state, expiry: :native]
