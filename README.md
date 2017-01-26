@@ -88,3 +88,16 @@ Here are some useful commands if you've just forked the project and want to cont
 - `mix dialyzer` - Run static code analysis on compiled BEAM bytecode
 - `mix docs` - Generate documentation files
 - `mix clean` - If any of the above stop behaving as expected
+
+Testing
+-------
+
+By default, the test suite omits doctests. This is because, by nature of the library, for a full working documentation-driven integration tests, some external state must be stored in an out-of-memory system. Normal tests have the opportunity to correctly configure these systems; doctests do not.
+
+If you wish to run these, use the environment variable `DOCTESTS=true`. For them to pass, you must have:
+
+- The ability to read from and write to the filesystem the codebase is on
+- A redis server available at the default hostname (`localhost`) and port (`6379`), not password protected
+- A memcached instance available at the default hostname (`localhost`) and port (`11211`), not password protected
+
+The CI server fulfills these requirements, so if you can't, you can always configure your fork to use [travis](https://travis-ci.org) too, to get the same build environment we use to vet all pull requests.

@@ -11,11 +11,69 @@ defmodule Mnemonix.Stores.Null do
       nil
   """
 
-  use Mnemonix.Store.Behaviour, doc: false
+  use Mnemonix.Store.Behaviour, docs: false
   use Mnemonix.Store.Translator.Raw
 
   alias Mnemonix.Store
 
+
+  @doc """
+  Starts a new `Mnemonix.Store.Server` using the `Mnemonix.Stores.Null` module with `options`.
+
+  The `options` are the same as described in `Mnemonix.Store.Server.start_link/2`.
+  The `:store` options are used in `config/1` to start the store;
+  the `:server` options are passed directly to `GenServer.start_link/2`.
+
+  The returned `t:GenServer.server/0` reference can be used as the primary
+  argument to the `Mnemonix` API.
+
+  ## Examples
+
+      iex> {:ok, store} = Mnemonix.Stores.Null.start_link()
+      iex> Mnemonix.put(store, "foo", "bar")
+      iex> Mnemonix.get(store, "foo")
+      nil
+
+      iex> {:ok, _store} = Mnemonix.Stores.Null.start_link(server: [name: My.Mnemonix.Stores.Null])
+      iex> Mnemonix.put(My.Mnemonix.Stores.Null, "foo", "bar")
+      iex> Mnemonix.get(My.Mnemonix.Stores.Null, "foo")
+      nil
+  """
+  @spec start_link()                              :: GenServer.on_start
+  @spec start_link(Mnemonix.Store.Server.options) :: GenServer.on_start
+  def start_link(options \\ [])
+  def start_link(options), do: super(options)
+
+  @doc """
+  Starts a new `Mnemonix.Store.Server` using `Mnemonix.Stores.Null` with `store` and `server` options.
+
+  The options are the same as described in `Mnemonix.Store.Server.start_link/3`.
+  The `store` options are used in `config/1` to start the store;
+  the `server` options are passed directly to `GenServer.start_link/2`.
+
+  The returned `t:GenServer.server/0` reference can be used as the primary
+  argument to the `Mnemonix` API.
+
+  ## Examples
+
+      iex> {:ok, store} = Mnemonix.Stores.Null.start_link([], [])
+      iex> Mnemonix.put(store, "foo", "bar")
+      iex> Mnemonix.get(store, "foo")
+      nil
+
+      iex> {:ok, _store} = Mnemonix.Stores.Null.start_link([], [name: My.Mnemonix.Stores.Null])
+      iex> Mnemonix.put(My.Mnemonix.Stores.Null, "foo", "bar")
+      iex> Mnemonix.get(My.Mnemonix.Stores.Null, "foo")
+      nil
+  """
+  @spec start_link(Mnemonix.Store.Server.options, GenServer.options) :: GenServer.on_start
+  def start_link(store, server), do: super(store, server)
+
+  @doc """
+  Skips setup since this store does nothing.
+
+  Ignores all options.
+  """
   @spec setup(Mnemonix.Store.options)
     :: {:ok, nil}
   def setup(_opts) do

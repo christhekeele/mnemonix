@@ -13,9 +13,9 @@ defmodule Mnemonix.Store.Behaviour do
 
   @doc false
   defmacro __using__(opts) do
-    doc = Keyword.get(opts, :doc, true)
+    docs = Keyword.get(opts, :docs, true)
 
-    quote location: :keep, bind_quoted: [doc: doc] do
+    quote location: :keep, bind_quoted: [docs: docs] do
 
       use Mnemonix.Store.Behaviours.Core
       use Mnemonix.Store.Behaviours.Map
@@ -24,23 +24,25 @@ defmodule Mnemonix.Store.Behaviour do
 
       @store __MODULE__ |> Inspect.inspect(%Inspect.Opts{})
 
-      if doc do
+      if docs do
         @doc """
         Starts a new `Mnemonix.Store.Server` using the `#{@store}` module with `options`.
 
         The `options` are the same as described in `Mnemonix.Store.Server.start_link/2`.
+        The `:store` options are used in `config/1` to start the store;
+        the `:server` options are passed directly to `GenServer.start_link/2`.
 
         The returned `t:GenServer.server/0` reference can be used as the primary
         argument to the `Mnemonix` API.
 
         ## Examples
 
-            iex> {:ok, store} = #{@store}.start_link
+            iex> {:ok, store} = #{@store}.start_link()
             iex> Mnemonix.put(store, "foo", "bar")
             iex> Mnemonix.get(store, "foo")
             "bar"
 
-            iex> {:ok, _store} = #{@store}.start_link([], [name: My.#{@store}])
+            iex> {:ok, _store} = #{@store}.start_link(server: [name: My.#{@store}])
             iex> Mnemonix.put(My.#{@store}, "foo", "bar")
             iex> Mnemonix.get(My.#{@store}, "foo")
             "bar"
@@ -51,12 +53,15 @@ defmodule Mnemonix.Store.Behaviour do
       def start_link(options \\ []) do
         Mnemonix.Store.Server.start_link(__MODULE__, options)
       end
+      defoverridable start_link: 0, start_link: 1
 
-      if doc do
+      if docs do
         @doc """
-        Starts a new `Mnemonix.Store.Server` using the `#{@store}` with `store` and `server` options.
+        Starts a new `Mnemonix.Store.Server` using `#{@store}` with `store` and `server` options.
 
         The options are the same as described in `Mnemonix.Store.Server.start_link/3`.
+        The `store` options are used in `config/1` to start the store;
+        the `server` options are passed directly to `GenServer.start_link/2`.
 
         The returned `t:GenServer.server/0` reference can be used as the primary
         argument to the `Mnemonix` API.
@@ -78,6 +83,7 @@ defmodule Mnemonix.Store.Behaviour do
       def start_link(store, server) do
         Mnemonix.Store.Server.start_link(__MODULE__, store, server)
       end
+      defoverridable start_link: 2
 
     end
   end
