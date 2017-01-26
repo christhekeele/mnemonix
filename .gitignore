@@ -19,5 +19,10 @@ erl_crash.dump
 # Libraries shouldn't include
 mix.lock
 
+# Ignore test artifacts
+writable.tmp
+dump.rdb
+Mnesia.nonode@nohost
+
 bench/graphs
 bench/snapshots

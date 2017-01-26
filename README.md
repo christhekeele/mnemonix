@@ -88,3 +88,32 @@ Here are some useful commands if you've just forked the project and want to cont
 - `mix dialyzer` - Run static code analysis on compiled BEAM bytecode
 - `mix docs` - Generate documentation files
 - `mix clean` - If any of the above stop behaving as expected
+
+Testing
+-------
+
+### Setup
+
+Some parts of the test suite are contingent upon configration of out-of-memory systems. Detection of these systems can be configured through environment variables. If they can't be detected, the parts of the suite that rely on them will be skipped.
+
+- Mnesia
+  - `FILESYSTEM_TEST_DIR`: The location of a filesystem Elixir can read from and write to. 
+    - Default: `System.tmp_dir/0`
+- Redis
+  - `REDIS_TEST_HOST`: The hostname of a redis server. 
+    - Default: `localhost`
+  - `REDIS_TEST_PORT`: The port on the host redis is accessible at. 
+    - Default: `6379`
+- Memcached
+  - `MEMCACHED_TEST_HOST`: The hostname of a memcached instance. 
+    - Default: `localhost`
+  - `MEMCACHED_TEST_PORT`: The port on the host memcached is accessible at. 
+    - Default: `11211`
+
+### Doctests
+
+By default, the test suite omits doctests. This is because, by nature of the library, for full working examples in documentation to act as integration tests, some external state must be stored in an out-of-memory system. Normal tests have the opportunity to correctly configure these systems; doctests do not.
+
+If you wish to run these, use the environment variable `DOCTESTS=true`. For them to pass, your system must be configured using the defaults in the setup steps specified above.
+
+The CI server fulfills these requirements, so if you can't, you can always configure your fork to use [travis](https://travis-ci.org) too, to get the same build environment we use to vet all pull requests.

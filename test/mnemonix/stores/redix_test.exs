@@ -1,5 +1,7 @@
 defmodule Mnemonix.Stores.Redix.Test do
-  use ExUnit.Case, async: true
+  use Mnemonix.Test.Case, async: true, artifacts: "dump.rdb"
+
+  @moduletag :redis
 
   doctest Mnemonix.Stores.Redix
 

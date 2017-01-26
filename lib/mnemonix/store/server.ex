@@ -30,7 +30,7 @@ defmodule Mnemonix.Store.Server do
 
   - `:server`
 
-    A keyword list of options to be given to `GenServer`.
+    A keyword list of options to be given to `GenServer.start_link/3`.
 
   - `:otp_app`
 
