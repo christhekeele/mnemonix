@@ -1,7 +1,7 @@
 defmodule Mnemonix.Stores.Null.Test do
   use ExUnit.Case, async: true
 
-  doctest Mnemonix.Stores.Null
+  # doctest Mnemonix.Stores.Null
 
   test "put/get/delete" do
     {:ok, store} = Mnemonix.Stores.Null.start_link
