@@ -1,5 +1,5 @@
 defmodule Plug.Session.MNEMONIX.Test do
-  use ExUnit.Case, async: true
+  use Mnemonix.Test.Case, async: true
   alias Plug.Session.MNEMONIX
 
   @mnemonix_store Mnemonix.Plug.Session

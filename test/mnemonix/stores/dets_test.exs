@@ -1,5 +1,5 @@
 defmodule Mnemonix.Stores.DETS.Test do
-  use ExUnit.Case, async: true
+  use Mnemonix.Test.Case, async: true
 
   setup do
     on_exit fn ->

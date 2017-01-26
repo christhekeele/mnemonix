@@ -20,6 +20,7 @@ erl_crash.dump
 mix.lock
 
 # Ignore test artifacts
+writable.tmp
 dump.rdb
 Mnesia.nonode@nohost
 
