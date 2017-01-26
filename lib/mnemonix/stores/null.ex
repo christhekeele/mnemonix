@@ -11,7 +11,7 @@ defmodule Mnemonix.Stores.Null do
       nil
   """
 
-  use Mnemonix.Store.Behaviour
+  use Mnemonix.Store.Behaviour, doc: false
   use Mnemonix.Store.Translator.Raw
 
   alias Mnemonix.Store
