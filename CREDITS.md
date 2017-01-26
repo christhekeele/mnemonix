@@ -1,10 +1,21 @@
 Credits
 =======
 
+Contributors
+------------
+
+Thanks for taking the time to work on Mnemonix!
+
+- [rzane](https://github.com/rzane)
+- [coderrick](https://github.com/coderrick)
+
+Moneta
+------
+
 All glory to the authors of [`moneta`](https://github.com/minad/moneta), the inspiration for this project:
 
 - [​wycats](https://github.com/​wycats)
-- [minead](https://github.com/minead)
+- [minad](https://github.com/minad)
 - [​piotrmurach](https://github.com/​piotrmurach)
 - [​dkastner](https://github.com/​dkastner)
 - [​asppsa](https://github.com/​asppsa)
