@@ -17,6 +17,7 @@ if Code.ensure_loaded?(Memcache) do
     end
 
     use Mnemonix.Store.Behaviour
+    use Mnemonix.Store.Translator.Term
 
     alias Mnemonix.Store
 
