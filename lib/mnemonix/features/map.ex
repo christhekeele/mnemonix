@@ -471,7 +471,7 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get(store, :d)
       4
 
-      iex> {removed, store} = Mnemonix.split Mnemonix.new, [:a, :b, :c]
+      iex> {removed, _store} = Mnemonix.split Mnemonix.new, [:a, :b, :c]
       iex> removed
       %{}
 
