@@ -64,7 +64,7 @@ Available features are:
 
   ```elixir
   def deps do
-    [{:mnemonix, "~> 0.7.1"}]
+    [{:mnemonix, "~> 0.8.0"}]
   end
   ```
 
