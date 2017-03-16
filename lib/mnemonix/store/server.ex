@@ -1,6 +1,14 @@
 defmodule Mnemonix.Store.Server do
   @moduledoc """
   Bridges `Mnemonix.Features` with underlying `Mnemonix.Stores`.
+
+  This is normally the module you will be working with once you've selected your desired store
+  implementation and want to insert it properly into a supervision tree.
+
+  The options here will allow you to specify your store type, keep your store always available, and
+  decide on the process name for others to recognize it by, if any.
+
+  If you want to play around with the Mnemonix API first, see `Mnemonix.new/0`.
   """
 
   use GenServer
@@ -98,7 +106,7 @@ defmodule Mnemonix.Store.Server do
 
   Invokes the `c:Mnemonix.Core.Behaviour.setup/1` and `c:Mnemonix.Expiry.Behaviour.setup_expiry/1`
   callbacks.
-  """
+  """ && false
   @spec init({Mnemonix.Store.Behaviour.t, Mnemonix.Store.options})
     :: {:ok, Mnemonix.Store.t} | :ignore | {:stop, reason :: term}
   def init({impl, options}) do
@@ -114,7 +122,7 @@ defmodule Mnemonix.Store.Server do
   Cleans up the underlying store on termination.
 
   Invokes the `c:Mnemonix.Lifecycle.Behaviour.teardown/2` callback.
-  """
+  """ && false
   @spec terminate(reason, Mnemonix.Store.t) :: reason
     when reason: :normal | :shutdown | {:shutdown, term} | term
   def terminate(reason, store = %Mnemonix.Store{impl: impl}) do
@@ -125,7 +133,7 @@ defmodule Mnemonix.Store.Server do
 
   @doc """
   Delegates Mnemonix.Feature functions to the underlying store behaviours.
-  """
+  """ && false
   @spec handle_call(request :: term, GenServer.from, Mnemonix.Store.t) ::
     {:reply, reply, new_store} |
     {:reply, reply, new_store, timeout | :hibernate} |

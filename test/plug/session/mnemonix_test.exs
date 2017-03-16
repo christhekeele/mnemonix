@@ -13,7 +13,7 @@ defmodule Plug.Session.MNEMONIX.Test do
     opts = MNEMONIX.init(store: @mnemonix_store)
 
     assert "foo" = MNEMONIX.put(%{}, "foo", %{foo: :bar}, opts)
-    assert "bar" = MNEMONIX.put(%{}, "bar", %{bar: :foo}, opts)
+    assert "bar" = MNEMONIX.put(%{}, "bar", [bar: :foo], opts)
 
     assert {"foo", %{foo: :bar}} = MNEMONIX.get(%{}, "foo", opts)
     assert {"bar", %{bar: :foo}} = MNEMONIX.get(%{}, "bar", opts)
