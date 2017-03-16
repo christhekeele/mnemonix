@@ -59,7 +59,7 @@ defmodule Mnemonix.Mixfile do
   defp package, do: [
     description: "A unified interface to key-value stores.",
     maintainers: [
-      "Chris Keele <dev@chriskeele.com>",
+      "Chris Keele <christhekeele+mnemonix@gmail.com>",
     ],
     licenses: [
       "MIT",
