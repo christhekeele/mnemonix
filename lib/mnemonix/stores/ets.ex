@@ -49,11 +49,11 @@ defmodule Mnemonix.Stores.ETS do
 
     - *Default:* nil
 
-  - `transactional`: Whether or not to perform transactional reads or writes.
+  - `concurrent`: Whether or not to optimize access for concurrent reads or writes.
 
-    - *Allowed:* `:reads | :writes | :both | nil`
+    - *Allowed:* `:reads | :writes | :both | false`
 
-    - *Default:* `nil`
+    - *Default:* `false`
 
   - `compressed`: Whether or not to compress the values being stored.
 
@@ -69,8 +69,8 @@ defmodule Mnemonix.Stores.ETS do
     table   = Keyword.get(opts, :table) || Module.concat(__MODULE__, Table)
     privacy = Keyword.get(opts, :privacy) || :private
     heir    = Keyword.get(opts, :heir) || :none
-    read    = not Keyword.get(opts, :transactional, :both) in [:reads, :both]
-    write   = not Keyword.get(opts, :transactional, :both) in [:writes, :both]
+    read    = Keyword.get(opts, :concurrent, false) in [:reads, :both]
+    write   = Keyword.get(opts, :concurrent, false) in [:writes, :both]
 
     options = [:set, privacy,
       heir: heir,
