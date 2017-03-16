@@ -10,6 +10,7 @@ defmodule Mnemonix do
   - `Mnemonix.Features.Map`
   - `Mnemonix.Features.Bump`
   - `Mnemonix.Features.Expiry`
+  - `Mnemonix.Features.Enumerable`
 
   ## Map Features
 
@@ -41,22 +42,17 @@ defmodule Mnemonix do
       4
 
   These functions behave exactly like their `Map` counterparts. However, `Mnemonix`
-  doesn't supply analogs for functions that assume a store can be exhaustively
-  iterated or fit into a specific shape:
+  doesn't supply analogs for functions that assume a store can be fit into a specific shape:
 
-  - `Map.equal?/2`
   - `Map.from_struct/1`
-  - `Map.keys/1`
   - `Map.merge/2`
   - `Map.merge/3`
-  - `Map.split/2`
-  - `Map.take/2`
-  - `Map.to_list/1`
-  - `Map.values/1`
 
-## Bump Features
+  Functions that exhaustively iterate over a store's contents live are implemented differently, see below.
 
-`Mnemonix.Features.Bump` lets you perform increment/decrement operations on any store.
+  ## Bump Features
+
+  `Mnemonix.Features.Bump` lets you perform increment/decrement operations on any store.
 
       iex> store = Mnemonix.new(fizz: 1)
       iex> Mnemonix.increment(store, :fizz)
@@ -66,15 +62,32 @@ defmodule Mnemonix do
       iex> Mnemonix.get(store, :fizz)
       1
 
-## Expiry Features
+  ## Expiry Features
 
-`Mnemonix.Features.Expiry` lets you set entries to expire after a given time-to-live on any store.
+  `Mnemonix.Features.Expiry` lets you set entries to expire after a given time-to-live on any store.
 
       iex> store = Mnemonix.new(fizz: 1)
       iex> Mnemonix.expire(store, :fizz, 100)
       iex> :timer.sleep(1000)
       iex> Mnemonix.get(store, :fizz)
       nil
+
+  ## Enumerable Features
+
+  `Mnemonix.Features.Enumerable` enables functions that try to iterate over a store's contents. These
+  functions are to keep as much parity with the `Map` API as possible, but be warned: they are only
+  implemented for a subset of stores, and may be very inefficient. Consult your store's specific
+  documentation for more details.
+
+  These `Map` equivalents will raise `Mnemonix.Features.Enumerable.Error` if your store doesn't
+  support them:
+
+  - `Mnemonix.equal?/2`
+  - `Mnemonix.keys/1`
+  - `Mnemonix.to_list/1`
+  - `Mnemonix.values/1`
+
+  Any store can be checked for enumerability support via `Mnemonix.enumerable?/1`.
 
   """
 

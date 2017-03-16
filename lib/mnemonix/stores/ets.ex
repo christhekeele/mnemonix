@@ -9,6 +9,8 @@ defmodule Mnemonix.Stores.ETS do
       iex> Mnemonix.delete(store, "foo")
       iex> Mnemonix.get(store, "foo")
       nil
+
+  This store supports the functions in `Mnemonix.Features.Enumerable`.
   """
 
   defmodule Exception do

@@ -39,7 +39,6 @@ defmodule Mnemonix.Features.Enumerable do
       iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.DETS)
       iex> Mnemonix.enumerable? store
       false
-
   """
   @spec enumerable?(Mnemonix.store)
     :: boolean | no_return
@@ -68,10 +67,9 @@ defmodule Mnemonix.Features.Enumerable do
 
   ## Notes
 
-  If `enumerable?/1` returns false then this function will raise a `Mnemonix.Features.Enumerable.Error`.
+  If `enumerable?/1` returns `false` for either store then this function will raise a `Mnemonix.Features.Enumerable.Error`.
 
-  Depending on the underlying store this function may be very inefficient.
-
+  Depending on the underlying store types this function may be very inefficient.
   """
   @spec equal?(Mnemonix.store, Mnemonix.store)
     :: boolean | no_return
@@ -102,7 +100,6 @@ defmodule Mnemonix.Features.Enumerable do
   If `enumerable?/1` returns false then this function will raise a `Mnemonix.Features.Enumerable.Error`.
 
   Depending on the underlying store this function may be very inefficient.
-
   """
   @spec keys(Mnemonix.store)
     :: [Mnemonix.key] | no_return
@@ -138,7 +135,6 @@ defmodule Mnemonix.Features.Enumerable do
   If `enumerable?/1` returns false then this function will raise a `Mnemonix.Features.Enumerable.Error`.
 
   Depending on the underlying store this function may be very inefficient.
-
   """
   @spec to_list(Mnemonix.store)
     :: [{Mnemonix.key, Mnemonix.value}] | no_return
@@ -166,7 +162,6 @@ defmodule Mnemonix.Features.Enumerable do
   If `enumerable?/1` returns false then this function will raise a `Mnemonix.Features.Enumerable.Error`.
 
   Depending on the underlying store this function may be very inefficient.
-
   """
   @spec values(Mnemonix.store)
     :: [Mnemonix.value] | no_return

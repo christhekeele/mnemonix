@@ -12,6 +12,8 @@ defmodule Mnemonix.Stores.Mnesia do
       iex> Mnemonix.delete(store, "foo")
       iex> Mnemonix.get(store, "foo")
       nil
+
+  This store throws errors on the functions in `Mnemonix.Features.Enumerable`.
   """
 
   defmodule Exception do

@@ -15,6 +15,8 @@ defmodule Mnemonix.Stores.Map do
       iex> Mnemonix.delete(store, "foo")
       iex> Mnemonix.get(store, "foo")
       nil
+
+  This store supports the functions in `Mnemonix.Features.Enumerable`.
   """
 
   use Mnemonix.Store.Behaviour
