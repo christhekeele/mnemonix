@@ -32,6 +32,9 @@ before_script:
 script:
   - if [ $PULL_REQUEST_ID != false && -z "$GITHUB_ACCESS_TOKEN" ]; then pronto run -f github_pr github_status; fi
   - mix coveralls.travis
+after_script:
+  - mix deps.get
+  - mix inch.report
 services:
   - redis-server
   - memcached

@@ -35,6 +35,7 @@ defmodule Mnemonix.Mixfile do
     {:excoveralls, "~> 0.6",  only: :test},
     {:credo,       "~> 0.6",  only: [:dev, :test]},
     {:benchfella,  "~> 0.3",  only: [:dev, :test]},
+    {:inch_ex,     "~> 0.5",  only: [:dev, :test]},
   ]
 
   defp backends, do: [
