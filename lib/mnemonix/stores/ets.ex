@@ -20,6 +20,10 @@ defmodule Mnemonix.Stores.ETS do
 
   alias Mnemonix.Store
 
+  ####
+  # Mnemonix.Store.Behaviours.Core
+  ##
+
   @doc """
   Creates a new ETS table to store state.
 
@@ -91,6 +95,10 @@ defmodule Mnemonix.Stores.ETS do
     end
   end
 
+  ####
+  # Mnemonix.Store.Behaviours.Map
+  ##
+
   @spec delete(Mnemonix.Store.t, Mnemonix.key)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
   def delete(store = %Store{state: table}, key) do
@@ -123,6 +131,22 @@ defmodule Mnemonix.Stores.ETS do
         message: "ETS operation failed: `:ets.insert(#{table}, {#{key}, #{value}})`"
       }
     end
+  end
+
+  ####
+  # Mnemonix.Store.Behaviours.Enumerable
+  ##
+
+  @spec enumerable?(Mnemonix.Store.t)
+    :: {:ok, Mnemonix.Store.t, boolean} | Mnemonix.Store.Behaviour.exception
+  def enumerable?(store) do
+    {:ok, store, true}
+  end
+
+  @spec to_enumerable(Mnemonix.Store.t)
+    :: {:ok, Mnemonix.Store.t, Enumerable.t} | Mnemonix.Store.Behaviour.exception
+  def to_enumerable(store = %Store{state: table}) do
+    {:ok, store, :ets.tab2list(table)}
   end
 
 end

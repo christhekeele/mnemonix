@@ -22,6 +22,10 @@ defmodule Mnemonix.Stores.Map do
 
   alias Mnemonix.Store
 
+  ####
+  # Mnemonix.Store.Behaviours.Core
+  ##
+
   @doc """
   Constructs a map to store data.
 
@@ -36,6 +40,10 @@ defmodule Mnemonix.Stores.Map do
   def setup(_opts) do
     {:ok, %{}}
   end
+
+  ####
+  # Mnemonix.Store.Behaviours.Map
+  ##
 
   @spec delete(Mnemonix.Store.t, Mnemonix.key)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
@@ -53,6 +61,22 @@ defmodule Mnemonix.Stores.Map do
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
   def put(store = %Store{state: map}, key, value) do
     {:ok, %{store | state: Map.put(map, key, value)}}
+  end
+
+  ####
+  # Mnemonix.Store.Behaviours.Enumerable
+  ##
+
+  @spec enumerable?(Mnemonix.Store.t)
+    :: {:ok, Mnemonix.Store.t, boolean} | Mnemonix.Store.Behaviour.exception
+  def enumerable?(store) do
+    {:ok, store, true}
+  end
+
+  @spec to_enumerable(Mnemonix.Store.t)
+    :: {:ok, Mnemonix.Store.t, Enumerable.t} | Mnemonix.Store.Behaviour.exception
+  def to_enumerable(store = %Store{state: map}) do
+    {:ok, store, map}
   end
 
 end

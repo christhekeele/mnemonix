@@ -21,6 +21,10 @@ if Code.ensure_loaded?(Redix) do
 
     alias Mnemonix.Store
 
+    ####
+    # Mnemonix.Store.Behaviours.Core
+    ##
+
     @doc """
     Connects to redis to store data.
 
@@ -43,6 +47,10 @@ if Code.ensure_loaded?(Redix) do
 
       Redix.start_link(conn || "redis://localhost:6379", options)
     end
+
+    ####
+    # Mnemonix.Store.Behaviours.Map
+    ##
 
     @spec delete(Mnemonix.Store.t, Mnemonix.key)
       :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception

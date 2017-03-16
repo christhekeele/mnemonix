@@ -21,6 +21,10 @@ if Code.ensure_loaded?(Memcache) do
 
     alias Mnemonix.Store
 
+    ####
+    # Mnemonix.Store.Behaviours.Core
+    ##
+
     @doc """
     Connects to memcached to store data.
 
@@ -38,6 +42,10 @@ if Code.ensure_loaded?(Memcache) do
 
       Memcache.start_link(options)
     end
+
+    ####
+    # Mnemonix.Store.Behaviours.Map
+    ##
 
     @spec delete(Mnemonix.Store.t, Mnemonix.key)
       :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception

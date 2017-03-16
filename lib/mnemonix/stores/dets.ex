@@ -20,6 +20,10 @@ defmodule Mnemonix.Stores.DETS do
 
   alias Mnemonix.Store
 
+  ####
+  # Mnemonix.Store.Behaviours.Core
+  ##
+
   @doc """
   Creates a new DETS table to store state.
 
@@ -48,6 +52,19 @@ defmodule Mnemonix.Stores.DETS do
       {:stop, reason}
     end
   end
+
+  @spec teardown(reason, Mnemonix.Store.t)
+    :: {:ok, reason} | {:error, reason}
+      when reason: :normal | :shutdown | {:shutdown, term} | term
+  def teardown(reason, %Store{state: state}) do
+    with :ok <- :dets.close(state) do
+      {:ok, reason}
+    end
+  end
+
+  ####
+  # Mnemonix.Store.Behaviours.Map
+  ##
 
   @spec delete(Mnemonix.Store.t, Mnemonix.key)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
@@ -80,15 +97,6 @@ defmodule Mnemonix.Stores.DETS do
       {:raise, Exception,
         "DETS operation failed: `:dets.insert(#{table}, {#{key}, #{value}})`"
       }
-    end
-  end
-
-  @spec teardown(reason, Mnemonix.Store.t)
-    :: {:ok, reason} | {:error, reason}
-      when reason: :normal | :shutdown | {:shutdown, term} | term
-  def teardown(reason, %Store{state: state}) do
-    with :ok <- :dets.close(state) do
-      {:ok, reason}
     end
   end
 

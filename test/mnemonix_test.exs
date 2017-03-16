@@ -4,19 +4,23 @@ defmodule Mnemonix.Test do
   doctest Mnemonix
 
   test "implements (almost) all functions in Map" do
-    assert Map.__info__(:functions) -- Mnemonix.__info__(:functions) == [
-      drop: 2,
-      equal?: 2,
+    missing = [
+      # drop: 2,
+      # equal?: 2,
       from_struct: 1,
-      keys: 1,
+      # keys: 1,
       merge: 2,
       merge: 3,
-      size: 1,
-      split: 2,
-      take: 2,
-      to_list: 1,
-      values: 1,
+      # split: 2,
+      # take: 2,
+      # to_list: 1,
+      # values: 1,
     ]
+    missing = if :gt == System.version |> Version.parse! |> Version.compare(Version.parse!("1.4.0")) do
+      Enum.sort missing ++ [size: 1]
+    else; missing; end
+
+    assert Map.__info__(:functions) -- Mnemonix.__info__(:functions) == missing
   end
 
 end
