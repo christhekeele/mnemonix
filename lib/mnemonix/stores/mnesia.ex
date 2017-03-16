@@ -38,17 +38,17 @@ defmodule Mnemonix.Stores.Mnesia do
 
   - `table:` Name of the table to use, will be created if it doesn't exist.
 
-    *Default:* `#{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}.Table`
+    - *Default:* `#{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}.Table`
 
   - `transactional`: Whether or not to perform transactional reads or writes.
 
-    *Allowed:* `:reads | :writes | :both | nil`
+    - *Allowed:* `:reads | :writes | :both | nil`
 
-    *Default:* `:both`
+    - *Default:* `:both`
 
   - `initial:` A map of key/value pairs to ensure are set on the table at boot.
 
-    *Default:* `%{}`
+    - *Default:* `%{}`
 
   The rest of the options are passed into `:dets.open_file/2` verbaitm, except
   for `type:`, which will always be `:set`.

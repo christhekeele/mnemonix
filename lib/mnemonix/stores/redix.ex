@@ -34,11 +34,11 @@ if Code.ensure_loaded?(Redix) do
 
     - `conn:` The Redis to connect to, as either a string or list of opts w/ host, port, password, and database.
 
-      *Default:* `"redis://localhost:6379"`
+      - *Default:* `"redis://localhost:6379"`
 
     - `initial:` A map of key/value pairs to ensure are set in redis at boot.
 
-      *Default:* `%{}`
+      - *Default:* `%{}`
 
     All other options are passed verbatim to `Redix.start_link/2`.
     """

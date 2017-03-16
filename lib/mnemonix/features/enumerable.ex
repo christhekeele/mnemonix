@@ -36,7 +36,7 @@ defmodule Mnemonix.Features.Enumerable do
       iex> Mnemonix.enumerable? store
       true
 
-      iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.DETS)
+      iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Memcachex)
       iex> Mnemonix.enumerable? store
       false
   """
@@ -126,9 +126,9 @@ defmodule Mnemonix.Features.Enumerable do
       iex> Mnemonix.to_list Mnemonix.new
       []
 
-      iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.DETS)
+      iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Memcachex)
       iex> Mnemonix.to_list store
-      ** (Mnemonix.Features.Enumerable.Error) Mnemonix.Stores.DETS cannot be exhaustively iterated over
+      ** (Mnemonix.Features.Enumerable.Error) Mnemonix.Stores.Memcachex cannot be exhaustively iterated over
 
   ## Notes
 

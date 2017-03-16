@@ -35,7 +35,7 @@ defmodule Mnemonix.Stores.Map do
 
   - `initial:` An existing map to start the store with.
 
-    *Default:* `%{}`
+    - *Default:* `%{}`
   """
   @spec setup(Mnemonix.Store.options)
     :: {:ok, state :: term} | {:stop, reason :: any}

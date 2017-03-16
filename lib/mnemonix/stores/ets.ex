@@ -31,38 +31,37 @@ defmodule Mnemonix.Stores.ETS do
 
   ## Options
 
-  - `table:` Name of the table to create.
+  - `table`: Name of the table to create.
 
-    *Default:* `#{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}.Table`
+    - *Default:* `#{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}.Table`
 
-  - `named:` ETS named table option
+  - `named`: ETS named table option
 
-    *Default:* `false`
+    - *Default:* `false`
 
-    If making a non-public table it's reccommened to use this option, so that
-    the table name can be used outside of this store.
+    - *Notes:* If making a non-private table it's reccommened to give your table a name.
 
-  - `privacy:` ETS privacy option - `:public | :protected | :private`
+  - `privacy`: ETS privacy option - `:public | :protected | :private`
 
-    *Default:* `:private`
+    - *Default:* `:private`
 
-  - `heir:` ETS heir option - `{pid, any} | nil`
+  - `heir`: ETS heir option - `{pid, any} | nil`
 
-    *Default:* nil
+    - *Default:* nil
 
   - `transactional`: Whether or not to perform transactional reads or writes.
 
-    *Allowed:* `:reads | :writes | :both | nil`
+    - *Allowed:* `:reads | :writes | :both | nil`
 
-    *Default:* `nil`
+    - *Default:* `nil`
 
   - `compressed`: Whether or not to compress the values being stored.
 
-    *Default:* `false`
+    - *Default:* `false`
 
-  - `initial:` A map of key/value pairs to ensure are set on the DETS table at boot.
+  - `initial`: A map of key/value pairs to ensure are set on the DETS table at boot.
 
-    *Default:* `%{}`
+    - *Default:* `%{}`
   """
   @spec setup(Mnemonix.Store.options)
     :: {:ok, state :: term} | {:stop, reason :: any}

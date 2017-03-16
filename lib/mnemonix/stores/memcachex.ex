@@ -32,7 +32,7 @@ if Code.ensure_loaded?(Memcache) do
 
   - `initial:` A map of key/value pairs to ensure are set in memcached at boot.
 
-    *Default:* `%{}`
+    - *Default:* `%{}`
 
     All other options are passed verbatim to `Memcache.start_link/1`.
     """
