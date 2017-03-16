@@ -9,6 +9,8 @@ defmodule Mnemonix.Stores.DETS do
       iex> Mnemonix.delete(store, "foo")
       iex> Mnemonix.get(store, "foo")
       nil
+
+  This store throws errors on the functions in `Mnemonix.Features.Enumerable`.
   """
 
   defmodule Exception do
@@ -20,6 +22,10 @@ defmodule Mnemonix.Stores.DETS do
 
   alias Mnemonix.Store
 
+  ####
+  # Mnemonix.Store.Behaviours.Core
+  ##
+
   @doc """
   Creates a new DETS table to store state.
 
@@ -29,11 +35,11 @@ defmodule Mnemonix.Stores.DETS do
 
   - `table:` Name of the table to connect to.
 
-    *Default:* `#{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}.Table`
+    - *Default:* `#{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}.Table`
 
   - `initial:` A map of key/value pairs to ensure are set on the ETS table at boot.
 
-    *Default:* `%{}`
+    - *Default:* `%{}`
 
   The rest of the options are passed into `:dets.open_file/2` verbaitm, except
   for `type:`, which will always be `:set`.
@@ -48,6 +54,19 @@ defmodule Mnemonix.Stores.DETS do
       {:stop, reason}
     end
   end
+
+  @spec teardown(reason, Mnemonix.Store.t)
+    :: {:ok, reason} | {:error, reason}
+      when reason: :normal | :shutdown | {:shutdown, term} | term
+  def teardown(reason, %Store{state: state}) do
+    with :ok <- :dets.close(state) do
+      {:ok, reason}
+    end
+  end
+
+  ####
+  # Mnemonix.Store.Behaviours.Map
+  ##
 
   @spec delete(Mnemonix.Store.t, Mnemonix.key)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
@@ -80,15 +99,6 @@ defmodule Mnemonix.Stores.DETS do
       {:raise, Exception,
         "DETS operation failed: `:dets.insert(#{table}, {#{key}, #{value}})`"
       }
-    end
-  end
-
-  @spec teardown(reason, Mnemonix.Store.t)
-    :: {:ok, reason} | {:error, reason}
-      when reason: :normal | :shutdown | {:shutdown, term} | term
-  def teardown(reason, %Store{state: state}) do
-    with :ok <- :dets.close(state) do
-      {:ok, reason}
     end
   end
 

@@ -10,6 +10,8 @@ if Code.ensure_loaded?(Memcache) do
         iex> Mnemonix.delete(store, "foo")
         iex> Mnemonix.get(store, "foo")
         nil
+
+    This store throws errors on the functions in `Mnemonix.Features.Enumerable`.
     """
 
     defmodule Exception do
@@ -17,15 +19,20 @@ if Code.ensure_loaded?(Memcache) do
     end
 
     use Mnemonix.Store.Behaviour
+    use Mnemonix.Store.Translator.Term
 
     alias Mnemonix.Store
+
+    ####
+    # Mnemonix.Store.Behaviours.Core
+    ##
 
     @doc """
     Connects to memcached to store data.
 
   - `initial:` A map of key/value pairs to ensure are set in memcached at boot.
 
-    *Default:* `%{}`
+    - *Default:* `%{}`
 
     All other options are passed verbatim to `Memcache.start_link/1`.
     """
@@ -37,6 +44,10 @@ if Code.ensure_loaded?(Memcache) do
 
       Memcache.start_link(options)
     end
+
+    ####
+    # Mnemonix.Store.Behaviours.Map
+    ##
 
     @spec delete(Mnemonix.Store.t, Mnemonix.key)
       :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception

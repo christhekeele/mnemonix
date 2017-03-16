@@ -71,6 +71,7 @@ defmodule Mnemonix.Builder do
       use Mnemonix.Features.Map, unquote(opts)
       use Mnemonix.Features.Bump, unquote(opts)
       use Mnemonix.Features.Expiry, unquote(opts)
+      use Mnemonix.Features.Enumerable, unquote(opts)
     end
   end
 

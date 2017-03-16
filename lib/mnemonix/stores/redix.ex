@@ -10,6 +10,8 @@ if Code.ensure_loaded?(Redix) do
         iex> Mnemonix.delete(store, "foo")
         iex> Mnemonix.get(store, "foo")
         nil
+
+    This store throws errors on the functions in `Mnemonix.Features.Enumerable`.
     """
 
     defmodule Exception do
@@ -17,8 +19,13 @@ if Code.ensure_loaded?(Redix) do
     end
 
     use Mnemonix.Store.Behaviour
+    use Mnemonix.Store.Translator.Term
 
     alias Mnemonix.Store
+
+    ####
+    # Mnemonix.Store.Behaviours.Core
+    ##
 
     @doc """
     Connects to redis to store data.
@@ -27,11 +34,11 @@ if Code.ensure_loaded?(Redix) do
 
     - `conn:` The Redis to connect to, as either a string or list of opts w/ host, port, password, and database.
 
-      *Default:* `"redis://localhost:6379"`
+      - *Default:* `"redis://localhost:6379"`
 
     - `initial:` A map of key/value pairs to ensure are set in redis at boot.
 
-      *Default:* `%{}`
+      - *Default:* `%{}`
 
     All other options are passed verbatim to `Redix.start_link/2`.
     """
@@ -42,6 +49,10 @@ if Code.ensure_loaded?(Redix) do
 
       Redix.start_link(conn || "redis://localhost:6379", options)
     end
+
+    ####
+    # Mnemonix.Store.Behaviours.Map
+    ##
 
     @spec delete(Mnemonix.Store.t, Mnemonix.key)
       :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception

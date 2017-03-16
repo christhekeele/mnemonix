@@ -9,6 +9,8 @@ defmodule Mnemonix.Stores.ETS do
       iex> Mnemonix.delete(store, "foo")
       iex> Mnemonix.get(store, "foo")
       nil
+
+  This store supports the functions in `Mnemonix.Features.Enumerable`.
   """
 
   defmodule Exception do
@@ -20,43 +22,46 @@ defmodule Mnemonix.Stores.ETS do
 
   alias Mnemonix.Store
 
+  ####
+  # Mnemonix.Store.Behaviours.Core
+  ##
+
   @doc """
   Creates a new ETS table to store state.
 
   ## Options
 
-  - `table:` Name of the table to create.
+  - `table`: Name of the table to create.
 
-    *Default:* `#{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}.Table`
+    - *Default:* `#{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}.Table`
 
-  - `named:` ETS named table option
+  - `named`: ETS named table option
 
-    *Default:* `false`
+    - *Default:* `false`
 
-    If making a non-public table it's reccommened to use this option, so that
-    the table name can be used outside of this store.
+    - *Notes:* If making a non-private table it's reccommened to give your table a name.
 
-  - `privacy:` ETS privacy option - `:public | :protected | :private`
+  - `privacy`: ETS privacy option - `:public | :protected | :private`
 
-    *Default:* `:private`
+    - *Default:* `:private`
 
-  - `heir:` ETS heir option - `{pid, any} | nil`
+  - `heir`: ETS heir option - `{pid, any} | nil`
 
-    *Default:* nil
+    - *Default:* nil
 
-  - `transactional`: Whether or not to perform transactional reads or writes.
+  - `concurrent`: Whether or not to optimize access for concurrent reads or writes.
 
-    *Allowed:* `:reads | :writes | :both | nil`
+    - *Allowed:* `:reads | :writes | :both | false`
 
-    *Default:* `nil`
+    - *Default:* `false`
 
   - `compressed`: Whether or not to compress the values being stored.
 
-    *Default:* `false`
+    - *Default:* `false`
 
-  - `initial:` A map of key/value pairs to ensure are set on the DETS table at boot.
+  - `initial`: A map of key/value pairs to ensure are set on the DETS table at boot.
 
-    *Default:* `%{}`
+    - *Default:* `%{}`
   """
   @spec setup(Mnemonix.Store.options)
     :: {:ok, state :: term} | {:stop, reason :: any}
@@ -64,8 +69,8 @@ defmodule Mnemonix.Stores.ETS do
     table   = Keyword.get(opts, :table) || Module.concat(__MODULE__, Table)
     privacy = Keyword.get(opts, :privacy) || :private
     heir    = Keyword.get(opts, :heir) || :none
-    read    = not Keyword.get(opts, :transactional, :both) in [:reads, :both]
-    write   = not Keyword.get(opts, :transactional, :both) in [:writes, :both]
+    read    = Keyword.get(opts, :concurrent, false) in [:reads, :both]
+    write   = Keyword.get(opts, :concurrent, false) in [:writes, :both]
 
     options = [:set, privacy,
       heir: heir,
@@ -90,6 +95,10 @@ defmodule Mnemonix.Stores.ETS do
       state            -> {:ok, state}
     end
   end
+
+  ####
+  # Mnemonix.Store.Behaviours.Map
+  ##
 
   @spec delete(Mnemonix.Store.t, Mnemonix.key)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
@@ -123,6 +132,22 @@ defmodule Mnemonix.Stores.ETS do
         message: "ETS operation failed: `:ets.insert(#{table}, {#{key}, #{value}})`"
       }
     end
+  end
+
+  ####
+  # Mnemonix.Store.Behaviours.Enumerable
+  ##
+
+  @spec enumerable?(Mnemonix.Store.t)
+    :: {:ok, Mnemonix.Store.t, boolean} | Mnemonix.Store.Behaviour.exception
+  def enumerable?(store) do
+    {:ok, store, true}
+  end
+
+  @spec to_enumerable(Mnemonix.Store.t)
+    :: {:ok, Mnemonix.Store.t, Enumerable.t} | Mnemonix.Store.Behaviour.exception
+  def to_enumerable(store = %Store{state: table}) do
+    {:ok, store, :ets.tab2list(table)}
   end
 
 end

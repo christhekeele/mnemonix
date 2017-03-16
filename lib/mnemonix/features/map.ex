@@ -79,6 +79,29 @@ defmodule Mnemonix.Features.Map do
   end
 
   @doc """
+  Drops the given `keys` from the `store`.
+
+  If `keys` contains keys that are not in the store, they’re simply ignored.
+
+  ## Examples
+
+      iex> store = Mnemonix.drop Mnemonix.new(%{a: 1, b: 2, d: 4}), [:a, :b, :c]
+      iex> Mnemonix.get store, :a
+      nil
+      iex> Mnemonix.get store, :d
+      4
+
+  """
+  @spec drop(Mnemonix.store, Enumerable.t)
+    :: %{Mnemonix.key => Mnemonix.value} | no_return
+  def drop(store, keys) do
+    case GenServer.call(store, {:drop, keys}) do
+      :ok                  -> store
+      {:raise, type, args} -> raise type, args
+    end
+  end
+
+  @doc """
   Fetches the value for specific `key`.
 
   If `key` does not exist, a `KeyError` is raised.
@@ -429,13 +452,61 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
-  # TODO:
-  # split(store, keys)
-  # Takes all entries corresponding to the given keys and extracts them into a map
+  @doc """
+  Takes all entries corresponding to the given `keys` and removes them from the `store` into a separate map.
 
-  # TODO:
-  # take(store, keys)
-  # Takes all entries corresponding to the given keys and returns them in a map
+  Returns a tuple with the new map and the store updated with removed keys.
+
+  If `keys` contains keys that are not in the store, they’re simply ignored.
+
+  ## Examples
+
+      iex> {removed, store} = Mnemonix.split Mnemonix.new(%{a: 1, b: 2, d: 4}), [:a, :b, :c]
+      iex> removed
+      %{a: 1, b: 2}
+      iex> Mnemonix.get(store, :a)
+      nil
+      iex> Mnemonix.get(store, :c)
+      nil
+      iex> Mnemonix.get(store, :d)
+      4
+
+      iex> {removed, store} = Mnemonix.split Mnemonix.new, [:a, :b, :c]
+      iex> removed
+      %{}
+
+  """
+  @spec split(Mnemonix.store, Enumerable.t)
+    :: {%{Mnemonix.key => Mnemonix.value}, Mnemonix.store} | no_return
+  def split(store, keys) do
+    case GenServer.call(store, {:split, keys}) do
+      {:ok, result}        -> {result, store}
+      {:raise, type, args} -> raise type, args
+    end
+  end
+
+  @doc """
+  Returns a map of all key/value pairs in `store` where the key is in `keys`.
+
+  If `keys` contains keys that are not in the store, they’re simply ignored.
+
+  ## Examples
+
+      iex> Mnemonix.take Mnemonix.new(%{a: 1, b: 2, d: 4}), [:a, :b, :c]
+      %{a: 1, b: 2}
+
+      iex> Mnemonix.take Mnemonix.new, [:a, :b, :c]
+      %{}
+
+  """
+  @spec take(Mnemonix.store, Enumerable.t)
+    :: %{Mnemonix.key => Mnemonix.value} | no_return
+  def take(store, keys) do
+    case GenServer.call(store, {:take, keys}) do
+      {:ok, result}        -> result
+      {:raise, type, args} -> raise type, args
+    end
+  end
 
   @doc """
   Updates the `key` in `store` with the given function.

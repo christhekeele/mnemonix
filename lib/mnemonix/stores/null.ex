@@ -9,13 +9,14 @@ defmodule Mnemonix.Stores.Null do
       iex> Mnemonix.delete(store, "foo")
       iex> Mnemonix.get(store, "foo")
       nil
+
+  This store supports the functions in `Mnemonix.Features.Enumerable`.
   """
 
   use Mnemonix.Store.Behaviour, docs: false
   use Mnemonix.Store.Translator.Raw
 
   alias Mnemonix.Store
-
 
   @doc """
   Starts a new `Mnemonix.Store.Server` using the `Mnemonix.Stores.Null` module with `options`.
@@ -43,6 +44,10 @@ defmodule Mnemonix.Stores.Null do
   @spec start_link(Mnemonix.Store.Server.options) :: GenServer.on_start
   def start_link(options \\ [])
   def start_link(options), do: super(options)
+
+  ####
+  # Mnemonix.Store.Behaviours.Core
+  ##
 
   @doc """
   Starts a new `Mnemonix.Store.Server` using `Mnemonix.Stores.Null` with `store` and `server` options.
@@ -80,6 +85,10 @@ defmodule Mnemonix.Stores.Null do
     {:ok, nil}
   end
 
+  ####
+  # Mnemonix.Store.Behaviours.Map
+  ##
+
   @spec delete(Mnemonix.Store.t, Mnemonix.key)
     :: {:ok, Mnemonix.Store.t}
   def delete(store = %Store{}, _key) do
@@ -97,4 +106,21 @@ defmodule Mnemonix.Stores.Null do
   def put(store = %Store{}, _key, _value) do
     {:ok, store}
   end
+
+  ####
+  # Mnemonix.Store.Behaviours.Enumerable
+  ##
+
+  @spec enumerable?(Mnemonix.Store.t)
+    :: {:ok, Mnemonix.Store.t, boolean} | Mnemonix.Store.Behaviour.exception
+  def enumerable?(store) do
+    {:ok, store, true}
+  end
+
+  @spec to_enumerable(Mnemonix.Store.t)
+    :: {:ok, Mnemonix.Store.t, Enumerable.t} | Mnemonix.Store.Behaviour.exception
+  def to_enumerable(store = %Store{}) do
+    {:ok, store, []}
+  end
+
 end

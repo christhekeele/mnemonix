@@ -4,19 +4,14 @@ defmodule Mnemonix.Test do
   doctest Mnemonix
 
   test "implements (almost) all functions in Map" do
-    assert Map.__info__(:functions) -- Mnemonix.__info__(:functions) == [
-      drop: 2,
-      equal?: 2,
+    exceptions = [
       from_struct: 1,
-      keys: 1,
       merge: 2,
       merge: 3,
       size: 1,
-      split: 2,
-      take: 2,
-      to_list: 1,
-      values: 1,
     ]
+
+    assert Map.__info__(:functions) -- Mnemonix.__info__(:functions) == exceptions
   end
 
 end

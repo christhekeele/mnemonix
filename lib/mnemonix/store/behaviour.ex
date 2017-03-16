@@ -18,9 +18,11 @@ defmodule Mnemonix.Store.Behaviour do
     quote location: :keep, bind_quoted: [docs: docs] do
 
       use Mnemonix.Store.Behaviours.Core
+
       use Mnemonix.Store.Behaviours.Map
-      use Mnemonix.Store.Behaviours.Expiry
       use Mnemonix.Store.Behaviours.Bump
+      use Mnemonix.Store.Behaviours.Expiry
+      use Mnemonix.Store.Behaviours.Enumerable
 
       @store __MODULE__ |> Inspect.inspect(%Inspect.Opts{})
 

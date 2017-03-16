@@ -58,6 +58,14 @@ defmodule Mnemonix.Store.Behaviours.Map do
   @callback put_new_lazy(Mnemonix.Store.t, Mnemonix.key, fun)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
+  @optional_callbacks split: 2
+  @callback split(Mnemonix.Store.t, [Mnemonix.key])
+    :: {:ok, Mnemonix.Store.t, %{Mnemonix.key => Mnemonix.value}} | Mnemonix.Store.Behaviour.exception
+
+  @optional_callbacks take: 2
+  @callback take(Mnemonix.Store.t, [Mnemonix.key])
+    :: {:ok, Mnemonix.Store.t, %{Mnemonix.key => Mnemonix.value}} | Mnemonix.Store.Behaviour.exception
+
   @optional_callbacks update: 4
   @callback update(Mnemonix.Store.t, Mnemonix.key, Mnemonix.value, fun)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
@@ -70,6 +78,24 @@ defmodule Mnemonix.Store.Behaviours.Map do
   defmacro __using__(_) do
     quote location: :keep do
       @behaviour unquote __MODULE__
+
+      @doc false
+      def drop(store, keys) do
+        try do
+          Enum.reduce(keys, store, fn key, store ->
+            with {:ok, store} <- delete(store, key) do
+              store
+            else
+              error -> throw {:error, error}
+            end
+          end)
+        catch
+          {:error, error} -> error
+        else
+          store -> {:ok, store}
+        end
+      end
+      defoverridable drop: 2
 
       @doc false
       def fetch!(store, key) do
@@ -201,6 +227,52 @@ defmodule Mnemonix.Store.Behaviours.Map do
         end
       end
       defoverridable put_new_lazy: 3
+
+      @doc false
+      def split(store, keys) do
+        try do
+          Enum.reduce(keys, {store, %{}}, fn key, {store, result} ->
+            with {:ok, store, value} <- fetch(store, key) do
+              case value do
+                :error       -> {store, result}
+                {:ok, value} -> case delete(store, key) do
+                  {:ok, store} -> {store, Map.put(result, key, value)}
+                  error -> throw {:error, error}
+                end
+                error -> throw {:error, error}
+              end
+            else
+              error -> throw {:error, error}
+            end
+          end)
+        catch
+          {:error, error} -> error
+        else
+          {store, result} -> {:ok, store, result}
+        end
+      end
+      defoverridable split: 2
+
+      @doc false
+      def take(store, keys) do
+        try do
+          Enum.reduce(keys, {store, %{}}, fn key, {store, result} ->
+            with {:ok, store, value} <- fetch(store, key) do
+              case value do
+                {:ok, value} -> {store, Map.put(result, key, value)}
+                :error       -> {store, result}
+              end
+            else
+              error -> throw {:error, error}
+            end
+          end)
+        catch
+          {:error, error} -> error
+        else
+          {store, result} -> {:ok, store, result}
+        end
+      end
+      defoverridable take: 2
 
       @doc false
       def update(store, key, initial, fun) do
