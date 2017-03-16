@@ -18,7 +18,7 @@ Mnemonix
   - Experiment with different key-value store backends for your application
   - Allow end-users of your library liberty to choose their preferred backend
 
-It encodes the behaviour, lifecycle, and feature set of a key-value store behind a common `GenServer` interface, normalizes different store APIs to conform to that interface, polyfill stores lacking features, and exposes access to them through a familiar `Map` API.
+It encodes the behaviour, lifecycle, and feature set of a key-value store behind a common `GenServer` interface, normalizes different store APIs to conform to that interface, polyfills stores lacking features, and exposes access to them through a familiar `Map` API.
 
 [Learn more about starting a `Mnemonix.Store.Server` and manipulating it with the `Mnemonix` API in the documentation.](https://hexdocs.pm/mnemonix/index.html)
 
