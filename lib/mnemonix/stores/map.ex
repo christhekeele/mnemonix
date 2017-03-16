@@ -29,7 +29,7 @@ defmodule Mnemonix.Stores.Map do
   ##
 
   @doc """
-  Constructs a map to store data.
+  Constructs a map to store data using provided `opts`.
 
   ## Options
 

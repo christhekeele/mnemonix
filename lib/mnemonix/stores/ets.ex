@@ -27,7 +27,7 @@ defmodule Mnemonix.Stores.ETS do
   ##
 
   @doc """
-  Creates a new ETS table to store state.
+  Creates a new ETS table to store state using provided `opts`.
 
   ## Options
 

@@ -30,7 +30,7 @@ defmodule Mnemonix.Stores.Mnesia do
   ##
 
   @doc """
-  Creates a Mnesia table to store state in.
+  Creates a Mnesia table to store state in using provided `opts`.
 
   If the table specified already exists, it will use that instead.
 

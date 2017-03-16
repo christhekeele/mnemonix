@@ -111,12 +111,14 @@ defmodule Mnemonix do
   @doc """
   Starts the `:mnemonix` application.
 
-  Finds stores in your application configuration and brings them up when your app starts.
-  See `Mnemonix.Application` for more.
+  Finds stores in your application configuration and brings them up when your app starts with the
+  specified start `type`.
+
+  See `Mnemonix.Application` for more on how the `opts` are consumed.
   """
   @spec start(Application.start_type, [Mnemonix.Store.Server.config])
     :: {:ok, store} | {:error, reason :: term}
-  def start(_type, [default]) do
+  def start(_type, _opts = [default]) do
     Mnemonix.Application.start_link(default)
   end
 

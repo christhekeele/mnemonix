@@ -28,7 +28,7 @@ if Code.ensure_loaded?(Memcache) do
     ##
 
     @doc """
-    Connects to memcached to store data.
+    Connects to memcached to store data using provided `opts`.
 
   - `initial:` A map of key/value pairs to ensure are set in memcached at boot.
 

@@ -50,7 +50,7 @@ defmodule Mnemonix.Features.Enumerable do
   end
 
   @doc """
-  Checks if the contents of two stores are equal.
+  Checks that contents of stores `store1` and `store2` are equal.
 
   Two stores are considered to be equal if they contain the same keys and those keys contain the same values.
 

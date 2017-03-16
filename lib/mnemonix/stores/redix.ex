@@ -28,7 +28,7 @@ if Code.ensure_loaded?(Redix) do
     ##
 
     @doc """
-    Connects to redis to store data.
+    Connects to redis to store data using provided `opts`.
 
     ## Options
 

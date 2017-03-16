@@ -27,7 +27,7 @@ defmodule Mnemonix.Stores.DETS do
   ##
 
   @doc """
-  Creates a new DETS table to store state.
+  Creates a new DETS table to store state using provided `opts`.
 
   If the DETS file already exists, will use the contents of that table.
 

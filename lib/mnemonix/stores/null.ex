@@ -77,7 +77,7 @@ defmodule Mnemonix.Stores.Null do
   @doc """
   Skips setup since this store does nothing.
 
-  Ignores all options.
+  Ignores all `opts`.
   """
   @spec setup(Mnemonix.Store.options)
     :: {:ok, nil}

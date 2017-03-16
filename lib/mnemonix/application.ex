@@ -34,7 +34,7 @@ defmodule Mnemonix.Application do
   """
 
   @doc """
-  Starts a Mnemonix.Application with a default configuration. Invoked by `Mnemonix.start/2`.
+  Starts a Mnemonix.Application with a `default` configuration. Invoked by `Mnemonix.start/2`.
   """
   @spec start_link(Mnemonix.Store.Server.config)
     :: {:ok, Mnemonix.store} | {:error, reason :: term}
