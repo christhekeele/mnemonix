@@ -509,7 +509,7 @@ defmodule Mnemonix.Features.Map do
   end
 
   @doc """
-  Updates the `key` in `store` with the given function.
+  Updates the value at `key` in `store` with the given `function`.
 
   If the `key` does not exist, inserts the given `initial` value.
 
@@ -525,15 +525,15 @@ defmodule Mnemonix.Features.Map do
   """
   @spec update(Mnemonix.store, Mnemonix.key, Mnemonix.value, (Mnemonix.value -> Mnemonix.value))
     :: Mnemonix.store
-  def update(store, key, initial, fun) do
-    case GenServer.call(store, {:update, key, initial, fun}) do
+  def update(store, key, initial, function) do
+    case GenServer.call(store, {:update, key, initial, function}) do
       :ok                  -> store
       {:raise, type, args} -> raise type, args
     end
   end
 
   @doc """
-  Updates the `key` with the given function.
+  Updates the value at `key` in `store` with the given `function`.
 
   If the `key` does not exist, raises `KeyError`.
 
@@ -548,8 +548,8 @@ defmodule Mnemonix.Features.Map do
   """
   @spec update!(Mnemonix.store, Mnemonix.key, (Mnemonix.value -> Mnemonix.value))
     :: Mnemonix.store | no_return
-  def update!(store, key, fun) do
-    case GenServer.call(store, {:update!, key, fun}) do
+  def update!(store, key, function) do
+    case GenServer.call(store, {:update!, key, function}) do
       :ok                  -> store
       {:raise, type, args} -> raise type, args
     end

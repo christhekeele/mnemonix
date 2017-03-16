@@ -114,11 +114,11 @@ defmodule Mnemonix do
   Finds stores in your application configuration and brings them up when your app starts with the
   specified start `type`.
 
-  See `Mnemonix.Application` for more on how the `opts` are consumed.
+  See `Mnemonix.Application` for more on how the `options` are consumed.
   """
-  @spec start(Application.start_type, [Mnemonix.Store.Server.config])
+  @spec start(Application.start_type, Mnemonix.Application.options)
     :: {:ok, store} | {:error, reason :: term}
-  def start(_type, _opts = [default]) do
+  def start(_type, [default]) do
     Mnemonix.Application.start_link(default)
   end
 

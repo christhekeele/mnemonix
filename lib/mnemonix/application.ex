@@ -33,6 +33,11 @@ defmodule Mnemonix.Application do
       #=> :b
   """
 
+  @typedoc """
+  Default options used by `Mnemonix.Application.start_link/2` to start stores with no specified config.
+  """
+  @type options :: [Mnemonix.Store.Server.config]
+
   @doc """
   Starts a Mnemonix.Application with a `default` configuration. Invoked by `Mnemonix.start/2`.
   """

@@ -1,24 +1,24 @@
 Mnemonix
 ========
 
-> *A unified interface to key-value stores.*
+> **A unified interface to key-value stores.**
 
 [hex]: https://hex.pm/packages/mnemonix
 [hex-version-badge]:   https://img.shields.io/hexpm/v/mnemonix.svg?maxAge=86400&style=flat-square
 [hex-downloads-badge]: https://img.shields.io/hexpm/dt/mnemonix.svg?maxAge=86400&style=flat-square
 [hex-license-badge]:   https://img.shields.io/badge/license-MIT-7D26CD.svg?maxAge=86400&style=flat-square
 
-[deps]: https://beta.hexfaktor.org/github/christhekeele/mnemonix
-[deps-badge]: https://beta.hexfaktor.org/badge/all/github/christhekeele/mnemonix.svg?branch=master&style=flat-square
-
 [docs]: https://inch-ci.org/github/christhekeele/mnemonix
 [docs-badge]: https://inch-ci.org/github/christhekeele/mnemonix.svg?branch=master&style=flat-square
+
+[deps]: https://beta.hexfaktor.org/github/christhekeele/mnemonix
+[deps-badge]: https://beta.hexfaktor.org/badge/all/github/christhekeele/mnemonix.svg?branch=master&style=flat-square
 
 [![Version][hex-version-badge]][hex]
 [![Downloads][hex-downloads-badge]][hex]
 [![License][hex-license-badge]][hex]
-[![Dependencies][deps-badge]][deps]
 [![Documentation][docs-badge]][docs]
+[![Dependencies][deps-badge]][deps]
 
 ## Synopsis
 
