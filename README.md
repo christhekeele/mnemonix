@@ -1,7 +1,7 @@
 Mnemonix
 ========
 
-> **A unified interface to key-value stores.**
+> **A unified interface to key/value stores.**
 
 [hex]: https://hex.pm/packages/mnemonix
 [hex-version-badge]:   https://img.shields.io/hexpm/v/mnemonix.svg?maxAge=86400&style=flat-square
@@ -24,21 +24,19 @@ Mnemonix
 
 `Mnemonix` aims to help you:
 
-  - Get running with key-values stores with minimal ceremony
-  - Experiment with different key-value store backends for your application
+  - Get running with key/values stores with minimal ceremony
+  - Experiment with different key/value store backends for your application
   - Allow end-users of your library liberty to choose their preferred backend
 
-It encodes the behaviour, lifecycle, and feature set of a key-value store behind a common `GenServer` interface, normalizes different store APIs to conform to that interface, polyfills stores lacking features, and exposes access to them through a familiar `Map` API.
+It encodes the behaviour, lifecycle, and feature set of a key/value store behind a common `GenServer` interface, normalizes different store APIs to conform to that interface, polyfills stores lacking features, and exposes access to them through a familiar `Map` API.
 
-[Learn more about starting a `Mnemonix.Store.Server` and manipulating it with the `Mnemonix` API in the documentation.](https://hexdocs.pm/mnemonix/index.html)
+[Learn more about starting a store and manipulating it with the `Mnemonix` API in the documentation.](https://hexdocs.pm/mnemonix/index.html)
 
 ##### Pronunciation: **`/nɛˈmɑːnɪks/`** – *`noo-MAHN-icks`*
 
 > Mnemonic systems are techniques or strategies consciously used to improve memory. They help use information already stored in long-term memory to make memorization an easier task.
 >
 > — *[Mnemonics](https://en.wikipedia.org/wiki/Mnemonic)*, **Wikipedia**
-
-*Not to be confused with the mnemonicode library, [`Mnemonex`](https://github.com/mwmiller/mnemonex).*
 
 ## Status
 
@@ -60,13 +58,15 @@ It encodes the behaviour, lifecycle, and feature set of a key-value store behind
 
 ## Features
 
-Obviously, `Mnemonix` gives you `Map`-style functions to manipulate various key-value stores. However, `Mnemonix` also offers extra features beyond simple Map functions. Stores that don't natively support these features have the capability added through an Elixir polyfill, guaranteeing you can use and switch stores without worrying about what features they support under the hood.
+Obviously, `Mnemonix` gives you `Map`-style functions to manipulate various key/value stores. However, `Mnemonix` also offers extra features beyond simple Map functions. Stores that don't natively support these features have the capability added through an Elixir polyfill, guaranteeing you can use and switch stores without worrying about what features they support under the hood.
 
 Available features are:
 
-- `Mnemonix.Features.Map` - The key-value manipulation you know and love
+- `Mnemonix.Features.Map` - The key/value manipulation you know and love
 - `Mnemonix.Features.Bump` - Increment/decrement integer values
 - `Mnemonix.Features.Expiry` - Set entries to remove themselves from the store with a ttl
+- `Mnemonix.Features.Enumerable` - Iterate over all key/value pairs in supported stores
+- `Mnemonix.Features.Supervision` - Handles `start_link` for custom stores so they fit in with built-in tools
 
 ## Installation
 
@@ -74,7 +74,7 @@ Available features are:
 
   ```elixir
   def deps do
-    [{:mnemonix, "~> 0.8.1"}]
+    [{:mnemonix, "~> 0.9.0"}]
   end
   ```
 
@@ -127,3 +127,8 @@ By default, the test suite omits doctests. This is because, by nature of the lib
 If you wish to run these, use the environment variable `DOCTESTS=true`. For them to pass, your system must be configured using the defaults in the setup steps specified above.
 
 The CI server fulfills these requirements, so if you can't, you can always configure your fork to use [travis](https://travis-ci.org) too, to get the same build environment we use to vet all pull requests.
+
+Notes
+-----
+
+- *Not to be confused with the mnemonicode library, [`Mnemonex`](https://github.com/mwmiller/mnemonex).*

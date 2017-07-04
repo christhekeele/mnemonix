@@ -5,7 +5,7 @@ defmodule Mnemonix.Mixfile do
     name: "Mnemonix",
     app: :mnemonix,
 
-    version: "0.8.1",
+    version: "0.9.0",
     elixir: "~> 1.3",
 
     build_embedded: Mix.env == :prod,
@@ -58,7 +58,7 @@ defmodule Mnemonix.Mixfile do
   ]
 
   defp package, do: [
-    description: "A unified interface to key-value stores.",
+    description: "A unified interface to key/value stores.",
     maintainers: [
       "Chris Keele <christhekeele+mnemonix@gmail.com>",
     ],
