@@ -19,9 +19,9 @@ defmodule Mnemonix.Stores.Null do
   alias Mnemonix.Store
 
   @doc """
-  Starts a new `Mnemonix.Store.Server` using the `Mnemonix.Stores.Null` module with `options`.
+  Starts a new store using the `Mnemonix.Stores.Null` module with `options`.
 
-  The `options` are the same as described in `Mnemonix.Store.Server.start_link/2`.
+  The `options` are the same as described in `Mnemonix.Features.Supervision.start_link/2`.
   The `:store` options are used in `config/1` to start the store;
   the `:server` options are passed directly to `GenServer.start_link/2`.
 
@@ -41,7 +41,7 @@ defmodule Mnemonix.Stores.Null do
       nil
   """
   @spec start_link()                              :: GenServer.on_start
-  @spec start_link(Mnemonix.Store.Server.options) :: GenServer.on_start
+  @spec start_link(Mnemonix.Supervisor.options) :: GenServer.on_start
   def start_link(options \\ [])
   def start_link(options), do: super(options)
 
@@ -50,9 +50,9 @@ defmodule Mnemonix.Stores.Null do
   ##
 
   @doc """
-  Starts a new `Mnemonix.Store.Server` using `Mnemonix.Stores.Null` with `store` and `server` options.
+  Starts a new store using `Mnemonix.Stores.Null` with `store` and `server` options.
 
-  The options are the same as described in `Mnemonix.Store.Server.start_link/3`.
+  The options are the same as described in `Mnemonix.start_link/2`.
   The `store` options are used in `config/1` to start the store;
   the `server` options are passed directly to `GenServer.start_link/2`.
 
@@ -71,7 +71,7 @@ defmodule Mnemonix.Stores.Null do
       iex> Mnemonix.get(My.Mnemonix.Stores.Null, "foo")
       nil
   """
-  @spec start_link(Mnemonix.Store.Server.options, GenServer.options) :: GenServer.on_start
+  @spec start_link(Mnemonix.Supervisor.options, GenServer.options) :: GenServer.on_start
   def start_link(store, server), do: super(store, server)
 
   @doc """

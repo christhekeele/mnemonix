@@ -1,7 +1,7 @@
 if Code.ensure_loaded?(Plug) do
   defmodule Plug.Session.MNEMONIX do
     @moduledoc """
-    Stores the session in a `Mnemonix.Store.Server`.
+    Stores the session in a store.
 
     This store does not create the Mnemonix store; it expects that a reference to an existing store server is passed in as an argument.
 

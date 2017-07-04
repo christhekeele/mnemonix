@@ -7,7 +7,7 @@ defmodule Mnemonix.Store.Behaviour do
   @type t :: Module.t
 
   @typedoc """
-  An instruction to the Mnemonix.Store.server to raise an error in the client.
+  An instruction to the `Mnemonix.Store.Server` to raise an error in the client.
   """
   @type exception :: {:raise, Module.t, raise_opts :: Keyword.t}
 
@@ -15,7 +15,7 @@ defmodule Mnemonix.Store.Behaviour do
   defmacro __using__(opts) do
     docs = Keyword.get(opts, :docs, true)
 
-    quote location: :keep, bind_quoted: [docs: docs] do
+    quote bind_quoted: [docs: docs] do
 
       use Mnemonix.Store.Behaviours.Core
 
@@ -28,9 +28,9 @@ defmodule Mnemonix.Store.Behaviour do
 
       if docs do
         @doc """
-        Starts a new `Mnemonix.Store.Server` using the `#{@store}` module with `options`.
+        Starts a new store using the `#{@store}` module with `options`.
 
-        The `options` are the same as described in `Mnemonix.Store.Server.start_link/2`.
+        The `options` are the same as described in `Mnemonix.Features.Supervision.start_link/2`.
         The `:store` options are used in `config/1` to start the store;
         the `:server` options are passed directly to `GenServer.start_link/2`.
 
@@ -51,17 +51,17 @@ defmodule Mnemonix.Store.Behaviour do
         """
       end
       @spec start_link()                              :: GenServer.on_start
-      @spec start_link(Mnemonix.Store.Server.options) :: GenServer.on_start
+      @spec start_link(Mnemonix.Supervisor.options) :: GenServer.on_start
       def start_link(options \\ []) do
-        Mnemonix.Store.Server.start_link(__MODULE__, options)
+        Mnemonix.start_link(__MODULE__, options)
       end
       defoverridable start_link: 0, start_link: 1
 
       if docs do
         @doc """
-        Starts a new `Mnemonix.Store.Server` using `#{@store}` with `store` and `server` options.
+        Starts a new store using `#{@store}` with `store` and `server` options.
 
-        The options are the same as described in `Mnemonix.Store.Server.start_link/3`.
+        The options are the same as described in `Mnemonix.start_link/2`.
         The `store` options are used in `config/1` to start the store;
         the `server` options are passed directly to `GenServer.start_link/2`.
 
@@ -81,7 +81,7 @@ defmodule Mnemonix.Store.Behaviour do
             "bar"
         """
       end
-      @spec start_link(Mnemonix.Store.Server.options, GenServer.options) :: GenServer.on_start
+      @spec start_link(Mnemonix.Supervisor.options, GenServer.options) :: GenServer.on_start
       def start_link(store, server) do
         Mnemonix.Store.Server.start_link(__MODULE__, store, server)
       end

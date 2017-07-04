@@ -7,7 +7,7 @@ defmodule Mnemonix.Builder do
       iex> defmodule My.Store do
       ...>   use Mnemonix.Builder
       ...>   def start_link do
-      ...>     Mnemonix.Store.Server.start_link(Mnemonix.Stores.ETS, server: [name: __MODULE__])
+      ...>     Mnemonix.start_link(Mnemonix.Stores.ETS, server: [name: __MODULE__])
       ...>   end
       ...> end
       iex> {:ok, store} = My.Store.start_link
@@ -18,13 +18,13 @@ defmodule Mnemonix.Builder do
       1
 
   You can pass in the `:singleton` option to create a module that uses its own name
-  as a `Mnemonix.Store.Server` reference, omitting the need for the first argument to all
+  as a store reference, omitting the need for the first argument to all
   `Mnemonix.Feature` functions:
 
       iex> defmodule My.Singleton do
       ...>   use Mnemonix.Builder, singleton: true
       ...>   def start_link do
-      ...>     Mnemonix.Store.Server.start_link(Mnemonix.Stores.ETS, server: [name: __MODULE__])
+      ...>     Mnemonix.start_link(Mnemonix.Stores.ETS, server: [name: __MODULE__])
       ...>   end
       ...> end
       iex> My.Singleton.start_link
@@ -39,7 +39,7 @@ defmodule Mnemonix.Builder do
       iex> defmodule My.Other.Singleton do
       ...>   use Mnemonix.Builder, singleton: true
       ...>   def start_link do
-      ...>     Mnemonix.Store.Server.start_link(Mnemonix.Stores.ETS, server: [name: __MODULE__])
+      ...>     Mnemonix.start_link(Mnemonix.Stores.ETS, server: [name: __MODULE__])
       ...>   end
       ...> end
       iex> My.Other.Singleton.start_link
@@ -67,11 +67,12 @@ defmodule Mnemonix.Builder do
   """
 
   defmacro __using__(opts) do
-    quote location: :keep do
+    quote do
       use Mnemonix.Features.Map, unquote(opts)
       use Mnemonix.Features.Bump, unquote(opts)
       use Mnemonix.Features.Expiry, unquote(opts)
       use Mnemonix.Features.Enumerable, unquote(opts)
+      use Mnemonix.Features.Supervision, unquote(opts)
     end
   end
 

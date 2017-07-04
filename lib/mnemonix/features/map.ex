@@ -1,6 +1,6 @@
 defmodule Mnemonix.Features.Map do
   @moduledoc """
-  Functions to operate on key/value pairs within a `Mnemonix.Store.Server`.
+  Functions to operate on key/value pairs within a store.
 
   All of these functions are available on the main `Mnemonix` module.
   """

@@ -1,9 +1,9 @@
 defmodule Mnemonix do
   @moduledoc """
-  Provides easy access to a `Mnemonix.Store.Server` through a Map-like interface.
+  Provides easy access to a store through a Map-like interface.
 
   Rather than a map, you can use the `t:GenServer.server/0` reference returned
-  by `Mnemonix.Store.Server.start_link/2` to perform operations on Mnemonix stores.
+  by `Mnemonix.Features.Supervision.start_link/2` to perform operations on Mnemonix stores.
 
   All functions defined in the `Mnemonix.Features` modules are available on the `Mnemonix` module:
 
@@ -14,7 +14,7 @@ defmodule Mnemonix do
 
   ## Map Features
 
-  `Mnemonix.Features.Map` lets you manipulate a `Mnemonix.Store.Server` just like a `Map`.
+  `Mnemonix.Features.Map` lets you manipulate a store just like a `Map`.
 
   The `new/0`, `new/1`, and `new/2` functions start links to a
   `Mnemonix.Stores.Map` (mimicking `Map.new`) and make it easy to play with the
@@ -41,14 +41,14 @@ defmodule Mnemonix do
       iex> Mnemonix.get(store, :fizz)
       4
 
-  These functions behave exactly like their `Map` counterparts. However, `Mnemonix`
-  doesn't supply analogs for functions that assume a store can be fit into a specific shape:
+  These functions behave exactly like their `Map` counterparts. `Mnemonix`
+  doesn't supply analogs for only a few Map functions:
 
   - `Map.from_struct/1`
   - `Map.merge/2`
   - `Map.merge/3`
 
-  Functions that exhaustively iterate over a store's contents live are implemented differently, see below.
+  Map functions that traverse every entry in a store are handled a little differently, in the Enumerable feature below.
 
   ## Bump Features
 
@@ -75,19 +75,23 @@ defmodule Mnemonix do
   ## Enumerable Features
 
   `Mnemonix.Features.Enumerable` enables functions that try to iterate over a store's contents. These
-  functions are to keep as much parity with the `Map` API as possible, but be warned: they are only
-  implemented for a subset of stores, and may be very inefficient. Consult your store's specific
-  documentation for more details.
+  functions keep parity with the `Map` API, but be warned: they are only implemented for a subset of
+  stores, and may be very inefficient. Consult your store's specific documentation for more details.
 
   These `Map` equivalents will raise `Mnemonix.Features.Enumerable.Error` if your store doesn't
   support them:
 
-  - `Mnemonix.equal?/2`
-  - `Mnemonix.keys/1`
-  - `Mnemonix.to_list/1`
-  - `Mnemonix.values/1`
+  - `Mnemonix.Features.Enumerable.equal?/2`
+  - `Mnemonix.Features.Enumerable.keys/1`
+  - `Mnemonix.Features.Enumerable.to_list/1`
+  - `Mnemonix.Features.Enumerable.values/1`
 
-  Any store can be checked for enumerability support via `Mnemonix.enumerable?/1`.
+  Any store can be checked for enumerable support via `Mnemonix.enumerable?/1`.
+
+  ## Supervision Features
+
+  `Mnemonix.Features.Supervision` allows all stores to fit into Mnemonix supervision tools out of the box.
+  If you know what you're doing and really want to customize them, you can always override them.
 
   """
 
@@ -122,8 +126,10 @@ defmodule Mnemonix do
     Mnemonix.Application.start_link(default)
   end
 
+  use Mnemonix.Builder
+
   @doc """
-  Starts a new empty `Mnemonix.Stores.Map`-powered `Mnemonix.Store.Server`.
+  Starts a new empty `Mnemonix.Stores.Map`-powered store.
 
   ## Examples
 
@@ -135,13 +141,13 @@ defmodule Mnemonix do
   """
   @spec new() :: store
   def new() do
-    with {:ok, store} <- Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map) do
+    with {:ok, store} <- start_link(Mnemonix.Stores.Map) do
       store
     end
   end
 
   @doc """
-  Starts a new `Mnemonix.Stores.Map`-powered `Mnemonix.Store.Server` using `enumerable` for initial data.
+  Starts a new `Mnemonix.Stores.Map`-powered store using `enumerable` for initial data.
 
   Duplicated keys in the `enumerable` are removed; the last mentioned one prevails.
 
@@ -159,9 +165,9 @@ defmodule Mnemonix do
   end
 
   @doc """
-  Starts a new `Mnemonix.Stores.Map`-powered `Mnemonix.Store.Server` applying a `transformation` to `enumerable` for initial data.
+  Starts a new `Mnemonix.Stores.Map`-powered store applying a `transformation` to `enumerable` for initial data.
 
-  Duplicated keys are removed; the latest one prevails.
+  Duplicated keys are removed; the last mentioned one prevails.
 
   ## Examples
 
@@ -180,9 +186,7 @@ defmodule Mnemonix do
 
   defp do_new(map) do
     options = [store: [initial: map]]
-    with {:ok, store} <- Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, options), do: store
+    with {:ok, store} <- start_link(Mnemonix.Stores.Map, options), do: store
   end
-
-  use Mnemonix.Builder
 
 end

@@ -5,7 +5,7 @@ defmodule Mnemonix.Builder.Bench do
     use Mnemonix.Builder
 
     def start_link do
-      Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, server: [name: __MODULE__])
+      Mnemonix.start_link(Mnemonix.Stores.Map, server: [name: __MODULE__])
     end
   end
 

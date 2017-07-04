@@ -34,32 +34,43 @@ defmodule Mnemonix.Application do
   """
 
   @typedoc """
-  Default options used by `Mnemonix.Application.start_link/2` to start stores with no specified config.
+  Default options used by `Mnemonix.start/2` to start stores with no specified config.
+
+  The default options are `[{Mnemonix.Stores.Map, []}]`.
   """
-  @type options :: [Mnemonix.Store.Server.config]
+  @type options :: [Mnemonix.Supervisor.config]
 
   @doc """
-  Starts a Mnemonix.Application with a `default` configuration. Invoked by `Mnemonix.start/2`.
-  """
-  @spec start_link(Mnemonix.Store.Server.config)
+  Starts supervision of the Mnemonix.Application.
+
+  Reads from the `:mnemonix` application `:stores` configuration to detect stores to automatically supervise.
+
+  If a store listed in the configuration has its own entry under the `:mnemonix` application configuration,
+  that entry will be used to configure the store.
+
+  Otherwise, the provided default config will be used.
+  The default config is `{Mnemonix.Stores.Map, []}` and automatically passed in from `Mnemonix.start/2`
+  when your application starts.
+  """ && false
+  @spec start_link({Mnemonix.Store.Behaviour.t, Mnemonix.Supervisor.options})
     :: {:ok, Mnemonix.store} | {:error, reason :: term}
-  def start_link(default) do
-    :mnemonix
+  def start_link({impl, opts}) do
+    options = :mnemonix
     |> Application.get_env(:stores, [])
     |> Enum.map(fn name ->
       :mnemonix
-      |> Application.get_env(name, default)
+      |> Application.get_env(name, [])
       |> start_defaults(name)
+      |> Keyword.merge(opts)
     end)
-    |> Mnemonix.Store.Supervisor.start_link
+    Mnemonix.start_link(impl, options)
   end
 
-  defp start_defaults({module, opts}, name) do
-    {module, opts
-      |> Keyword.put(:otp_app, :mnemonix)
-      |> Keyword.put_new(:server, [])
-      |> Kernel.put_in([:server, :name], name)
-    }
+  defp start_defaults(opts, name) do
+    opts
+    |> Keyword.put(:otp_app, :mnemonix)
+    |> Keyword.put_new(:server, [])
+    |> Kernel.put_in([:server, :name], name)
   end
 
 end
