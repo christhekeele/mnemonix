@@ -27,7 +27,7 @@ defmodule Mnemonix.Store.Behaviours.Core do
 
   @doc false
   defmacro __using__(_) do
-    quote location: :keep do
+    quote do
       @behaviour unquote __MODULE__
 
       @doc false

@@ -1,6 +1,6 @@
 defmodule Mnemonix.Features.Enumerable do
   @moduledoc """
-  Functions that rely on enumerating over all key/value pairs within a `Mnemonix.Store.Server`.
+  Functions that rely on enumerating over all key/value pairs within a store.
 
   All of these functions are available on the main `Mnemonix` module. However, not all stores
   support exhaustive iteration. Consult your store's docs for more information.
@@ -32,11 +32,11 @@ defmodule Mnemonix.Features.Enumerable do
 
   ## Examples
 
-      iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.ETS)
+      iex> {:ok, store} = Mnemonix.start_link(Mnemonix.Stores.ETS)
       iex> Mnemonix.enumerable? store
       true
 
-      iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Memcachex)
+      iex> {:ok, store} = Mnemonix.start_link(Mnemonix.Stores.Memcachex)
       iex> Mnemonix.enumerable? store
       false
   """
@@ -126,7 +126,7 @@ defmodule Mnemonix.Features.Enumerable do
       iex> Mnemonix.to_list Mnemonix.new
       []
 
-      iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Memcachex)
+      iex> {:ok, store} = Mnemonix.start_link(Mnemonix.Stores.Memcachex)
       iex> Mnemonix.to_list store
       ** (Mnemonix.Features.Enumerable.Error) Mnemonix.Stores.Memcachex cannot be exhaustively iterated over
 

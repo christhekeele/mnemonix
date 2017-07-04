@@ -1,6 +1,6 @@
 defmodule Mnemonix.Features.Expiry do
   @moduledoc """
-  Functions to manage the time-to-live of entries within a `Mnemonix.Store.Server`.
+  Functions to manage the time-to-live of entries within a store.
 
   All of these functions are available on the main `Mnemonix` module.
   """
