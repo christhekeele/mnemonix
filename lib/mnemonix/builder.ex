@@ -6,9 +6,6 @@ defmodule Mnemonix.Builder do
 
       iex> defmodule My.Store do
       ...>   use Mnemonix.Builder
-      ...>   def start_link do
-      ...>     Mnemonix.start_link(Mnemonix.Stores.ETS, server: [name: __MODULE__])
-      ...>   end
       ...> end
       iex> {:ok, store} = My.Store.start_link
       iex> My.Store.get(store, :a)
@@ -23,9 +20,6 @@ defmodule Mnemonix.Builder do
 
       iex> defmodule My.Singleton do
       ...>   use Mnemonix.Builder, singleton: true
-      ...>   def start_link do
-      ...>     Mnemonix.start_link(Mnemonix.Stores.ETS, server: [name: __MODULE__])
-      ...>   end
       ...> end
       iex> My.Singleton.start_link
       iex> My.Singleton.get(:a)
@@ -38,9 +32,6 @@ defmodule Mnemonix.Builder do
 
       iex> defmodule My.Other.Singleton do
       ...>   use Mnemonix.Builder, singleton: true
-      ...>   def start_link do
-      ...>     Mnemonix.start_link(Mnemonix.Stores.ETS, server: [name: __MODULE__])
-      ...>   end
       ...> end
       iex> My.Other.Singleton.start_link
       iex> My.Other.Singleton.get(:a)
@@ -51,9 +42,24 @@ defmodule Mnemonix.Builder do
       iex> My.Other.Singleton.get(:a)
       1
 
-  You can pass a name into `:singleton` to use a different named store:
+  Singletons use their own names as references names to work.
+  You can change the name used when defining the singleton:
 
-      iex> Mnemonix.Stores.Map.start_link(server: [name: :store])
+      iex> defmodule My.Other.Singleton do
+      ...>   use Mnemonix.Builder, singleton: My.Other.Singleton.Name
+      ...> end
+      iex> My.Other.Singleton.start_link
+      iex> My.Other.Singleton.get(:a)
+      nil
+      iex> Mnemonix.get(My.Other.Singleton, :a)
+      nil
+      iex> Mnemonix.put(My.Other.Singleton, :a, 1)
+      iex> My.Other.Singleton.get(:a)
+      1
+
+    Singletons use their own names as references names to work.
+    You can change the name used when defining the singleton:
+
       iex> defmodule My.Singleton.Interface do
       ...>   use Mnemonix.Builder, singleton: :store
       ...> end
