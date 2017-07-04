@@ -129,7 +129,7 @@ defmodule Mnemonix do
   use Mnemonix.Builder
 
   @doc """
-  Starts a new empty `Mnemonix.Stores.Map`-powered store.
+  Starts a new empty in-memory store.
 
   ## Examples
 
@@ -141,13 +141,11 @@ defmodule Mnemonix do
   """
   @spec new() :: store
   def new() do
-    with {:ok, store} <- start_link(Mnemonix.Stores.Map) do
-      store
-    end
+    do_new Map.new
   end
 
   @doc """
-  Starts a new `Mnemonix.Stores.Map`-powered store using `enumerable` for initial data.
+  Starts a new in-memory store using `enumerable` for initial data.
 
   Duplicated keys in the `enumerable` are removed; the last mentioned one prevails.
 
@@ -165,7 +163,7 @@ defmodule Mnemonix do
   end
 
   @doc """
-  Starts a new `Mnemonix.Stores.Map`-powered store applying a `transformation` to `enumerable` for initial data.
+  Starts a new store applying a `transformation` to `enumerable` for initial data.
 
   Duplicated keys are removed; the last mentioned one prevails.
 
@@ -185,8 +183,10 @@ defmodule Mnemonix do
   end
 
   defp do_new(map) do
-    options = [store: [initial: map]]
-    with {:ok, store} <- start_link(Mnemonix.Stores.Map, options), do: store
+    {impl, opts} = Mnemonix.Application.default
+    opts = if Keyword.get(opts, :store), do: opts, else: Keyword.put(opts, :store, [])
+    opts = Kernel.put_in(opts, [:store, :initial], map)
+    with {:ok, store} <- start_link(impl, opts), do: store
   end
 
 end

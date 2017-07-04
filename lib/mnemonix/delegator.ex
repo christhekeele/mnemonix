@@ -19,6 +19,18 @@ defmodule Mnemonix.Delegator do
 
   # Singleton start_links are special:
 
+  # Without impl or options, they should use the version below with the application default
+  defp delegate_singleton(_module, :start_link, 0, _store) do
+    quote do
+      @doc false
+      def start_link do
+        {impl, opts} = Mnemonix.Application.default
+        start_link impl, opts
+      end
+      defoverridable [start_link: 0]
+    end
+  end
+
   # Without options, they should call the version below
   defp delegate_singleton(_module, :start_link, 1, _store) do
     quote do

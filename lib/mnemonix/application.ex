@@ -60,17 +60,28 @@ defmodule Mnemonix.Application do
     |> Enum.map(fn name ->
       :mnemonix
       |> Application.get_env(name, [])
-      |> start_defaults(name)
+      |> start_link_defaults(name)
       |> Keyword.merge(opts)
     end)
     Mnemonix.start_link(impl, options)
   end
 
-  defp start_defaults(opts, name) do
+  defp start_link_defaults(opts, name) do
     opts
     |> Keyword.put(:otp_app, :mnemonix)
     |> Keyword.put_new(:server, [])
     |> Kernel.put_in([:server, :name], name)
+  end
+
+  @doc """
+  The default Mnemonix.Application options defined in the project's `mix.exs`.
+  """
+  def default do
+    :mnemonix
+    |> Application.spec
+    |> Keyword.get(:mod)
+    |> elem(1)
+    |> List.first
   end
 
 end

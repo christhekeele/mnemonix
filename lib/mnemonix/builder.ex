@@ -42,27 +42,13 @@ defmodule Mnemonix.Builder do
       iex> My.Other.Singleton.get(:a)
       1
 
-  Singletons use their own names as references names to work.
-  You can change the name used when defining the singleton:
-
-      iex> defmodule My.Other.Singleton do
-      ...>   use Mnemonix.Builder, singleton: My.Other.Singleton.Name
-      ...> end
-      iex> My.Other.Singleton.start_link
-      iex> My.Other.Singleton.get(:a)
-      nil
-      iex> Mnemonix.get(My.Other.Singleton, :a)
-      nil
-      iex> Mnemonix.put(My.Other.Singleton, :a, 1)
-      iex> My.Other.Singleton.get(:a)
-      1
-
     Singletons use their own names as references names to work.
     You can change the name used when defining the singleton:
 
       iex> defmodule My.Singleton.Interface do
       ...>   use Mnemonix.Builder, singleton: :store
       ...> end
+      iex> My.Singleton.Interface.start_link
       iex> My.Singleton.Interface.get(:a)
       nil
       iex> Mnemonix.get(:store, :a)
