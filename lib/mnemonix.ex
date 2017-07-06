@@ -11,6 +11,7 @@ defmodule Mnemonix do
   - `Mnemonix.Features.Bump`
   - `Mnemonix.Features.Expiry`
   - `Mnemonix.Features.Enumerable`
+  - `Mnemonix.Features.Supervision`
 
   ## Map Features
 
