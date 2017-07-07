@@ -1,18 +1,14 @@
 if Code.ensure_loaded?(Elastix) do
+  defmodule Mnemonix.Stores.Elastix.Conn do
+    defstruct  url: "http://127.0.0.1:9200",
+             index: "mnemonix",
+              type: "item"
+
+  end
+
   defmodule Mnemonix.Stores.Elastix do
     @moduledoc """
     A `Mnemonix.Store` that uses Elastix to store state in ElasticSearch.
-
-        iex> {:ok, store} = Mnemonix.Stores.Elastix.start_link()
-        iex> Mnemonix.put(store, "foo", "bar")
-        iex> Mnemonix.get(store, "foo")
-        "bar"
-        iex> Mnemonix.delete(store, "foo")
-        iex> Mnemonix.get(store, "foo")
-        nil
-        iex> Mnemonix.put(store, "baz", %{"x" => 1})
-        iex> Mnemonix.get(store, "baz")
-        %{"x" => 1}
 
     This store throws errors on the functions in `Mnemonix.Features.Enumerable`.
     """
@@ -51,9 +47,9 @@ if Code.ensure_loaded?(Elastix) do
     """
     @spec setup(Mnemonix.Store.options)
       :: {:ok, state :: term} | {:stop, reason :: any}
-    def setup(_) do
+    def setup(opts) do
       Elastix.start()
-      {:ok, %{}}
+      {:ok, struct(Mnemonix.Stores.Elastix.Conn, opts)}
     end
 
     ####
@@ -62,11 +58,11 @@ if Code.ensure_loaded?(Elastix) do
 
     @spec delete(Mnemonix.Store.t, Mnemonix.key)
       :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
-    def delete(store = %Store{opts: opts}, key) do
-      [url: url, index: index, type: type] = config(opts)
+    def delete(store = %Store{state: conn}, key) do
+      %{url: url, index: index, type: type} = conn
 
       case Elastix.Document.delete(url, index, type, key) do
-        %Response{body: _} -> success(store)
+        %Response{body: _} -> {:ok, store}
         %Error{reason: reason} -> {:raise, Exception, [message: reason]}
       end
 
@@ -74,8 +70,8 @@ if Code.ensure_loaded?(Elastix) do
 
     @spec fetch(Mnemonix.Store.t, Mnemonix.key)
       :: {:ok, Mnemonix.Store.t, {:ok, Mnemonix.value} | :error} | Mnemonix.Store.Behaviour.exception
-    def fetch(store = %Store{opts: opts}, key) do
-      [url: url, index: index, type: type] = config(opts)
+    def fetch(store = %Store{state: conn}, key) do
+      %{url: url, index: index, type: type} = conn
       search = %{query: %{term: %{_id: key}}}
 
       case Elastix.Search.search(url, index, [type], search) do
@@ -92,34 +88,16 @@ if Code.ensure_loaded?(Elastix) do
 
     @spec put(Mnemonix.Store.t, Mnemonix.key, Store.value)
       :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
-    def put(store = %Store{opts: opts}, key, value) do
-      [url: url, index: index, type: type] = config(opts)
+    def put(store = %Store{state: conn}, key, value) do
+      %{url: url, index: index, type: type} = conn
 
-      value = case value do
-        value when is_map(value) -> value
-        value-> %{"_value" => value}
-      end
+      value = unless is_map(value), do: %{"_value" => value}, else: value
 
       case Elastix.Document.index(url, index, type, key, value) do
-        %Response{status_code: code} when code in [200, 201] -> success(store)
+        %Response{status_code: code} when code in [200, 201] -> {:ok, store}
         %Response{body: body } -> {:raise, Exception, [message: get_in(body, ["error", "reason"]) ]}
         %Error{reason: reason} -> {:raise, Exception, [message: reason]}
       end
-    end
-
-    defp success(store) do
-      if Mix.env == :test do
-        # need to sleep during tests to ensure values processed by ElasticSearch
-        :timer.sleep(2000)
-      end
-
-      {:ok, store}
-    end
-
-    defp config(opts) do
-      [ url:   Keyword.get(opts, :url, "http://127.0.0.1:9200"),
-        index: Keyword.get(opts, :index, "mnemonix"),
-        type:  Keyword.get(opts, :type, "item") ]
     end
 
   end
