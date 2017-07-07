@@ -46,6 +46,20 @@ exclusions = case :gen_tcp.connect(memcached_host, memcached_port, []) do
     [:memcached | exclusions]
 end
 
+# Exclude elastic-dependent tests if elastic is not available.
+
+elastic_host = String.to_char_list(System.get_env("ELASTIC_TEST_HOST") || "127.0.0.1")
+elastic_port = String.to_integer(System.get_env("ELASTIC_TEST_PORT") || "9200")
+
+exclusions = case :gen_tcp.connect(elastic_host, elastic_port, []) do
+  {:ok, socket} ->
+    :gen_tcp.close(socket)
+    exclusions
+  {:error, reason} ->
+    Mix.shell.info "Cannot connect to Elastic (http://#{elastic_host}:#{elastic_port}): #{:inet.format_error(reason)}\nSkipping elastic tests."
+    [:elastic | exclusions]
+end
+
 ExUnit.configure(exclude: exclusions)
 
 defmodule Filesystem.TestHelpers do
@@ -59,6 +73,21 @@ defmodule Filesystem.TestHelpers do
   end
 
   def test_dir(), do: unquote(filesystem_dir)
+
+end
+
+defmodule Elastic.TestHelpers do
+  def wait_for_value(key, value, context, i \\ 1) do
+    if(i==20) do
+      :timeout
+    else
+      if Mnemonix.get(context[:store], key) == value do
+        value
+      else
+        :timer.sleep(100); Elastic.TestHelpers.wait_for_value(key, value, context, i + 1)
+      end
+    end
+  end
 
 end
 
