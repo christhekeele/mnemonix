@@ -201,6 +201,20 @@ defmodule Mnemonix.Store.Server do
     end
   end
 
+  def handle_call({:replace, key, value}, _, store = %Mnemonix.Store{impl: impl}) do
+    case impl.replace(store, impl.serialize_key(key, store), impl.serialize_value(value, store)) do
+      {:ok, store}         -> {:reply, :ok, store}
+      {:raise, type, args} -> {:reply, {:raise, type, deserialize_error(args, store)}, store}
+    end
+  end
+
+  def handle_call({:replace!, key, value}, _, store = %Mnemonix.Store{impl: impl}) do
+    case impl.replace!(store, impl.serialize_key(key, store), impl.serialize_value(value, store)) do
+      {:ok, store}         -> {:reply, :ok, store}
+      {:raise, type, args} -> {:reply, {:raise, type, deserialize_error(args, store)}, store}
+    end
+  end
+
   def handle_call({:take, keys}, _, store = %Mnemonix.Store{impl: impl}) do
     case impl.take(store, keys) do
       {:ok, store, result} -> {:reply, {:ok, result}, store}

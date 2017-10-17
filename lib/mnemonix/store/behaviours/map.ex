@@ -58,6 +58,14 @@ defmodule Mnemonix.Store.Behaviours.Map do
   @callback put_new_lazy(Mnemonix.Store.t, Mnemonix.key, fun)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
+  @optional_callbacks replace: 3
+  @callback replace(Mnemonix.Store.t, Mnemonix.key, Mnemonix.value)
+    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+
+  @optional_callbacks replace!: 3
+  @callback replace!(Mnemonix.Store.t, Mnemonix.key, Mnemonix.value)
+    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+
   @optional_callbacks split: 2
   @callback split(Mnemonix.Store.t, [Mnemonix.key])
     :: {:ok, Mnemonix.Store.t, %{Mnemonix.key => Mnemonix.value}} | Mnemonix.Store.Behaviour.exception
@@ -227,6 +235,28 @@ defmodule Mnemonix.Store.Behaviours.Map do
         end
       end
       defoverridable put_new_lazy: 3
+
+      @doc false
+      def replace(store, key, value) do
+        with {:ok, store, current} <- fetch(store, key) do
+          case current do
+            :error -> {:ok, store}
+            _value -> put(store, key, value)
+          end
+        end
+      end
+      defoverridable replace: 3
+
+      @doc false
+      def replace!(store, key, value) do
+        with {:ok, store, current} <- fetch(store, key) do
+          case current do
+            :error -> {:raise, KeyError, [key: key, term: store.impl]}
+            _value -> put(store, key, value)
+          end
+        end
+      end
+      defoverridable replace!: 3
 
       @doc false
       def split(store, keys) do

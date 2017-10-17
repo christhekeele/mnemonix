@@ -7,7 +7,7 @@ exclusions = if System.get_env("DOCTESTS"), do: exclusions, else: [:doctest | ex
 
 # Exclude filesystem-dependent tests if the file system is not writable.
 
-filesystem_dir = String.to_char_list(System.get_env("FILESYSTEM_TEST_DIR") || System.tmp_dir())
+filesystem_dir = String.to_charlist(System.get_env("FILESYSTEM_TEST_DIR") || System.tmp_dir())
 
 exclusions = case File.touch(Path.join(filesystem_dir, "writable.tmp")) do
   :ok ->
@@ -20,7 +20,7 @@ end
 
 # Exclude redis-dependent tests if redis is not available.
 
-redis_host = String.to_char_list(System.get_env("REDIS_TEST_HOST") || "localhost")
+redis_host = String.to_charlist(System.get_env("REDIS_TEST_HOST") || "localhost")
 redis_port = String.to_integer(System.get_env("REDIS_TEST_PORT") || "6379")
 
 exclusions = case :gen_tcp.connect(redis_host, redis_port, []) do
@@ -34,7 +34,7 @@ end
 
 # Exclude memcached-dependent tests if memcached is not available.
 
-memcached_host = String.to_char_list(System.get_env("REDIS_TEST_HOST") || "localhost")
+memcached_host = String.to_charlist(System.get_env("REDIS_TEST_HOST") || "localhost")
 memcached_port = String.to_integer(System.get_env("REDIS_TEST_PORT") || "11211")
 
 exclusions = case :gen_tcp.connect(memcached_host, memcached_port, []) do
