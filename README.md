@@ -90,6 +90,8 @@ Available features are:
 
 [Pull requests](https://github.com/christhekeele/mnemonix/pulls) are welcome and greatly appreciated!
 
+Please submit them against the `development` branch rather than `master`––this allows useful changes to be finessed before release. The GitHub UI should do this by default.
+
 Here are some useful commands if you've just forked the project and want to contribute:
 
 - `mix deps.get` - Get development dependencies
