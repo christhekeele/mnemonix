@@ -5,7 +5,7 @@ defmodule Mnemonix.Mixfile do
     name: "Mnemonix",
     app: :mnemonix,
 
-    version: "0.9.0",
+    version: "0.10.0",
     elixir: "~> 1.4",
 
     build_embedded: Mix.env == :prod,
@@ -50,11 +50,15 @@ defmodule Mnemonix.Mixfile do
 
   defp docs, do: [
     main: "Mnemonix",
-    # logo: "mnemonix.png",
     extras: [
-      "README.md",
       "CREDITS.md",
       "LICENSE.md",
+    ],
+    groups_for_modules: [
+      Features: ~r<Mnemonix.Features>,
+      Integrations: [Plug.Session.MNEMONIX],
+      Supervision: [Mnemonix.Application, Mnemonix.Supervisor],
+      Stores: ~r<Mnemonix.Stores>,
     ]
   ]
 
