@@ -1,6 +1,8 @@
 defmodule Mnemonix.Stores.DETS.Test do
   use Mnemonix.Test.Case, async: true
 
+  @moduletag :dets
+
   setup do
     on_exit fn ->
       :dets.close(Mnemonix.Stores.DETS.Table)

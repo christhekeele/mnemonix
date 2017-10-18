@@ -457,7 +457,7 @@ defmodule Mnemonix.Features.Map do
      iex> store = Mnemonix.new(%{a: 1})
      iex> Mnemonix.replace(store, :a, 3)
      iex> Mnemonix.get(store, :a)
-     %{a: 3}
+     3
      iex> Mnemonix.replace(store, :b, 2)
      iex> Mnemonix.get(store, :b)
      nil
@@ -481,7 +481,7 @@ defmodule Mnemonix.Features.Map do
      iex> store = Mnemonix.new(%{a: 1})
      iex> Mnemonix.replace!(store, :a, 3)
      iex> Mnemonix.get(store, :a)
-     %{a: 3}
+     3
      iex> Mnemonix.replace!(store, :b, 2)
      ** (KeyError) key :b not found in: Mnemonix.Stores.Map
 
@@ -489,7 +489,7 @@ defmodule Mnemonix.Features.Map do
   @spec replace!(Mnemonix.store, Mnemonix.key, Mnemonix.value)
     :: Mnemonix.store | no_return
   def replace!(store, key, value) do
-    case GenServer.call(store, {:replace, key, value}) do
+    case GenServer.call(store, {:replace!, key, value}) do
       :ok                  -> store
       {:raise, type, args} -> raise type, args
     end

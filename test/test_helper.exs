@@ -46,17 +46,17 @@ exclusions = case :gen_tcp.connect(memcached_host, memcached_port, []) do
     [:memcached | exclusions]
 end
 
-# Exclude elastic-dependent tests if elastic is not available.
+# Exclude elasticsearch-dependent tests if elasticsearch is not available.
 
-elastic_host = String.to_char_list(System.get_env("ELASTIC_TEST_HOST") || "127.0.0.1")
-elastic_port = String.to_integer(System.get_env("ELASTIC_TEST_PORT") || "9200")
+elastic_search_host = String.to_charlist(System.get_env("ELASTIC_SEARCH_TEST_HOST") || "127.0.0.1")
+elastic_search_port = String.to_integer(System.get_env("ELASTIC_SEARCH_TEST_PORT") || "9200")
 
-exclusions = case :gen_tcp.connect(elastic_host, elastic_port, []) do
+exclusions = case :gen_tcp.connect(elastic_search_host, elastic_search_port, []) do
   {:ok, socket} ->
     :gen_tcp.close(socket)
     exclusions
   {:error, reason} ->
-    Mix.shell.info "Cannot connect to Elastic (http://#{elastic_host}:#{elastic_port}): #{:inet.format_error(reason)}\nSkipping elastic tests."
+    Mix.shell.info "Cannot connect to Elastic (http://#{elastic_search_host}:#{elastic_search_port}): #{:inet.format_error(reason)}\nSkipping elastic tests."
     [:elastic | exclusions]
 end
 

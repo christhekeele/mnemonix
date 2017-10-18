@@ -121,6 +121,11 @@ Some parts of the test suite are contingent upon configration of out-of-memory s
     - Default: `localhost`
   - `MEMCACHED_TEST_PORT`: The port on the host memcached is accessible at. 
     - Default: `11211`
+- ElasticSearch
+  - `ELASTIC_SEARCH_TEST_HOST`: The hostname of an ElasticSearch instance. 
+    - Default: `localhost`
+  - `ELASTIC_SEARCH_TEST_PORT`: The port on the host ElasticSearch is accessible at. 
+    - Default: `9200`
 
 ### Doctests
 

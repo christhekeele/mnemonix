@@ -6,7 +6,7 @@ defmodule Mnemonix.Mixfile do
     app: :mnemonix,
 
     version: "0.9.0",
-    elixir: "~> 1.3",
+    elixir: "~> 1.4",
 
     build_embedded: Mix.env == :prod,
     start_permanent: Mix.env == :prod,
@@ -23,7 +23,7 @@ defmodule Mnemonix.Mixfile do
   ]
 
   def application, do: [
-    applications: [:logger],
+    extra_applications: [:logger],
     mod: {Mnemonix, [{Mnemonix.Stores.Map, []}]},
   ]
 
@@ -41,7 +41,7 @@ defmodule Mnemonix.Mixfile do
   defp backends, do: [
     {:redix,     ">= 0.0.0", only: [:dev, :test]},
     {:memcachex, ">= 0.0.0", only: [:dev, :test]},
-    {:elastix,   ">= 0.0.0", only: [:dev, :test]},
+    {:elastix,   ">= 0.4.0", only: [:dev, :test]},
   ]
 
   defp integrations, do: [
