@@ -52,7 +52,7 @@ defmodule Mnemonix.Store.Expiry.Engine do
     end
   end
   defp schedule(store, server, key, ttl, state = %__MODULE__{timers: timers}) do
-    apparent_key = store.impl.deserialize_key(key, store)
+    apparent_key = store.impl.deserialize_key(store, key)
     with {:ok, timer} <- :timer.apply_after(ttl, Mnemonix, :delete, [server, apparent_key]) do
       {:ok, %{state | timers: Map.put(timers, key, timer)}}
     end

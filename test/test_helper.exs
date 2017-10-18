@@ -14,7 +14,10 @@ exclusions = case File.touch(Path.join(filesystem_dir, "writable.tmp")) do
     File.rm_rf("writable.tmp")
     exclusions
   {:error, reason} ->
-    Mix.shell.info "Cannot write to filesystem (path://#{filesystem_dir}): #{reason}\nSkipping file-dependent tests."
+    Mix.shell.info """
+    Cannot write to filesystem (path://#{filesystem_dir}): #{reason}
+    Skipping file-dependent tests.
+    """
     [:filesystem | exclusions]
 end
 
@@ -28,7 +31,10 @@ exclusions = case :gen_tcp.connect(redis_host, redis_port, []) do
     :gen_tcp.close(socket)
     exclusions
   {:error, reason} ->
-    Mix.shell.info "Cannot connect to Redis (redis://#{redis_host}:#{redis_port}): #{:inet.format_error(reason)}\nSkipping redis tests."
+    Mix.shell.info """
+    Cannot connect to Redis (redis://#{redis_host}:#{redis_port}): #{:inet.format_error(reason)}
+    Skipping redis tests.
+    """
     [:redis | exclusions]
 end
 
@@ -42,7 +48,10 @@ exclusions = case :gen_tcp.connect(memcached_host, memcached_port, []) do
     :gen_tcp.close(socket)
     exclusions
   {:error, reason} ->
-    Mix.shell.info "Cannot connect to Memcached (http://#{memcached_host}:#{memcached_port}): #{:inet.format_error(reason)}\nSkipping memcached tests."
+    Mix.shell.info """
+    Cannot connect to Memcached (http://#{memcached_host}:#{memcached_port}): #{:inet.format_error(reason)}
+    Skipping memcached tests.
+    """
     [:memcached | exclusions]
 end
 
@@ -56,8 +65,11 @@ exclusions = case :gen_tcp.connect(elastic_search_host, elastic_search_port, [])
     :gen_tcp.close(socket)
     exclusions
   {:error, reason} ->
-    Mix.shell.info "Cannot connect to Elastic (http://#{elastic_search_host}:#{elastic_search_port}): #{:inet.format_error(reason)}\nSkipping elastic tests."
-    [:elastic | exclusions]
+    Mix.shell.info """
+    Cannot connect to Elastic (http://#{elastic_search_host}:#{elastic_search_port}): #{:inet.format_error(reason)}
+    Skipping ElasticSearch tests.
+    """
+    [:elastic_search | exclusions]
 end
 
 ExUnit.configure(exclude: exclusions)

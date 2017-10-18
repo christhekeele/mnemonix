@@ -21,6 +21,16 @@ branches:
   only:
     - master
     - development
+matrix:
+  exclude:
+    - elixir: 1.4.0
+      otp_release: 20.0
+    - elixir: 1.4.0
+      otp_release: 20.1
+    - elixir: 1.4.2
+      otp_release: 20.0
+    - elixir: 1.4.2
+      otp_release: 20.1
 env:
   global:
     - MIX_ENV=test

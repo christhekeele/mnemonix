@@ -59,9 +59,9 @@ defmodule Mnemonix.Features.Supervision do
       iex> Mnemonix.get(store, :foo)
       :bar
 
-      iex> options = [store: [initial: %{foo: :bar}], server: [name: StoreCache]]
+      iex> options = [store: [initial: %{foo: :bar}], server: [name: NamedStore]]
       iex> {:ok, _store} = Mnemonix.start_link(Mnemonix.Stores.Map, options)
-      iex> Mnemonix.get(StoreCache, :foo)
+      iex> Mnemonix.get(NamedStore, :foo)
       :bar
   """
   @spec start_link(Mnemonix.Store.Behaviour.t, Mnemonix.Supervisor.options) :: GenServer.on_start

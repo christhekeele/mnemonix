@@ -23,7 +23,7 @@ defmodule Mnemonix.Store.Behaviours.Core do
         opts
         |> Keyword.get(:initial, %{})
         |> Enum.reduce({:ok, store}, fn {key, value}, {:ok, store} ->
-          impl.put(store, impl.serialize_key(key, store), impl.serialize_value(value, store))
+          impl.put(store, impl.serialize_key(store, key), impl.serialize_value(store, value))
         end)
       end
       defoverridable setup_initial: 1
