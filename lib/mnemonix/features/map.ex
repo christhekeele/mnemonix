@@ -37,8 +37,7 @@ defmodule Mnemonix.Features.Map do
   @doc """
   Retrievs the value of the entry under `key` in `store`.
 
-  If the `key` does not exist, returns `:error`, otherwise returns
-  `{:ok, value}`.
+  If the `key` does not exist, returns `:error`, otherwise returns `{:ok, value}`.
 
   ## Examples
 
@@ -401,8 +400,7 @@ defmodule Mnemonix.Features.Map do
   end
 
   @doc """
-  Puts the given `value` under `key` unless the entry `key`
-  already exists.
+  Puts the given `value` under `key` unless the entry `key` already exists.
 
   ## Examples
 
@@ -423,11 +421,9 @@ defmodule Mnemonix.Features.Map do
   end
 
   @doc """
-  Evaluates `fun` and puts the result under `key`
-  in `store` unless `key` is already present.
+  Evaluates `fun` and puts the result under `key` in `store` unless `key` is already present.
 
-  This is useful if the value is very expensive to calculate or
-  generally difficult to setup and teardown again.
+  This is useful if the value is very expensive to calculate or generally difficult to setup and teardown again.
 
   ## Examples
 
@@ -447,6 +443,53 @@ defmodule Mnemonix.Features.Map do
     :: Mnemonix.store | no_return
   def put_new_lazy(store, key, fun) when is_function(fun, 0) do
     case GenServer.call(store, {:put_new_lazy, key, fun}) do
+      :ok                  -> store
+      {:raise, type, args} -> raise type, args
+    end
+  end
+
+  @doc """
+  Alters the value stored under `key` to `value` if it already exists in `store`.
+
+  If the `key` does not exist, the contents of `store` will be unaffected.
+
+  ## Examples
+     iex> store = Mnemonix.new(%{a: 1})
+     iex> Mnemonix.replace(store, :a, 3)
+     iex> Mnemonix.get(store, :a)
+     3
+     iex> Mnemonix.replace(store, :b, 2)
+     iex> Mnemonix.get(store, :b)
+     nil
+
+  """
+  @spec replace(Mnemonix.store, Mnemonix.key, Mnemonix.value)
+    :: Mnemonix.store | no_return
+  def replace(store, key, value) do
+    case GenServer.call(store, {:replace, key, value}) do
+      :ok                  -> store
+      {:raise, type, args} -> raise type, args
+    end
+  end
+
+  @doc """
+  Alters the value stored under `key` to `value` if it already exists in `store`.
+
+  If the `key` does not exist, raises `KeyError`.
+
+  ## Examples
+     iex> store = Mnemonix.new(%{a: 1})
+     iex> Mnemonix.replace!(store, :a, 3)
+     iex> Mnemonix.get(store, :a)
+     3
+     iex> Mnemonix.replace!(store, :b, 2)
+     ** (KeyError) key :b not found in: Mnemonix.Stores.Map
+
+  """
+  @spec replace!(Mnemonix.store, Mnemonix.key, Mnemonix.value)
+    :: Mnemonix.store | no_return
+  def replace!(store, key, value) do
+    case GenServer.call(store, {:replace!, key, value}) do
       :ok                  -> store
       {:raise, type, args} -> raise type, args
     end

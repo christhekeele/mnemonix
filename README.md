@@ -90,6 +90,8 @@ Available features are:
 
 [Pull requests](https://github.com/christhekeele/mnemonix/pulls) are welcome and greatly appreciated!
 
+Please submit them against the `development` branch rather than `master`––this allows useful changes to be finessed before release. The GitHub UI should do this by default.
+
 Here are some useful commands if you've just forked the project and want to contribute:
 
 - `mix deps.get` - Get development dependencies
@@ -119,6 +121,11 @@ Some parts of the test suite are contingent upon configration of out-of-memory s
     - Default: `localhost`
   - `MEMCACHED_TEST_PORT`: The port on the host memcached is accessible at. 
     - Default: `11211`
+- ElasticSearch
+  - `ELASTIC_SEARCH_TEST_HOST`: The hostname of an ElasticSearch instance. 
+    - Default: `localhost`
+  - `ELASTIC_SEARCH_TEST_PORT`: The port on the host ElasticSearch is accessible at. 
+    - Default: `9200`
 
 ### Doctests
 

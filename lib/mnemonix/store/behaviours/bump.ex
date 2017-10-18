@@ -47,7 +47,7 @@ defmodule Mnemonix.Store.Behaviours.Bump do
         with {:ok, store, result} <- do_bump(store, :increment, key, amount) do
           case result do
             :ok                  -> {:ok, store}
-            {:error, no_integer} -> {:raise, ArithmeticError, [message: msg_for(no_integer, store.impl.deserialize_key(key, store))]}
+            {:error, no_integer} -> {:raise, ArithmeticError, [message: msg_for(no_integer, store.impl.deserialize_key(store, key))]}
           end
         end
       end
@@ -75,11 +75,11 @@ defmodule Mnemonix.Store.Behaviours.Bump do
       defp do_bump(store, operation, key, amount) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
-            :error -> with {:ok, store} <- put(store, key, store.impl.serialize_value(0, store)) do
+            :error -> with {:ok, store} <- put(store, key, store.impl.serialize_value(store, 0)) do
               do_bump(store, operation, key, amount)
             end
-            {:ok, value} -> case do_bump_calculation(operation, store.impl.deserialize_value(value, store), amount) do
-              {:ok, result} -> with {:ok, store} <- put(store, key, store.impl.serialize_value(result, store)) do
+            {:ok, value} -> case do_bump_calculation(operation, store.impl.deserialize_value(store, value), amount) do
+              {:ok, result} -> with {:ok, store} <- put(store, key, store.impl.serialize_value(store, result)) do
                 {:ok, store, :ok}
               end
               {:error, no_integer} -> {:ok, store, {:error, no_integer}}

@@ -24,6 +24,8 @@ defmodule Mnemonix.Store.Behaviour do
       use Mnemonix.Store.Behaviours.Expiry
       use Mnemonix.Store.Behaviours.Enumerable
 
+      @behaviour Mnemonix.Store.Translator
+
       @store __MODULE__ |> Inspect.inspect(%Inspect.Opts{})
 
       if docs do

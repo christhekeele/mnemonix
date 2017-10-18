@@ -40,7 +40,7 @@ defmodule Mnemonix.Stores.Null do
       iex> Mnemonix.get(My.Mnemonix.Stores.Null, "foo")
       nil
   """
-  @spec start_link()                              :: GenServer.on_start
+  @spec start_link()                            :: GenServer.on_start
   @spec start_link(Mnemonix.Supervisor.options) :: GenServer.on_start
   def start_link(options \\ [])
   def start_link(options), do: super(options)
