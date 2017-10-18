@@ -2,14 +2,11 @@ defmodule Mnemonix.Builder.Bench do
   use Benchfella
 
   defmodule Store do
-    use Mnemonix.Builder
-
-    def start_link do
-      Mnemonix.start_link(Mnemonix.Stores.Map, server: [name: __MODULE__])
-    end
+    use Mnemonix.Builder, singleton: true
   end
 
   setup_all do
+    Application.load(:mnemonix)
     Store.start_link
   end
 
