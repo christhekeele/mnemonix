@@ -6,7 +6,7 @@ defmodule Mnemonix.Mixfile do
     app: :mnemonix,
 
     version: "0.10.0",
-    elixir: "~> 1.4",
+    elixir: "~> 1.5",
 
     build_embedded: Mix.env == :prod,
     start_permanent: Mix.env == :prod,
