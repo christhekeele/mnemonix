@@ -13,6 +13,11 @@ defmodule Mnemonix do
   - `Mnemonix.Features.Enumerable`
   - `Mnemonix.Features.Supervision`
 
+  ## Supervision Features
+
+  `Mnemonix.Features.Supervision` provides the `start_link` implementations that enable all stores
+  to fit into the `Mnemonix.Application` and `Mnemonix.Supervisor` tools out of the box.
+
   ## Map Features
 
   `Mnemonix.Features.Map` lets you manipulate a store just like a `Map`.
@@ -88,11 +93,6 @@ defmodule Mnemonix do
   - `Mnemonix.Features.Enumerable.values/1`
 
   Any store can be checked for enumerable support via `Mnemonix.enumerable?/1`.
-
-  ## Supervision Features
-
-  `Mnemonix.Features.Supervision` allows all stores to fit into Mnemonix supervision tools out of the box.
-  If you know what you're doing and really want to customize them, you can always override them.
 
   """
 

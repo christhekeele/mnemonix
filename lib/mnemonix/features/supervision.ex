@@ -20,18 +20,18 @@ defmodule Mnemonix.Features.Supervision do
   end
 
   @doc """
-  Starts a new store using the default store `implementation` and `options`.
+  Starts a new store using the default store implementation and options.
 
   See `start_link/2` for more control.
   """
   @spec start_link :: GenServer.on_start
   def start_link do
-    {implementation, opts} = Mnemonix.Application.default
-    start_link implementation, opts
+    {implementation, options} = Mnemonix.Application.default
+    start_link implementation, options
   end
 
   @doc """
-  Starts a new store using the provided store `implementation`.
+  Starts a new store using the provided store `implementation` and default options.
 
   Checks under `config :mnemonix, implementation, [options]` for options:
   see `start_link/2` for a summary of the options you can set there.
