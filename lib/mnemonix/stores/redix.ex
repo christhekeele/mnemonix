@@ -23,9 +23,9 @@ if Code.ensure_loaded?(Redix) do
 
     alias Mnemonix.Store
 
-    ####
-    # Mnemonix.Store.Behaviours.Core
-    ##
+  ####
+  # Mnemonix.Store.Behaviours.Core
+  ##
 
     @doc """
     Connects to redis to store data using provided `opts`.
@@ -42,6 +42,7 @@ if Code.ensure_loaded?(Redix) do
 
     All other options are passed verbatim to `Redix.start_link/2`.
     """
+    @impl Mnemonix.Store.Behaviours.Core
     @spec setup(Mnemonix.Store.options)
       :: {:ok, state :: term} | {:stop, reason :: any}
     def setup(opts) do
@@ -50,10 +51,11 @@ if Code.ensure_loaded?(Redix) do
       Redix.start_link(conn || "redis://localhost:6379", options)
     end
 
-    ####
-    # Mnemonix.Store.Behaviours.Map
-    ##
+  ####
+  # Mnemonix.Store.Behaviours.Map
+  ##
 
+  @impl Mnemonix.Store.Behaviours.Map
     @spec delete(Mnemonix.Store.t, Mnemonix.key)
       :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
     def delete(store = %Store{state: conn}, key) do
@@ -63,6 +65,7 @@ if Code.ensure_loaded?(Redix) do
       end
     end
 
+    @impl Mnemonix.Store.Behaviours.Map
     @spec fetch(Mnemonix.Store.t, Mnemonix.key)
       :: {:ok, Mnemonix.Store.t, {:ok, Mnemonix.value} | :error} | Mnemonix.Store.Behaviour.exception
     def fetch(store = %Store{state: conn}, key) do
@@ -73,6 +76,7 @@ if Code.ensure_loaded?(Redix) do
       end
     end
 
+    @impl Mnemonix.Store.Behaviours.Map
     @spec put(Mnemonix.Store.t, Mnemonix.key, Store.value)
       :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
     def put(store = %Store{state: conn}, key, value) do

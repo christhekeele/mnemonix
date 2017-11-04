@@ -1,37 +1,30 @@
 defmodule Mnemonix.Store.Behaviours.Bump do
   @moduledoc false
 
-  @optional_callbacks bump: 3
   @callback bump(Mnemonix.Store.t, Mnemonix.key, Mnemonix.amount :: term)
     :: {:ok, Mnemonix.Store.t, Mnemonix.Features.Bump.bump_op} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks bump!: 3
   @callback bump!(Mnemonix.Store.t, Mnemonix.key, amount :: term)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks increment: 2
   @callback increment(Mnemonix.Store.t, Mnemonix.key)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks increment: 3
   @callback increment(Mnemonix.Store.t, Mnemonix.key, amount :: term)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks decrement: 2
   @callback decrement(Mnemonix.Store.t, Mnemonix.key)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks decrement: 3
   @callback decrement(Mnemonix.Store.t, Mnemonix.key, amount :: term)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
   @doc false
   defmacro __using__(_) do
     quote do
-
       @behaviour unquote __MODULE__
 
-      @doc false
+      @impl unquote __MODULE__
       def bump(store, key, amount) do
         with {:ok, store, result} <- do_bump(store, :increment, key, amount) do
           case result do
@@ -40,9 +33,8 @@ defmodule Mnemonix.Store.Behaviours.Bump do
           end
         end
       end
-      defoverridable bump: 3
 
-      @doc false
+      @impl unquote __MODULE__
       def bump!(store, key, amount) do
         with {:ok, store, result} <- do_bump(store, :increment, key, amount) do
           case result do
@@ -51,26 +43,23 @@ defmodule Mnemonix.Store.Behaviours.Bump do
           end
         end
       end
-      defoverridable bump!: 3
 
-      defp msg_for(:amount, _key), do: "value provided to operation is not an integer"
-      defp msg_for(:value, key),   do: "value at key #{key |> Inspect.inspect(%Inspect.Opts{})} is not an integer"
-
-      @doc false
+      @impl unquote __MODULE__
       def increment(store, key, amount \\ 1) do
         with {:ok, store, _result} <- do_bump(store, :increment, key, amount) do
           {:ok, store}
         end
       end
-      defoverridable increment: 2, increment: 3
 
-      @doc false
+      @impl unquote __MODULE__
       def decrement(store, key, amount \\ 1) do
         with {:ok, store, _result} <- do_bump(store, :decrement, key, amount) do
           {:ok, store}
         end
       end
-      defoverridable decrement: 2, decrement: 3
+
+      defp msg_for(:amount, _key), do: "value provided to operation is not an integer"
+      defp msg_for(:value, key),   do: "value at key #{key |> Inspect.inspect(%Inspect.Opts{})} is not an integer"
 
       defp do_bump(store, operation, key, amount) do
         with {:ok, store, current} <- fetch(store, key) do

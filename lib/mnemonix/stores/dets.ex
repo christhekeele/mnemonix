@@ -22,9 +22,9 @@ defmodule Mnemonix.Stores.DETS do
 
   alias Mnemonix.Store
 
-  ####
-  # Mnemonix.Store.Behaviours.Core
-  ##
+####
+# Mnemonix.Store.Behaviours.Core
+##
 
   @doc """
   Creates a new DETS table to store state using provided `opts`.
@@ -44,6 +44,7 @@ defmodule Mnemonix.Stores.DETS do
   The rest of the options are passed into `:dets.open_file/2` verbaitm, except
   for `type:`, which will always be `:set`.
   """
+  @impl Mnemonix.Store.Behaviours.Core
   @spec setup(Mnemonix.Store.options)
     :: {:ok, state :: term} | {:stop, reason :: any}
   def setup(opts) do
@@ -55,6 +56,7 @@ defmodule Mnemonix.Stores.DETS do
     end
   end
 
+  @impl Mnemonix.Store.Behaviours.Core
   @spec teardown(reason, Mnemonix.Store.t)
     :: {:ok, reason} | {:error, reason}
       when reason: :normal | :shutdown | {:shutdown, term} | term
@@ -64,10 +66,11 @@ defmodule Mnemonix.Stores.DETS do
     end
   end
 
-  ####
-  # Mnemonix.Store.Behaviours.Map
-  ##
+####
+# Mnemonix.Store.Behaviours.Map
+##
 
+  @impl Mnemonix.Store.Behaviours.Map
   @spec delete(Mnemonix.Store.t, Mnemonix.key)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
   def delete(store = %Store{state: table}, key) do
@@ -80,6 +83,7 @@ defmodule Mnemonix.Stores.DETS do
     end
   end
 
+  @impl Mnemonix.Store.Behaviours.Map
   @spec fetch(Mnemonix.Store.t, Mnemonix.key)
     :: {:ok, Mnemonix.Store.t, {:ok, Mnemonix.value} | :error} | Mnemonix.Store.Behaviour.exception
   def fetch(store = %Store{state: table}, key) do
@@ -90,6 +94,7 @@ defmodule Mnemonix.Stores.DETS do
     end
   end
 
+  @impl Mnemonix.Store.Behaviours.Map
   @spec put(Mnemonix.Store.t, Mnemonix.key, Store.value)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
   def put(store = %Store{state: table}, key, value) do

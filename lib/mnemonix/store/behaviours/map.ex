@@ -1,6 +1,10 @@
 defmodule Mnemonix.Store.Behaviours.Map do
   @moduledoc false
 
+####
+# CORE
+##
+
   @callback delete(Mnemonix.Store.t, Mnemonix.key)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
@@ -10,75 +14,64 @@ defmodule Mnemonix.Store.Behaviours.Map do
   @callback put(Mnemonix.Store.t, Mnemonix.key, Mnemonix.value)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks fetch!: 2
+####
+# DERIVABLE
+##
+
+  @callback drop(Mnemonix.Store.t, [Mnemonix.key])
+    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+
   @callback fetch!(Mnemonix.Store.t, Mnemonix.key)
     :: {:ok, Mnemonix.Store.t, Mnemonix.value} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks get: 2
   @callback get(Mnemonix.Store.t, Mnemonix.key)
     :: {:ok, Mnemonix.Store.t, Mnemonix.value} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks get: 3
   @callback get(Mnemonix.Store.t, Mnemonix.key, Mnemonix.value)
     :: {:ok, Mnemonix.Store.t, Mnemonix.value} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks get_and_update: 3
   @callback get_and_update(Mnemonix.Store.t, Mnemonix.key, fun)
     :: {:ok, Mnemonix.Store.t, Mnemonix.value} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks get_and_update!: 3
   @callback get_and_update!(Mnemonix.Store.t, Mnemonix.key, fun)
     :: {:ok, Mnemonix.Store.t, Mnemonix.value} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks get_lazy: 3
   @callback get_lazy(Mnemonix.Store.t, Mnemonix.key, fun)
     :: {:ok, Mnemonix.Store.t, Mnemonix.value} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks has_key?: 2
   @callback has_key?(Mnemonix.Store.t, Mnemonix.key)
     :: {:ok, Mnemonix.Store.t, boolean} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks pop: 2
   @callback pop(Mnemonix.Store.t, Mnemonix.key)
     :: {:ok, Mnemonix.Store.t, Mnemonix.value} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks pop: 3
   @callback pop(Mnemonix.Store.t, Mnemonix.key, Mnemonix.value)
     :: {:ok, Mnemonix.Store.t, Mnemonix.value} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks pop_lazy: 3
   @callback pop_lazy(Mnemonix.Store.t, Mnemonix.key, fun)
     :: {:ok, Mnemonix.Store.t, Mnemonix.value} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks put_new: 3
   @callback put_new(Mnemonix.Store.t, Mnemonix.key, Mnemonix.value)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks put_new_lazy: 3
   @callback put_new_lazy(Mnemonix.Store.t, Mnemonix.key, fun)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks replace: 3
   @callback replace(Mnemonix.Store.t, Mnemonix.key, Mnemonix.value)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks replace!: 3
   @callback replace!(Mnemonix.Store.t, Mnemonix.key, Mnemonix.value)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks split: 2
   @callback split(Mnemonix.Store.t, [Mnemonix.key])
     :: {:ok, Mnemonix.Store.t, %{Mnemonix.key => Mnemonix.value}} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks take: 2
   @callback take(Mnemonix.Store.t, [Mnemonix.key])
     :: {:ok, Mnemonix.Store.t, %{Mnemonix.key => Mnemonix.value}} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks update: 4
   @callback update(Mnemonix.Store.t, Mnemonix.key, Mnemonix.value, fun)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
-  @optional_callbacks update!: 3
   @callback update!(Mnemonix.Store.t, Mnemonix.key, fun)
     :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
 
@@ -87,7 +80,7 @@ defmodule Mnemonix.Store.Behaviours.Map do
     quote do
       @behaviour unquote __MODULE__
 
-      @doc false
+      @impl unquote __MODULE__
       def drop(store, keys) do
         try do
           Enum.reduce(keys, store, fn key, store ->
@@ -103,9 +96,8 @@ defmodule Mnemonix.Store.Behaviours.Map do
           store -> {:ok, store}
         end
       end
-      defoverridable drop: 2
 
-      @doc false
+      @impl unquote __MODULE__
       def fetch!(store, key) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -114,9 +106,8 @@ defmodule Mnemonix.Store.Behaviours.Map do
           end
         end
       end
-      defoverridable fetch!: 2
 
-      @doc false
+      @impl unquote __MODULE__
       def get(store, key, default \\ nil) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -125,9 +116,8 @@ defmodule Mnemonix.Store.Behaviours.Map do
           end
         end
       end
-      defoverridable get: 2, get: 3
 
-      @doc false
+      @impl unquote __MODULE__
       def get_and_update(store, key, fun) do
         with {:ok, store, current} <- fetch(store, key) do
           value = case current do
@@ -145,9 +135,8 @@ defmodule Mnemonix.Store.Behaviours.Map do
           end
         end
       end
-      defoverridable get_and_update: 3
 
-      @doc false
+      @impl unquote __MODULE__
       def get_and_update!(store, key, fun) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -163,9 +152,8 @@ defmodule Mnemonix.Store.Behaviours.Map do
           end
         end
       end
-      defoverridable get_and_update!: 3
 
-      @doc false
+      @impl unquote __MODULE__
       def get_lazy(store, key, fun) when is_function(fun, 0) do
         with {:ok, store, current} <- fetch(store, key) do
           value = case current do
@@ -175,9 +163,8 @@ defmodule Mnemonix.Store.Behaviours.Map do
           {:ok, store, value}
         end
       end
-      defoverridable get_lazy: 3
 
-      @doc false
+      @impl unquote __MODULE__
       def has_key?(store, key) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -186,9 +173,8 @@ defmodule Mnemonix.Store.Behaviours.Map do
           end
         end
       end
-      defoverridable has_key?: 2
 
-      @doc false
+      @impl unquote __MODULE__
       def pop(store, key, default \\ nil) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -199,9 +185,8 @@ defmodule Mnemonix.Store.Behaviours.Map do
           end
         end
       end
-      defoverridable pop: 2, pop: 3
 
-      @doc false
+      @impl unquote __MODULE__
       def pop_lazy(store, key, fun) when is_function(fun, 0) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -212,9 +197,8 @@ defmodule Mnemonix.Store.Behaviours.Map do
           end
         end
       end
-      defoverridable pop_lazy: 3
 
-      @doc false
+      @impl unquote __MODULE__
       def put_new(store, key, value) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -223,9 +207,8 @@ defmodule Mnemonix.Store.Behaviours.Map do
           end
         end
       end
-      defoverridable put_new: 3
 
-      @doc false
+      @impl unquote __MODULE__
       def put_new_lazy(store, key, fun) when is_function(fun, 0) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -234,9 +217,8 @@ defmodule Mnemonix.Store.Behaviours.Map do
           end
         end
       end
-      defoverridable put_new_lazy: 3
 
-      @doc false
+      @impl unquote __MODULE__
       def replace(store, key, value) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -245,9 +227,8 @@ defmodule Mnemonix.Store.Behaviours.Map do
           end
         end
       end
-      defoverridable replace: 3
 
-      @doc false
+      @impl unquote __MODULE__
       def replace!(store, key, value) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -256,9 +237,8 @@ defmodule Mnemonix.Store.Behaviours.Map do
           end
         end
       end
-      defoverridable replace!: 3
 
-      @doc false
+      @impl unquote __MODULE__
       def split(store, keys) do
         try do
           Enum.reduce(keys, {store, %{}}, fn key, {store, result} ->
@@ -281,9 +261,8 @@ defmodule Mnemonix.Store.Behaviours.Map do
           {store, result} -> {:ok, store, result}
         end
       end
-      defoverridable split: 2
 
-      @doc false
+      @impl unquote __MODULE__
       def take(store, keys) do
         try do
           Enum.reduce(keys, {store, %{}}, fn key, {store, result} ->
@@ -302,9 +281,8 @@ defmodule Mnemonix.Store.Behaviours.Map do
           {store, result} -> {:ok, store, result}
         end
       end
-      defoverridable take: 2
 
-      @doc false
+      @impl unquote __MODULE__
       def update(store, key, initial, fun) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -313,9 +291,8 @@ defmodule Mnemonix.Store.Behaviours.Map do
           end
         end
       end
-      defoverridable update: 4
 
-      @doc false
+      @impl unquote __MODULE__
       def update!(store, key, fun) do
         with {:ok, store, current} <- fetch(store, key) do
           case current do
@@ -324,7 +301,6 @@ defmodule Mnemonix.Store.Behaviours.Map do
           end
         end
       end
-      defoverridable update!: 3
 
     end
   end

@@ -25,9 +25,9 @@ defmodule Mnemonix.Stores.Mnesia do
 
   alias Mnemonix.Store
 
-  ####
-  # Mnemonix.Store.Behaviours.Core
-  ##
+####
+# Mnemonix.Store.Behaviours.Core
+##
 
   @doc """
   Creates a Mnesia table to store state in using provided `opts`.
@@ -53,7 +53,8 @@ defmodule Mnemonix.Stores.Mnesia do
   The rest of the options are passed into `:dets.open_file/2` verbaitm, except
   for `type:`, which will always be `:set`.
   """
-  @spec setup(Mnemonix.Store.options)
+  @impl Mnemonix.Store.Behaviours.Core
+  @spec setup(Store.options)
     :: {:ok, state :: term} | {:stop, reason :: any}
   def setup(opts) do
     {table, opts} = Keyword.get_and_update(opts, :table, fn _ -> :pop end)
@@ -70,20 +71,22 @@ defmodule Mnemonix.Stores.Mnesia do
     end
   end
 
-  ####
-  # Mnemonix.Store.Behaviours.Map
-  ##
+####
+# Mnemonix.Store.Behaviours.Map
+##
 
-  @spec delete(Mnemonix.Store.t, Mnemonix.key)
-    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+  @impl Store.Behaviours.Map
+  @spec delete(Store.t, Mnemonix.key)
+    :: {:ok, Store.t} | Store.Behaviour.exception
   def delete(store = %Store{state: table}, key) do
     with :ok <- :mnesia.dirty_delete(table, key) do
       {:ok, store}
     end
   end
 
-  @spec fetch(Mnemonix.Store.t, Mnemonix.key)
-    :: {:ok, Mnemonix.Store.t, {:ok, Mnemonix.value} | :error} | Mnemonix.Store.Behaviour.exception
+  @impl Store.Behaviours.Map
+  @spec fetch(Store.t, Mnemonix.key)
+    :: {:ok, Store.t, {:ok, Mnemonix.value} | :error} | Store.Behaviour.exception
   def fetch(store = %Store{state: table}, key) do
     case :mnesia.dirty_read(table, key) do
       [{^table, ^key, value} | []] -> {:ok, store, {:ok, value}}
@@ -92,8 +95,9 @@ defmodule Mnemonix.Stores.Mnesia do
     end
   end
 
-  @spec put(Mnemonix.Store.t, Mnemonix.key, Store.value)
-    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+  @impl Store.Behaviours.Map
+  @spec put(Store.t, Mnemonix.key, Store.value)
+    :: {:ok, Store.t} | Store.Behaviour.exception
   def put(store = %Store{state: table}, key, value) do
     with :ok <- :mnesia.dirty_write({table, key, value}) do
       {:ok, store}

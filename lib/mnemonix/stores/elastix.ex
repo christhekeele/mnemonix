@@ -10,8 +10,9 @@ if Code.ensure_loaded?(Elastix) do
       defexception [:message]
     end
 
-
     defmodule Conn do
+      @moduledoc false
+
       defstruct [
         url: "http://127.0.0.1:9200",
         index: :mnemonix,
@@ -26,9 +27,9 @@ if Code.ensure_loaded?(Elastix) do
     alias Mnemonix.Store
     alias HTTPoison.{Response,Error}
 
-    ####
-    # Mnemonix.Store.Behaviours.Core
-    ##
+  ####
+  # Mnemonix.Store.Behaviours.Core
+  ##
 
     @doc """
     Connects to ElasticSearch to store data using provided `opts`.
@@ -52,6 +53,7 @@ if Code.ensure_loaded?(Elastix) do
       - *Default:* `true`
 
     """
+    @impl Mnemonix.Store.Behaviours.Core
     @spec setup(Mnemonix.Store.options)
       :: {:ok, state :: term} | {:stop, reason :: any}
     def setup(opts) do
@@ -62,6 +64,7 @@ if Code.ensure_loaded?(Elastix) do
     # Mnemonix.Store.Behaviours.Map
     ##
 
+    @impl Mnemonix.Store.Behaviours.Map
     @spec delete(Mnemonix.Store.t, Mnemonix.key)
       :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
     def delete(store = %Store{state: %Conn{url: url, index: index, type: type, refresh: refresh}}, key) do
@@ -72,6 +75,7 @@ if Code.ensure_loaded?(Elastix) do
 
     end
 
+    @impl Mnemonix.Store.Behaviours.Map
     @spec fetch(Mnemonix.Store.t, Mnemonix.key)
       :: {:ok, Mnemonix.Store.t, {:ok, Mnemonix.value} | :error} | Mnemonix.Store.Behaviour.exception
     def fetch(store = %Store{state: %Conn{url: url, index: index, type: type}}, key) do
@@ -89,6 +93,7 @@ if Code.ensure_loaded?(Elastix) do
 
     end
 
+    @impl Mnemonix.Store.Behaviours.Map
     @spec put(Mnemonix.Store.t, Mnemonix.key, Store.value)
       :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
     def put(store = %Store{state: %Conn{url: url, index: index, type: type, refresh: refresh}}, key, value) do
