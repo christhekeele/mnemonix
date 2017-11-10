@@ -2,8 +2,8 @@ defmodule Mnemonix do
   @moduledoc """
   Provides easy access to a store through a Map-like interface.
 
-  Rather than a map, you can use the `t:GenServer.server/0` reference returned
-  by `Mnemonix.Features.Supervision.start_link/2` to perform operations on Mnemonix stores.
+  Rather than a map, use the `t:GenServer.server/0` reference returned
+  by a store's `start_link/2` to perform operations on them.
 
   All functions defined in the `Mnemonix.Features` modules are available on the `Mnemonix` module:
 
@@ -11,12 +11,6 @@ defmodule Mnemonix do
   - `Mnemonix.Features.Bump`
   - `Mnemonix.Features.Expiry`
   - `Mnemonix.Features.Enumerable`
-  - `Mnemonix.Features.Supervision`
-
-  ## Supervision Features
-
-  `Mnemonix.Features.Supervision` provides the `start_link` implementations that enable all stores
-  to fit into the `Mnemonix.Application` and `Mnemonix.Supervisor` tools out of the box.
 
   ## Map Features
 
@@ -111,22 +105,6 @@ defmodule Mnemonix do
   """
   @type store :: pid | GenServer.name
 
-  use Application
-
-  @doc """
-  Starts the `:mnemonix` application.
-
-  Finds stores in your application configuration and brings them up when your app starts with the
-  specified start `type`.
-
-  See `Mnemonix.Application` for more on how the `options` are consumed.
-  """
-  @spec start(Application.start_type, Mnemonix.Application.options)
-    :: {:ok, store} | {:error, reason :: term}
-  def start(_type, [default]) do
-    Mnemonix.Application.start_link(default)
-  end
-
   use Mnemonix.Builder
 
   @doc """
@@ -184,10 +162,7 @@ defmodule Mnemonix do
   end
 
   defp do_new(map) do
-    {impl, opts} = Mnemonix.Application.default
-    opts = if Keyword.get(opts, :store), do: opts, else: Keyword.put(opts, :store, [])
-    opts = Kernel.put_in(opts, [:store, :initial], map)
-    with {:ok, store} <- start_link(impl, opts), do: store
+    with {:ok, store} <- Mnemonix.Stores.Map.start_link(initial: map), do: store
   end
 
 end

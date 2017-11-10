@@ -13,17 +13,17 @@ defmodule Mnemonix.Stores.Mnesia do
       iex> Mnemonix.get(store, "foo")
       nil
 
-  This store throws errors on the functions in `Mnemonix.Features.Enumerable`.
+  This store raises errors on the functions in `Mnemonix.Features.Enumerable`.
   """
+
+  alias Mnemonix.Store
+
+  use Store.Behaviour
+  use Store.Translator.Raw
 
   defmodule Exception do
     defexception [:message]
   end
-
-  use Mnemonix.Store.Behaviour
-  use Mnemonix.Store.Translator.Raw
-
-  alias Mnemonix.Store
 
 ####
 # Mnemonix.Store.Behaviours.Core
@@ -53,7 +53,7 @@ defmodule Mnemonix.Stores.Mnesia do
   The rest of the options are passed into `:dets.open_file/2` verbaitm, except
   for `type:`, which will always be `:set`.
   """
-  @impl Mnemonix.Store.Behaviours.Core
+  @impl Store.Behaviours.Core
   @spec setup(Store.options)
     :: {:ok, state :: term} | {:stop, reason :: any}
   def setup(opts) do

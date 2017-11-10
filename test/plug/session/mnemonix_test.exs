@@ -5,7 +5,7 @@ defmodule Plug.Session.MNEMONIX.Test do
   @mnemonix_store Mnemonix.Plug.Session
 
   setup do
-    Mnemonix.Stores.Map.start_link(server: [name: @mnemonix_store])
+    Mnemonix.Stores.Map.start_link(name: @mnemonix_store)
     :ok
   end
 

@@ -1,13 +1,14 @@
 defmodule Mnemonix.Store.Behaviours.Core do
   @moduledoc false
 
+  @callback child_spec()
+  :: Supervisor.child_spec
+  @callback child_spec(options :: Keyword.t)
+    :: Supervisor.child_spec
+
   @callback start_link()
     :: GenServer.on_start
-
   @callback start_link(Mnemonix.Supervisor.options)
-    :: GenServer.on_start
-
-  @callback start_link(Mnemonix.Supervisor.options, GenServer.options)
     :: GenServer.on_start
 
   @callback setup(Mnemonix.Store.options)
@@ -28,6 +29,23 @@ defmodule Mnemonix.Store.Behaviours.Core do
       @store __MODULE__ |> Inspect.inspect(%Inspect.Opts{})
 
       @doc """
+      """
+      @impl unquote __MODULE__
+      @spec child_spec(overrides :: Keyword.t)
+        :: Supervisor.child_spec
+      def child_spec(options \\ []) do
+        {restart, options} = Keyword.pop(options, :restart, :permanent)
+        {shutdown, options} = Keyword.pop(options, :shutdown, 5000)
+        %{
+          id: make_ref(),
+          start: {Mnemonix.Store.Server, :start_link, [__MODULE__, options]},
+          restart: restart,
+          shutdown: shutdown,
+          type: :worker,
+        }
+      end
+
+      @doc """
       Starts a new store using the `#{@store}` module with `options`.
 
       The `options` are the same as described in `Mnemonix.Features.Supervision.start_link/2`.
@@ -44,7 +62,7 @@ defmodule Mnemonix.Store.Behaviours.Core do
           iex> Mnemonix.get(store, "foo")
           "bar"
 
-          iex> {:ok, _store} = #{@store}.start_link(server: [name: My.#{@store}])
+          iex> {:ok, _store} = #{@store}.start_link(name: My.#{@store})
           iex> Mnemonix.put(My.#{@store}, "foo", "bar")
           iex> Mnemonix.get(My.#{@store}, "foo")
           "bar"
@@ -53,35 +71,7 @@ defmodule Mnemonix.Store.Behaviours.Core do
       @spec start_link()                            :: GenServer.on_start
       @spec start_link(Mnemonix.Supervisor.options) :: GenServer.on_start
       def start_link(options \\ []) do
-        Mnemonix.start_link(__MODULE__, options)
-      end
-
-      @doc """
-      Starts a new store using `#{@store}` with `store` and `server` options.
-
-      The options are the same as described in `Mnemonix.start_link/2`.
-      The `store` options are used in `setup/1` to start the store;
-      the `server` options are passed directly to `GenServer.start_link/2`.
-
-      The returned `t:GenServer.server/0` reference can be used as the primary
-      argument to the `Mnemonix` API.
-
-      ## Examples
-
-          iex> {:ok, store} = #{@store}.start_link([], [])
-          iex> Mnemonix.put(store, "foo", "bar")
-          iex> Mnemonix.get(store, "foo")
-          "bar"
-
-          iex> {:ok, _store} = #{@store}.start_link([], [name: My.#{@store}])
-          iex> Mnemonix.put(My.#{@store}, "foo", "bar")
-          iex> Mnemonix.get(My.#{@store}, "foo")
-          "bar"
-      """
-      @impl unquote __MODULE__
-      @spec start_link(Mnemonix.Supervisor.options, GenServer.options) :: GenServer.on_start
-      def start_link(store, server) do
-        Mnemonix.Store.Server.start_link(__MODULE__, store, server)
+        Mnemonix.Store.Server.start_link(__MODULE__, options)
       end
 
       @impl unquote __MODULE__

@@ -7,7 +7,7 @@ defmodule Mnemonix.Features.Enumerable do
 
   Stores that do not support enumeration will raise a `Mnemonix.Features.Enumerable.Error`
   when these functions are called. You can validate that a store is enumerable before you
-  invoke them with `enumerable?/1`.
+  invoke enumerable functions via `enumerable?/1`.
   """
 
   defmacro __using__(opts) do

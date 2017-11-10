@@ -6,6 +6,7 @@ defmodule Mnemonix.Store.Server do
   use GenServer
 
   @type reply :: :ok | {:ok, term} | Mnemonix.Store.Behaviour.exception
+  @type options :: Keyword.t
 
   @doc """
   Starts a new store using store `impl`, `store` options, and `server` options.
@@ -18,20 +19,20 @@ defmodule Mnemonix.Store.Server do
 
   ## Examples
 
-      iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, [], [])
+      iex> {:ok, store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, [])
       iex> Mnemonix.put(store, :foo, :bar)
       iex> Mnemonix.get(store, :foo)
       :bar
 
-      iex> store = [initial: %{foo: :bar}]
-      iex> server = [name: StoreCache]
-      iex> {:ok, _store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, store, server)
+      iex> options = [initial: %{foo: :bar}, name: StoreCache]
+      iex> {:ok, _store} = Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, options)
       iex> Mnemonix.get(StoreCache, :foo)
       :bar
   """
-  @spec start_link(Mnemonix.Store.Behaviour.t, Mnemonix.Store.options, GenServer.opts) :: GenServer.on_start
-  def start_link(impl, store, server) do
-    GenServer.start_link(__MODULE__, {impl, store}, server)
+  @spec start_link(Mnemonix.Store.Behaviour.t, Mnemonix.Store.Server.options) :: GenServer.on_start
+  def start_link(impl, options \\ []) do
+    {options, config} = Keyword.split(options, ~w[name timeout debug spawn_opt]a)
+    GenServer.start_link(__MODULE__, {impl, config}, options)
   end
 
   @doc """
@@ -42,9 +43,9 @@ defmodule Mnemonix.Store.Server do
   """
   @spec init({Mnemonix.Store.Behaviour.t, Mnemonix.Store.options})
     :: {:ok, Mnemonix.Store.t} | :ignore | {:stop, reason :: term}
-  def init({impl, options}) do
-    with {:ok, state} <- impl.setup(options),
-         store        <- Mnemonix.Store.new(impl, options, state),
+  def init({impl, config}) do
+    with {:ok, state} <- impl.setup(config),
+         store        <- Mnemonix.Store.new(impl, config, state),
          {:ok, store} <- impl.setup_expiry(store),
          {:ok, store} <- impl.setup_initial(store),
     do: {:ok, store}

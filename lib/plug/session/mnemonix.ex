@@ -13,7 +13,7 @@ if Code.ensure_loaded?(Plug) do
     ## Examples
 
         # Start a named store when the application starts
-        Mnemonix.Stores.Map.start_link(server: [name: My.Plug.Session])
+        Mnemonix.Stores.Map.start_link(name: My.Plug.Session)
 
         # Use the session plug with the table name
         plug Plug.Session, store: :mnemonix, key: "sid", store: My.Plug.Session

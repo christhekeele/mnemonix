@@ -1,12 +1,20 @@
 defmodule Mnemonix.Store do
   @moduledoc false
 
+  @type spec :: [
+    otp_app: atom,
+    store: options,
+    server: GenServer.options,
+  ]
+
+  @type options :: Keyword.t
+
   @typedoc """
   Container for store state.
   """
   @type t :: %__MODULE__{
     impl: Mnemonix.Store.Behaviour.t,
-    opts: Mnemonix.Supervisor.options,
+    opts: options,
     state: state :: term,
     expiry: :native | pid,
   }
@@ -14,7 +22,7 @@ defmodule Mnemonix.Store do
   defstruct [:impl, :opts, :state, expiry: :native]
 
   @doc false
-  @spec new(Mnemonix.Store.Behaviour.t, Mnemonix.Supervisor.options, state :: term) :: t
+  @spec new(Mnemonix.Store.Behaviour.t, options, state :: term) :: t
   def new(impl, opts, state) do
     %__MODULE__{impl: impl, opts: opts, state: state}
   end

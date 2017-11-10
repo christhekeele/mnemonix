@@ -49,6 +49,11 @@ defmodule Mnemonix.Store.Behaviours.Enumerable do
     # Mnemonix.Store.Behaviours.Enumerable
     ##
 
+      @doc """
+      Returns `false`: this store does not support the functions in `Mnemonix.Features.Enumerable`.
+
+      Invoking any of those functions on this store will raise a `Mnemonix.Features.Enumerable.Error`.
+      """
       @impl unquote __MODULE__
       def enumerable?(store) do
         {:ok, store, false}

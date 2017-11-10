@@ -11,17 +11,17 @@ if Code.ensure_loaded?(Memcache) do
         iex> Mnemonix.get(store, "foo")
         nil
 
-    This store throws errors on the functions in `Mnemonix.Features.Enumerable`.
+    This store raises errors on the functions in `Mnemonix.Features.Enumerable`.
     """
+
+    alias Mnemonix.Store
+
+    use Store.Behaviour
+    use Store.Translator.Term
 
     defmodule Exception do
       defexception [:message]
     end
-
-    use Mnemonix.Store.Behaviour
-    use Mnemonix.Store.Translator.Term
-
-    alias Mnemonix.Store
 
   ####
   # Mnemonix.Store.Behaviours.Core
@@ -36,8 +36,8 @@ if Code.ensure_loaded?(Memcache) do
 
     All other options are passed verbatim to `Memcache.start_link/1`.
     """
-    @impl Mnemonix.Store.Behaviours.Core
-    @spec setup(Mnemonix.Store.options)
+    @impl Store.Behaviours.Core
+    @spec setup(Store.options)
       :: {:ok, state :: term} | {:stop, reason :: any}
     def setup(opts) do
       options = opts
@@ -50,9 +50,9 @@ if Code.ensure_loaded?(Memcache) do
   # Mnemonix.Store.Behaviours.Map
   ##
 
-  @impl Mnemonix.Store.Behaviours.Map
-    @spec delete(Mnemonix.Store.t, Mnemonix.key)
-      :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+  @impl Store.Behaviours.Map
+    @spec delete(Store.t, Mnemonix.key)
+      :: {:ok, Store.t} | Store.Behaviour.exception
     def delete(store = %Store{state: conn}, key) do
       case Memcache.delete(conn, key) do
         {:ok}            -> {:ok, store}
@@ -60,9 +60,9 @@ if Code.ensure_loaded?(Memcache) do
       end
     end
 
-    @impl Mnemonix.Store.Behaviours.Map
-    @spec fetch(Mnemonix.Store.t, Mnemonix.key)
-      :: {:ok, Mnemonix.Store.t, {:ok, Mnemonix.value} | :error} | Mnemonix.Store.Behaviour.exception
+    @impl Store.Behaviours.Map
+    @spec fetch(Store.t, Mnemonix.key)
+      :: {:ok, Store.t, {:ok, Mnemonix.value} | :error} | Store.Behaviour.exception
     def fetch(store = %Store{state: conn}, key) do
       case Memcache.get(conn, key) do
         {:error, "Key not found"} -> {:ok, store, :error}
@@ -71,9 +71,9 @@ if Code.ensure_loaded?(Memcache) do
       end
     end
 
-    @impl Mnemonix.Store.Behaviours.Map
-    @spec put(Mnemonix.Store.t, Mnemonix.key, Store.value)
-      :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+    @impl Store.Behaviours.Map
+    @spec put(Store.t, Mnemonix.key, Store.value)
+      :: {:ok, Store.t} | Store.Behaviour.exception
     def put(store = %Store{state: conn}, key, value) do
       case Memcache.set(conn, key, value) do
         {:ok}            -> {:ok, store}

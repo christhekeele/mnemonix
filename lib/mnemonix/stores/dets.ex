@@ -10,17 +10,17 @@ defmodule Mnemonix.Stores.DETS do
       iex> Mnemonix.get(store, "foo")
       nil
 
-  This store throws errors on the functions in `Mnemonix.Features.Enumerable`.
+  This store raises errors on the functions in `Mnemonix.Features.Enumerable`.
   """
+
+  alias Mnemonix.Store
+
+  use Store.Behaviour
+  use Store.Translator.Raw
 
   defmodule Exception do
     defexception [:message]
   end
-
-  use Mnemonix.Store.Behaviour
-  use Mnemonix.Store.Translator.Raw
-
-  alias Mnemonix.Store
 
 ####
 # Mnemonix.Store.Behaviours.Core
@@ -44,8 +44,8 @@ defmodule Mnemonix.Stores.DETS do
   The rest of the options are passed into `:dets.open_file/2` verbaitm, except
   for `type:`, which will always be `:set`.
   """
-  @impl Mnemonix.Store.Behaviours.Core
-  @spec setup(Mnemonix.Store.options)
+  @impl Store.Behaviours.Core
+  @spec setup(Store.options)
     :: {:ok, state :: term} | {:stop, reason :: any}
   def setup(opts) do
     {table, opts} = Keyword.get_and_update(opts, :table, fn _ -> :pop end)
@@ -56,8 +56,8 @@ defmodule Mnemonix.Stores.DETS do
     end
   end
 
-  @impl Mnemonix.Store.Behaviours.Core
-  @spec teardown(reason, Mnemonix.Store.t)
+  @impl Store.Behaviours.Core
+  @spec teardown(reason, Store.t)
     :: {:ok, reason} | {:error, reason}
       when reason: :normal | :shutdown | {:shutdown, term} | term
   def teardown(reason, %Store{state: state}) do
@@ -70,9 +70,9 @@ defmodule Mnemonix.Stores.DETS do
 # Mnemonix.Store.Behaviours.Map
 ##
 
-  @impl Mnemonix.Store.Behaviours.Map
-  @spec delete(Mnemonix.Store.t, Mnemonix.key)
-    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+  @impl Store.Behaviours.Map
+  @spec delete(Store.t, Mnemonix.key)
+    :: {:ok, Store.t} | Store.Behaviour.exception
   def delete(store = %Store{state: table}, key) do
     if :dets.delete(table, key) do
       {:ok, store}
@@ -83,9 +83,9 @@ defmodule Mnemonix.Stores.DETS do
     end
   end
 
-  @impl Mnemonix.Store.Behaviours.Map
-  @spec fetch(Mnemonix.Store.t, Mnemonix.key)
-    :: {:ok, Mnemonix.Store.t, {:ok, Mnemonix.value} | :error} | Mnemonix.Store.Behaviour.exception
+  @impl Store.Behaviours.Map
+  @spec fetch(Store.t, Mnemonix.key)
+    :: {:ok, Store.t, {:ok, Mnemonix.value} | :error} | Store.Behaviour.exception
   def fetch(store = %Store{state: table}, key) do
     case :dets.lookup(table, key) do
       [{^key, value} | []] -> {:ok, store, {:ok, value}}
@@ -94,9 +94,9 @@ defmodule Mnemonix.Stores.DETS do
     end
   end
 
-  @impl Mnemonix.Store.Behaviours.Map
-  @spec put(Mnemonix.Store.t, Mnemonix.key, Store.value)
-    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+  @impl Store.Behaviours.Map
+  @spec put(Store.t, Mnemonix.key, Store.value)
+    :: {:ok, Store.t} | Store.Behaviour.exception
   def put(store = %Store{state: table}, key, value) do
     if :dets.insert(table, {key, value}) do
       {:ok, store}

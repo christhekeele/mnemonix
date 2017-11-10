@@ -13,14 +13,14 @@ defmodule Mnemonix.Stores.ETS do
   This store supports the functions in `Mnemonix.Features.Enumerable`.
   """
 
+  alias Mnemonix.Store
+
+  use Store.Behaviour
+  use Store.Translator.Raw
+
   defmodule Exception do
     defexception [:message]
   end
-
-  use Mnemonix.Store.Behaviour
-  use Mnemonix.Store.Translator.Raw
-
-  alias Mnemonix.Store
 
 ####
 # Mnemonix.Store.Behaviours.Core
@@ -63,8 +63,8 @@ defmodule Mnemonix.Stores.ETS do
 
     - *Default:* `%{}`
   """
-  @impl Mnemonix.Store.Behaviours.Core
-  @spec setup(Mnemonix.Store.options)
+  @impl Store.Behaviours.Core
+  @spec setup(Store.options)
     :: {:ok, state :: term} | {:stop, reason :: any}
   def setup(opts) do
     table   = Keyword.get(opts, :table) || Module.concat(__MODULE__, Table)
@@ -101,9 +101,9 @@ defmodule Mnemonix.Stores.ETS do
 # Mnemonix.Store.Behaviours.Map
 ##
 
-  @impl Mnemonix.Store.Behaviours.Map
-  @spec delete(Mnemonix.Store.t, Mnemonix.key)
-    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+  @impl Store.Behaviours.Map
+  @spec delete(Store.t, Mnemonix.key)
+    :: {:ok, Store.t} | Store.Behaviour.exception
   def delete(store = %Store{state: table}, key) do
     if :ets.delete(table, key) do
       {:ok, store}
@@ -114,9 +114,9 @@ defmodule Mnemonix.Stores.ETS do
     end
   end
 
-  @impl Mnemonix.Store.Behaviours.Map
-  @spec fetch(Mnemonix.Store.t, Mnemonix.key)
-    :: {:ok, Mnemonix.Store.t, {:ok, Mnemonix.value} | :error} | Mnemonix.Store.Behaviour.exception
+  @impl Store.Behaviours.Map
+  @spec fetch(Store.t, Mnemonix.key)
+    :: {:ok, Store.t, {:ok, Mnemonix.value} | :error} | Store.Behaviour.exception
   def fetch(store = %Store{state: table}, key) do
     case :ets.lookup(table, key) do
       [{^key, value} | []] -> {:ok, store, {:ok, value}}
@@ -125,9 +125,9 @@ defmodule Mnemonix.Stores.ETS do
     end
   end
 
-  @impl Mnemonix.Store.Behaviours.Map
-  @spec put(Mnemonix.Store.t, Mnemonix.key, Store.value)
-    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+  @impl Store.Behaviours.Map
+  @spec put(Store.t, Mnemonix.key, Store.value)
+    :: {:ok, Store.t} | Store.Behaviour.exception
   def put(store = %Store{state: table}, key, value) do
     if :ets.insert(table, {key, value}) do
       {:ok, store}
@@ -142,16 +142,19 @@ defmodule Mnemonix.Stores.ETS do
 # Mnemonix.Store.Behaviours.Enumerable
 ##
 
-  @impl Mnemonix.Store.Behaviours.Enumerable
-  @spec enumerable?(Mnemonix.Store.t)
-    :: {:ok, Mnemonix.Store.t, boolean} | Mnemonix.Store.Behaviour.exception
+  @doc """
+  Returns `true`: this store supports the functions in `Mnemonix.Features.Enumerable`.
+  """
+  @impl Store.Behaviours.Enumerable
+  @spec enumerable?(Store.t)
+    :: {:ok, Store.t, boolean} | Store.Behaviour.exception
   def enumerable?(store) do
     {:ok, store, true}
   end
 
-  @impl Mnemonix.Store.Behaviours.Enumerable
-  @spec to_enumerable(Mnemonix.Store.t)
-    :: {:ok, Mnemonix.Store.t, Enumerable.t} | Mnemonix.Store.Behaviour.exception
+  @impl Store.Behaviours.Enumerable
+  @spec to_enumerable(Store.t)
+    :: {:ok, Store.t, Enumerable.t} | Store.Behaviour.exception
   def to_enumerable(store = %Store{state: table}) do
     {:ok, store, :ets.tab2list(table)}
   end

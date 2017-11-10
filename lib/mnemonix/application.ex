@@ -33,55 +33,58 @@ defmodule Mnemonix.Application do
       #=> :b
   """
 
+  use Application
+
   @typedoc """
   Default options used by `Mnemonix.start/2` to start stores with no specified config.
 
   The default options are `[{Mnemonix.Stores.Map, []}]`.
   """
-  @type options :: [Mnemonix.Supervisor.config]
+  @type options :: [{Mnemonix.Store.Behaviour.t, Mnemonix.Store.Behaviour.options}]
 
   @doc """
-  Starts supervision of the Mnemonix.Application.
+  Starts the `:mnemonix` application.
+
+  Finds stores in your application configuration and brings them up when your app starts.
 
   Reads from the `:mnemonix` application `:stores` configuration to detect stores to automatically supervise.
 
   If a store listed in the configuration has its own entry under the `:mnemonix` application configuration,
   that entry will be used to configure the store.
 
-  Otherwise, the provided default config will be used.
-  The default config is `{Mnemonix.Stores.Map, []}` and automatically passed in from `Mnemonix.start/2`
-  when your application starts.
-  """ && false
-  @spec start_link({Mnemonix.Store.Behaviour.t, Mnemonix.Supervisor.options})
+  ### Examples
+
+      config :mnemonix, stores: [Foo, Bar]
+      config :mnemonix, Bar: {Mnemonix.Stores.ETS, server: [name: Baz]}
+  """
+  @impl Application
+  @spec start(Application.start_type, Mnemonix.Application.options)
     :: {:ok, Mnemonix.store} | {:error, reason :: term}
-  def start_link({impl, opts}) do
-    options = :mnemonix
+  def start(_type, [default]) do
+    :mnemonix
     |> Application.get_env(:stores, [])
     |> Enum.map(fn name ->
       :mnemonix
-      |> Application.get_env(name, [])
-      |> start_link_defaults(name)
-      |> Keyword.merge(opts)
+      |> Application.get_env(name, default)
+      |> prepare_child_spec(name)
     end)
-    Mnemonix.start_link(impl, options)
+    |> Supervisor.start_link(strategy: :one_for_one, name: Mnemonix.Supervisor)
   end
 
-  defp start_link_defaults(opts, name) do
-    opts
-    |> Keyword.put(:otp_app, :mnemonix)
-    |> Keyword.put_new(:server, [])
-    |> Kernel.put_in([:server, :name], name)
+  defp prepare_child_spec({impl, opts}, name) do
+    {impl, Keyword.put_new(opts, :name, name)}
   end
 
   @doc """
   The default Mnemonix.Application options defined in the project's `mix.exs`.
+
+  This is the configuration used for stores named in `config :mnemonix, :stores`
+  without corresponding configuration under `config :mnemonix, <name>`.
   """
-  def default do
-    :mnemonix
+  def default, do: :mnemonix
     |> Application.spec
     |> Keyword.get(:mod)
     |> elem(1)
     |> List.first
-  end
 
 end

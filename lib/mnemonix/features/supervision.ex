@@ -74,22 +74,14 @@ defmodule Mnemonix.Features.Supervision do
 
   ## Examples
 
-      iex> options = [store: [initial: %{foo: :bar}], server: [name: NamedStore]]
+      iex> options = [initial: %{foo: :bar}, name: NamedStore]
       iex> {:ok, _store} = Mnemonix.start_link(Mnemonix.Stores.Map, options)
       iex> Mnemonix.get(NamedStore, :foo)
       :bar
   """
   @spec start_link(Mnemonix.Store.Behaviour.t, Mnemonix.Supervisor.options) :: GenServer.on_start
   def start_link(implementation, options) do
-    config = options
-    |> Keyword.get(:otp_app, :mnemonix)
-    |> Application.get_env(implementation, [])
-    [store, server] = for option <- [:store, :server] do
-      config
-      |> Keyword.get(option, [])
-      |> Keyword.merge(Keyword.get(options, option, []))
-    end
-    Mnemonix.Store.Server.start_link implementation, store, server
+    implementation.start_link options
   end
 
 end

@@ -47,9 +47,7 @@ defmodule Mnemonix.Delegator do
     quote do
       @doc false
       def start_link(impl, opts) do
-        opts = if Keyword.get(opts, :server), do: opts, else: Keyword.put(opts, :server, [])
-        opts = Kernel.put_in(opts, [:server, :name], unquote(store))
-        unquote(module).start_link(impl, opts)
+        unquote(module).start_link(impl, Keyword.put_new(opts, :name, unquote(store)))
       end
       defoverridable [start_link: 2]
     end

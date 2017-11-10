@@ -7,7 +7,16 @@ defmodule Mnemonix.Store.Behaviour do
   @type t :: Module.t
 
   @typedoc """
-  An instruction to the `Mnemonix.Store.Server` to raise an error in the client.
+  Options for a `Mnemonix.Store.Behaviour` child specification.
+  """
+  @type options :: [
+    otp_app: atom,
+    store: Mnemonix.Store.options,
+    server: GenServer.options,
+  ]
+
+  @typedoc """
+  An instruction to a `Mnemonix.Store.Server` to raise an error in the client.
   """
   @type exception :: {:raise, Module.t, raise_opts :: Keyword.t}
 

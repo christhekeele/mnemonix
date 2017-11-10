@@ -24,7 +24,7 @@ defmodule Mnemonix.Mixfile do
 
   def application, do: [
     extra_applications: [:logger],
-    mod: {Mnemonix, [{Mnemonix.Stores.Map, []}]},
+    mod: {Mnemonix.Application, [{Mnemonix.Stores.Map, []}]},
   ]
 
   defp deps, do: tools() ++ backends() ++ integrations()

@@ -19,10 +19,10 @@ defmodule Mnemonix.Stores.Map do
   This store supports the functions in `Mnemonix.Features.Enumerable`.
   """
 
-  use Mnemonix.Store.Behaviour
-  use Mnemonix.Store.Translator.Raw
-
   alias Mnemonix.Store
+
+  use Store.Behaviour
+  use Store.Translator.Raw
 
 ####
 # Mnemonix.Store.Behaviours.Core
@@ -37,8 +37,8 @@ defmodule Mnemonix.Stores.Map do
 
     - *Default:* `%{}`
   """
-  @impl Mnemonix.Store.Behaviours.Core
-  @spec setup(Mnemonix.Store.options)
+  @impl Store.Behaviours.Core
+  @spec setup(Store.options)
     :: {:ok, state :: term} | {:stop, reason :: any}
   def setup(_opts) do
     {:ok, %{}}
@@ -48,23 +48,23 @@ defmodule Mnemonix.Stores.Map do
   # Mnemonix.Store.Behaviours.Map
   ##
 
-  @impl Mnemonix.Store.Behaviours.Map
-  @spec delete(Mnemonix.Store.t, Mnemonix.key)
-    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+  @impl Store.Behaviours.Map
+  @spec delete(Store.t, Mnemonix.key)
+    :: {:ok, Store.t} | Store.Behaviour.exception
   def delete(store = %Store{state: map}, key) do
     {:ok, %{store | state: Map.delete(map, key)}}
   end
 
-  @impl Mnemonix.Store.Behaviours.Map
-  @spec fetch(Mnemonix.Store.t, Mnemonix.key)
-    :: {:ok, Mnemonix.Store.t, {:ok, Mnemonix.value} | :error} | Mnemonix.Store.Behaviour.exception
+  @impl Store.Behaviours.Map
+  @spec fetch(Store.t, Mnemonix.key)
+    :: {:ok, Store.t, {:ok, Mnemonix.value} | :error} | Store.Behaviour.exception
   def fetch(store = %Store{state: map}, key) do
     {:ok, store, Map.fetch(map, key)}
   end
 
-  @impl Mnemonix.Store.Behaviours.Map
-  @spec put(Mnemonix.Store.t, Mnemonix.key, Store.value)
-    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+  @impl Store.Behaviours.Map
+  @spec put(Store.t, Mnemonix.key, Store.value)
+    :: {:ok, Store.t} | Store.Behaviour.exception
   def put(store = %Store{state: map}, key, value) do
     {:ok, %{store | state: Map.put(map, key, value)}}
   end
@@ -73,6 +73,9 @@ defmodule Mnemonix.Stores.Map do
 # Mnemonix.Store.Behaviours.Enumerable
 ##
 
+  @doc """
+  Returns `true`: this store supports the functions in `Mnemonix.Features.Enumerable`.
+  """
   @impl Mnemonix.Store.Behaviours.Enumerable
   @spec enumerable?(Mnemonix.Store.t)
     :: {:ok, Mnemonix.Store.t, boolean} | Mnemonix.Store.Behaviour.exception
