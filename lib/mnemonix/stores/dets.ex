@@ -48,7 +48,7 @@ defmodule Mnemonix.Stores.DETS do
   @spec setup(Store.options)
     :: {:ok, state :: term} | {:stop, reason :: any}
   def setup(opts) do
-    {table, opts} = Keyword.get_and_update(opts, :table, fn _ -> :pop end)
+    {table, opts} = Keyword.pop(opts, :table)
     table = if table, do: table, else: Module.concat(__MODULE__, Table)
 
     with {:error, reason} <- :dets.open_file(table, opts) do

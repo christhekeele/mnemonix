@@ -22,40 +22,6 @@ defmodule Mnemonix.Stores.Null do
 # Mnemonix.Store.Behaviours.Core
 ##
 
-  # Overrides documentation for start_links to demonstrate their null behaviour instead.
-
-  @doc """
-  Starts a new store using the `Mnemonix.Stores.Null` module with `options`.
-
-  The `options` are the same as described in `Mnemonix.Features.Supervision.start_link/2`.
-  The `:store` options are used in `setup/1` to start the store;
-  the `:server` options are passed directly to `GenServer.start_link/2`.
-
-  The returned `t:GenServer.server/0` reference can be used as the primary
-  argument to the `Mnemonix` API.
-
-  ## Examples
-
-      iex> {:ok, store} = Mnemonix.Stores.Null.start_link()
-      iex> Mnemonix.put(store, "foo", "bar")
-      iex> Mnemonix.get(store, "foo")
-      nil
-
-      iex> {:ok, _store} = Mnemonix.Stores.Null.start_link(name: My.Mnemonix.Stores.Null)
-      iex> Mnemonix.put(My.Mnemonix.Stores.Null, "foo", "bar")
-      iex> Mnemonix.get(My.Mnemonix.Stores.Null, "foo")
-      nil
-  """
-  @impl Store.Behaviours.Core
-  @spec start_link()                            :: GenServer.on_start
-  @spec start_link(Mnemonix.Supervisor.options) :: GenServer.on_start
-  def start_link(options \\ [])
-  def start_link(options), do: super(options)
-
-####
-# Mnemonix.Store.Behaviours.Core
-##
-
   @doc """
   Skips setup since this store does nothing.
 

@@ -3,14 +3,13 @@ defmodule Mnemonix.Features.Map do
   Functions to operate on key/value pairs within a store.
 
   All of these functions are available on the main `Mnemonix` module.
-  """
+  """ && false
 
-  defmacro __using__(opts) do
-    quote do
-      use Mnemonix.Feature, [unquote_splicing(opts), module: unquote(__MODULE__)]
-    end
-  end
+  use Mnemonix.Behaviour
+  use Mnemonix.Singleton.Behaviour
 
+  @callback delete(Mnemonix.store, Mnemonix.key)
+    :: Mnemonix.store | no_return
   @doc """
   Removes the entry under `key` in `store`.
 
@@ -34,6 +33,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback fetch(Mnemonix.store, Mnemonix.key)
+    :: {:ok, Mnemonix.value} | :error | no_return
   @doc """
   Retrievs the value of the entry under `key` in `store`.
 
@@ -56,6 +57,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback put(Mnemonix.store, Mnemonix.key, Mnemonix.value)
+    :: Mnemonix.store | no_return
   @doc """
   Creates a new entry for `value` under `key` in `store`.
 
@@ -77,6 +80,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback drop(Mnemonix.store, Enumerable.t)
+    :: %{Mnemonix.key => Mnemonix.value} | no_return
   @doc """
   Drops the given `keys` from the `store`.
 
@@ -100,6 +105,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback fetch!(Mnemonix.store, Mnemonix.key)
+    :: {:ok, Mnemonix.value} | :error | no_return
   @doc """
   Fetches the value for specific `key`.
 
@@ -122,6 +129,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback get(Mnemonix.store, Mnemonix.key)
+    :: Mnemonix.value | no_return
   @doc """
   Gets the value for a specific `key`.
 
@@ -144,6 +153,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback get(Mnemonix.store, Mnemonix.key, Mnemonix.value)
+    :: Mnemonix.value | no_return
   @doc """
   Gets the value for a specific `key` with `default`.
 
@@ -166,6 +177,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback get_and_update(Mnemonix.store, Mnemonix.key, (Mnemonix.value -> {get, Mnemonix.value} | :pop))
+    :: {get, Mnemonix.store} | no_return when get: term
   @doc """
   Gets the value from `key` and updates it, all in one pass.
 
@@ -222,6 +235,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback get_and_update!(Mnemonix.store, Mnemonix.key, (Mnemonix.value -> {get, Mnemonix.value}))
+    :: {get, Mnemonix.store} | no_return when get: term
   @doc """
   Gets the value from `key` and updates it. Raises if there is no `key`.
 
@@ -270,6 +285,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback get_lazy(Mnemonix.store, Mnemonix.key, (() -> Mnemonix.value))
+    :: Mnemonix.value | no_return
   @doc """
   Gets the value for a specific `key`.
 
@@ -299,6 +316,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback has_key?(Mnemonix.store, Mnemonix.key)
+    :: boolean
   @doc """
   Returns whether a given `key` exists in the given `store`.
 
@@ -310,7 +329,8 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.has_key?(store, :b)
       false
   """
-  @spec has_key?(Mnemonix.store, Mnemonix.key) :: boolean
+  @spec has_key?(Mnemonix.store, Mnemonix.key)
+    :: boolean
   def has_key?(store, key) do
     case GenServer.call(store, {:has_key?, key}) do
       {:ok, value}         -> value
@@ -318,6 +338,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback pop(Mnemonix.store, Mnemonix.key)
+    :: {Mnemonix.value, Mnemonix.store}
   @doc """
   Returns and removes the value associated with `key` in `store`.
 
@@ -345,6 +367,8 @@ defmodule Mnemonix.Features.Map do
   end
 
 
+  @callback pop(Mnemonix.store, Mnemonix.key, default :: term)
+    :: {Mnemonix.value, Mnemonix.store}
   @doc """
   Returns and removes the value associated with `key` in `store` with `default`.
 
@@ -370,6 +394,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback pop_lazy(Mnemonix.store, Mnemonix.key, (() -> Mnemonix.value))
+    :: {Mnemonix.value, Mnemonix.store}
   @doc """
   Lazily returns and removes the value associated with `key` in `store`.
 
@@ -399,6 +425,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback put_new(Mnemonix.store, Mnemonix.key, Mnemonix.value)
+    :: Mnemonix.store
   @doc """
   Puts the given `value` under `key` unless the entry `key` already exists.
 
@@ -412,7 +440,8 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get(store, :b)
       2
   """
-  @spec put_new(Mnemonix.store, Mnemonix.key, Mnemonix.value) :: Mnemonix.store
+  @spec put_new(Mnemonix.store, Mnemonix.key, Mnemonix.value)
+    :: Mnemonix.store
   def put_new(store, key, value) do
     case GenServer.call(store, {:put_new, key, value}) do
       :ok                  -> store
@@ -420,6 +449,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback put_new_lazy(Mnemonix.store, Mnemonix.key, (() -> Mnemonix.value))
+    :: Mnemonix.store | no_return
   @doc """
   Evaluates `fun` and puts the result under `key` in `store` unless `key` is already present.
 
@@ -448,6 +479,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback replace(Mnemonix.store, Mnemonix.key, Mnemonix.value)
+    :: Mnemonix.store | no_return
   @doc """
   Alters the value stored under `key` to `value` if it already exists in `store`.
 
@@ -472,6 +505,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback replace!(Mnemonix.store, Mnemonix.key, Mnemonix.value)
+    :: Mnemonix.store | no_return
   @doc """
   Alters the value stored under `key` to `value` if it already exists in `store`.
 
@@ -495,6 +530,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback split(Mnemonix.store, Enumerable.t)
+    :: {%{Mnemonix.key => Mnemonix.value}, Mnemonix.store} | no_return
   @doc """
   Takes all entries corresponding to the given `keys` and removes them from the `store` into a separate map.
 
@@ -528,6 +565,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback take(Mnemonix.store, Enumerable.t)
+    :: %{Mnemonix.key => Mnemonix.value} | no_return
   @doc """
   Returns a map of all key/value pairs in `store` where the key is in `keys`.
 
@@ -551,6 +590,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback update(Mnemonix.store, Mnemonix.key, Mnemonix.value, (Mnemonix.value -> Mnemonix.value))
+    :: Mnemonix.store
   @doc """
   Updates the value at `key` in `store` with the given `function`.
 
@@ -575,6 +616,8 @@ defmodule Mnemonix.Features.Map do
     end
   end
 
+  @callback update!(Mnemonix.store, Mnemonix.key, (Mnemonix.value -> Mnemonix.value))
+    :: Mnemonix.store | no_return
   @doc """
   Updates the value at `key` in `store` with the given `function`.
 

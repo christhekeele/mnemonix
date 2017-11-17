@@ -3,7 +3,7 @@ defmodule Mnemonix.Store.Translator.Term do
   # External Term Format serialization/deserialization logic for out-of-memory stores
 
   defmacro __using__(_) do
-    quote do
+    quote location: :keep do
 
       @impl Mnemonix.Store.Translator
       @spec serialize_key(Mnemonix.Store.t, Mnemonix.key)

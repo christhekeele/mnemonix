@@ -1,93 +1,80 @@
 defmodule Mnemonix.Store.Behaviours.Core do
   @moduledoc false
 
-  @callback child_spec()
-  :: Supervisor.child_spec
-  @callback child_spec(options :: Keyword.t)
-    :: Supervisor.child_spec
-
-  @callback start_link()
-    :: GenServer.on_start
-  @callback start_link(Mnemonix.Supervisor.options)
-    :: GenServer.on_start
+  use Mnemonix.Behaviour do
+    quote do
+      @impl unquote(__MODULE__)
+      def start_link() do
+        Mnemonix.Store.Server.start_link(__MODULE__, [])
+      end
+      @impl unquote(__MODULE__)
+      def start_link(opts) do
+        Mnemonix.Store.Server.start_link(__MODULE__, opts)
+      end
+    end
+  end
 
   @callback setup(Mnemonix.Store.options)
     :: {:ok, state :: term} | :ignore | {:stop, reason :: term}
+  # @doc false
+  # @spec setup(Mnemonix.Store.options)
+  #   :: {:ok, state :: term} | :ignore | {:stop, reason :: term}
+  # def setup(options), do: {:ok, options}
+
+  @callback start_link()
+    :: {:ok, Mnemonix.store} | no_return
+  @callback start_link(options :: Keyword.t)
+    :: {:ok, Mnemonix.store} | no_return
+
+  @callback child_spec()
+    :: Supervisor.child_spec
+  @doc false
+  @spec child_spec()
+    :: Supervisor.child_spec
+  def child_spec(), do: child_spec([])
+
+  @callback child_spec(options :: Keyword.t)
+    :: Supervisor.child_spec
+  @doc false
+  @spec child_spec(options :: Keyword.t)
+    :: Supervisor.child_spec
+  def child_spec(options) do
+    {restart, options} = Keyword.pop(options, :restart, :permanent)
+    {shutdown, options} = Keyword.pop(options, :shutdown, 5000)
+    %{
+      id: make_ref(),
+      start: {Mnemonix.Store.Server, :start_link, [__MODULE__, options]},
+      restart: restart,
+      shutdown: shutdown,
+      type: :worker,
+    }
+  end
 
   @callback setup_initial(Mnemonix.Store.t)
     :: {:ok, Mnemonix.store} | no_return
+  def setup_initial(store = %Mnemonix.Store{impl: impl, opts: opts}) do
+    opts
+    |> Keyword.get(:initial, %{})
+    |> Enum.map(fn {key, value} ->
+      {impl.serialize_key(store, key), value}
+    end)
+    |> Enum.map(fn {key, value} ->
+      {key, impl.serialize_value(store, value)}
+    end)
+    |> Enum.reduce({:ok, store}, fn {key, value}, {:ok, store} ->
+      impl.put(store, key, value)
+    end)
+  end
 
   @callback teardown(reason, Mnemonix.Store.t)
     :: {:ok, reason} | {:error, reason}
       when reason: :normal | :shutdown | {:shutdown, term} | term
-
   @doc false
-  defmacro __using__(_) do
-    quote do
-      @behaviour unquote __MODULE__
-
-      @store __MODULE__ |> Inspect.inspect(%Inspect.Opts{})
-
-      @doc """
-      """
-      @impl unquote __MODULE__
-      @spec child_spec(overrides :: Keyword.t)
-        :: Supervisor.child_spec
-      def child_spec(options \\ []) do
-        {restart, options} = Keyword.pop(options, :restart, :permanent)
-        {shutdown, options} = Keyword.pop(options, :shutdown, 5000)
-        %{
-          id: make_ref(),
-          start: {Mnemonix.Store.Server, :start_link, [__MODULE__, options]},
-          restart: restart,
-          shutdown: shutdown,
-          type: :worker,
-        }
-      end
-
-      @doc """
-      Starts a new store using the `#{@store}` module with `options`.
-
-      The `options` are the same as described in `Mnemonix.Features.Supervision.start_link/2`.
-      The `:store` options are used in `setup/1` to start the store;
-      the `:server` options are passed directly to `GenServer.start_link/2`.
-
-      The returned `t:GenServer.server/0` reference can be used as the primary
-      argument to the `Mnemonix` API.
-
-      ## Examples
-
-          iex> {:ok, store} = #{@store}.start_link()
-          iex> Mnemonix.put(store, "foo", "bar")
-          iex> Mnemonix.get(store, "foo")
-          "bar"
-
-          iex> {:ok, _store} = #{@store}.start_link(name: My.#{@store})
-          iex> Mnemonix.put(My.#{@store}, "foo", "bar")
-          iex> Mnemonix.get(My.#{@store}, "foo")
-          "bar"
-      """
-      @impl unquote __MODULE__
-      @spec start_link()                            :: GenServer.on_start
-      @spec start_link(Mnemonix.Supervisor.options) :: GenServer.on_start
-      def start_link(options \\ []) do
-        Mnemonix.Store.Server.start_link(__MODULE__, options)
-      end
-
-      @impl unquote __MODULE__
-      def setup_initial(store = %Mnemonix.Store{impl: impl, opts: opts}) do
-        opts
-        |> Keyword.get(:initial, %{})
-        |> Enum.reduce({:ok, store}, fn {key, value}, {:ok, store} ->
-          impl.put(store, impl.serialize_key(store, key), impl.serialize_value(store, value))
-        end)
-      end
-
-      @impl unquote __MODULE__
-      def teardown(reason, _store) do
-        {:ok, reason}
-      end
-    end
+  @spec teardown(reason, Mnemonix.Store.t)
+    :: {:ok, reason} | {:error, reason}
+      when reason: :normal | :shutdown | {:shutdown, term} | term
+  def teardown(reason, _store) do
+    {:ok, reason}
   end
 
 end

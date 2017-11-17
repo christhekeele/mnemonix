@@ -105,8 +105,6 @@ defmodule Mnemonix do
   """
   @type store :: pid | GenServer.name
 
-  use Mnemonix.Builder
-
   @doc """
   Starts a new empty in-memory store.
 
@@ -162,7 +160,9 @@ defmodule Mnemonix do
   end
 
   defp do_new(map) do
-    with {:ok, store} <- Mnemonix.Stores.Map.start_link(initial: map), do: store
+    with {:ok, store} <- Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, initial: map), do: store
   end
+
+  use Mnemonix.Builder#, inline: true
 
 end

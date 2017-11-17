@@ -77,7 +77,7 @@ ExUnit.configure(exclude: exclusions)
 defmodule Filesystem.TestHelpers do
 
   defmacro in_test_dir(dir \\ nil, [do: code]) do
-    quote do
+    quote location: :keep do
       File.cd!(unquote(dir) || Filesystem.TestHelpers.test_dir(), fn ->
         unquote code
       end)
@@ -123,7 +123,7 @@ defmodule Mnemonix.Test.Case do
   use ExUnit.CaseTemplate
 
   using do
-    quote do
+    quote location: :keep do
       import Mnemonix.Test.Case
       import Filesystem.TestHelpers
     end

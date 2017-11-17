@@ -23,9 +23,9 @@ defmodule Mnemonix.Store.Expiry.Engine do
     GenServer.call(engine, {:persist, store, key})
   end
 
-  def handle_call({:expire, store, key, ttl}, {server, _tag}, state = %__MODULE__{}) do
+  def handle_call({:expire, store, key, ttl}, _, state = %__MODULE__{}) do
     with {:ok, state} <- abort(key, state),
-         {:ok, state} <- schedule(store, server, key, ttl, state),
+         {:ok, state} <- schedule(store, key, ttl, state),
     do: {:reply, :ok, state}
   end
 
@@ -44,16 +44,15 @@ defmodule Mnemonix.Store.Expiry.Engine do
     end
   end
 
-  defp schedule(store, server, key, nil, state = %__MODULE__{default: ttl}) do
+  defp schedule(store, key, nil, state = %__MODULE__{default: ttl}) do
     if ttl do
-      schedule(store, server, key, ttl, state)
+      schedule(store, key, ttl, state)
     else
-      {:ok, server}
+      {:ok, state}
     end
   end
-  defp schedule(store, server, key, ttl, state = %__MODULE__{timers: timers}) do
-    apparent_key = store.impl.deserialize_key(store, key)
-    with {:ok, timer} <- :timer.apply_after(ttl, Mnemonix, :delete, [server, apparent_key]) do
+  defp schedule(store, key, ttl, state = %__MODULE__{timers: timers}) do
+    with {:ok, timer} <- :timer.apply_after(ttl, store.impl, :delete, [store, key]) do
       {:ok, %{state | timers: Map.put(timers, key, timer)}}
     end
   end

@@ -3,13 +3,10 @@ defmodule Mnemonix.Features.Bump do
   Functions to increment/decrement integer values within a store.
 
   All of these functions are available on the main `Mnemonix` module.
-  """
+  """ && false
 
-  defmacro __using__(opts) do
-    quote do
-      use Mnemonix.Feature, [unquote_splicing(opts), module: unquote(__MODULE__)]
-    end
-  end
+  use Mnemonix.Behaviour
+  use Mnemonix.Singleton.Behaviour
 
   @typedoc """
   The return value of a bump operation.
@@ -47,6 +44,8 @@ defmodule Mnemonix.Features.Bump do
       iex> Mnemonix.bump(store, :c, "foo")
       {:error, :no_integer}
   """
+  @callback bump(Mnemonix.store, Mnemonix.key, amount :: term)
+    :: bump_op | no_return
   @spec bump(Mnemonix.store, Mnemonix.key, amount :: term)
     :: bump_op | no_return
   def bump(store, key, amount) do
@@ -85,6 +84,8 @@ defmodule Mnemonix.Features.Bump do
       iex> Mnemonix.bump!(store, :d, "foo")
       ** (ArithmeticError) value provided to operation is not an integer
   """
+  @callback bump!(Mnemonix.store, Mnemonix.key, amount :: term)
+    :: :ok | no_return
   @spec bump!(Mnemonix.store, Mnemonix.key, amount :: term)
     :: :ok | no_return
   def bump!(store, key, amount) do
@@ -117,6 +118,8 @@ defmodule Mnemonix.Features.Bump do
       iex> Mnemonix.get(store, :c)
       "foo"
   """
+  @callback increment(Mnemonix.store, Mnemonix.key)
+    :: Mnemonix.store | no_return
   @spec increment(Mnemonix.store, Mnemonix.key)
     :: Mnemonix.store | no_return
   def increment(store, key) do
@@ -155,6 +158,8 @@ defmodule Mnemonix.Features.Bump do
       iex> Mnemonix.get(store, :d)
       0
   """
+  @callback increment(Mnemonix.store, Mnemonix.key, amount :: term)
+    :: Mnemonix.store | no_return
   @spec increment(Mnemonix.store, Mnemonix.key, amount :: term)
     :: Mnemonix.store | no_return
   def increment(store, key, amount) do
@@ -188,6 +193,8 @@ defmodule Mnemonix.Features.Bump do
       iex> Mnemonix.get(store, :c)
       "foo"
   """
+  @callback decrement(Mnemonix.store, Mnemonix.key)
+    :: Mnemonix.store | no_return
   @spec decrement(Mnemonix.store, Mnemonix.key)
     :: Mnemonix.store | no_return
   def decrement(store, key) do
@@ -226,6 +233,8 @@ defmodule Mnemonix.Features.Bump do
       iex> Mnemonix.get(store, :d)
       0
   """
+  @callback decrement(Mnemonix.store, Mnemonix.key, amount :: term)
+    :: Mnemonix.store | no_return
   @spec decrement(Mnemonix.store, Mnemonix.key, amount :: term)
     :: Mnemonix.store | no_return
   def decrement(store, key, amount) do

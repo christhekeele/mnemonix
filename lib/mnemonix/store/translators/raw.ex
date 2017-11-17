@@ -3,7 +3,7 @@ defmodule Mnemonix.Store.Translator.Raw do
   # No-op serialization/deserialization logic for in-memory stores
 
   defmacro __using__(_) do
-    quote do
+    quote location: :keep do
 
       @impl Mnemonix.Store.Translator
       @spec serialize_key(Mnemonix.Store.t, Mnemonix.key)

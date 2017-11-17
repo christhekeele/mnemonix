@@ -8,13 +8,10 @@ defmodule Mnemonix.Features.Enumerable do
   Stores that do not support enumeration will raise a `Mnemonix.Features.Enumerable.Error`
   when these functions are called. You can validate that a store is enumerable before you
   invoke enumerable functions via `enumerable?/1`.
-  """
+  """ && false
 
-  defmacro __using__(opts) do
-    quote do
-      use Mnemonix.Feature, [unquote_splicing(opts), module: unquote(__MODULE__)]
-    end
-  end
+  use Mnemonix.Behaviour
+  use Mnemonix.Singleton.Behaviour
 
   defmodule Error do
     defexception [:message]
@@ -24,6 +21,8 @@ defmodule Mnemonix.Features.Enumerable do
     end
   end
 
+  @callback enumerable?(Mnemonix.store)
+    :: boolean | no_return
   @doc """
   Returns `true` if the `store` is enumerable.
 
@@ -49,6 +48,8 @@ defmodule Mnemonix.Features.Enumerable do
     end
   end
 
+  @callback equal?(Mnemonix.store, Mnemonix.store)
+    :: boolean | no_return
   @doc """
   Checks that contents of stores `store1` and `store2` are equal.
 
@@ -82,6 +83,8 @@ defmodule Mnemonix.Features.Enumerable do
     end
   end
 
+  @callback keys(Mnemonix.store)
+    :: [Mnemonix.key] | no_return
   @doc """
   Returns all keys in `store`.
 
@@ -110,6 +113,8 @@ defmodule Mnemonix.Features.Enumerable do
     end
   end
 
+  @callback to_list(Mnemonix.store)
+    :: [{Mnemonix.key, Mnemonix.value}] | no_return
   @doc """
   Returns all key/value pairs in `store` as a list of two-tuples.
 
@@ -145,6 +150,8 @@ defmodule Mnemonix.Features.Enumerable do
     end
   end
 
+  @callback values(Mnemonix.store)
+    :: [Mnemonix.value] | no_return
   @doc """
   Returns all values in `store`.
 

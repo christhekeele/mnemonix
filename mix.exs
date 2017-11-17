@@ -55,9 +55,9 @@ defmodule Mnemonix.Mixfile do
       "LICENSE.md",
     ],
     groups_for_modules: [
-      Features: ~r<Mnemonix.Features>,
+      # Features: ~r<Mnemonix.Features>,
       Integrations: [Plug.Session.MNEMONIX],
-      Supervision: [Mnemonix.Application, Mnemonix.Supervisor],
+      # Supervision: [Mnemonix.Application, Mnemonix.Supervisor],
       Stores: ~r<Mnemonix.Stores>,
     ]
   ]
