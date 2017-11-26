@@ -62,7 +62,6 @@ defmodule Mnemonix.Behaviour do
             nil
           else
             callback = {source, name, length(params)} in source.__callbacks__
-            if callback, do: IO.inspect {source, name, length(params)}
             info = %{module: __MODULE__, source: source, kind: kind, docs: docs, inline: inline, callback: callback, singleton: singleton}
             Mnemonix.Behaviour.compose_default(info, doc, name, params, guards, body)
           end

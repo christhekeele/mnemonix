@@ -4,21 +4,12 @@ defmodule Mnemonix.Store.Behaviour do
   @typedoc """
   A module implementing `Mnemonix.Store.Behaviour`.
   """
-  @type t :: Module.t
-
-  @typedoc """
-  Options for a `Mnemonix.Store.Behaviour` child specification.
-  """
-  @type options :: [
-    otp_app: atom,
-    store: Mnemonix.Store.options,
-    server: GenServer.options,
-  ]
+  @type t :: module
 
   @typedoc """
   An instruction to a `Mnemonix.Store.Server` to raise an error in the client.
   """
-  @type exception :: {:raise, Module.t, raise_opts :: Keyword.t}
+  @type exception :: {:raise, module, raise_opts :: Keyword.t}
 
   @doc false
   defmacro __using__(opts \\ []) do

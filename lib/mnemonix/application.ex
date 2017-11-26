@@ -40,7 +40,7 @@ defmodule Mnemonix.Application do
 
   The default options are `[{Mnemonix.Stores.Map, []}]`.
   """
-  @type options :: [{Mnemonix.Store.Behaviour.t, Mnemonix.Store.Behaviour.options}]
+  @type options :: [{Mnemonix.Store.Behaviour.t, Mnemonix.Store.Server.options}]
 
   @doc """
   Starts the `:mnemonix` application.
@@ -59,7 +59,7 @@ defmodule Mnemonix.Application do
   """
   @impl Application
   @spec start(Application.start_type, Mnemonix.Application.options)
-    :: {:ok, Mnemonix.store} | {:error, reason :: term}
+    :: {:ok, pid} | {:error, reason :: term}
   def start(_type, [default]) do
     :mnemonix
     |> Application.get_env(:stores, [])

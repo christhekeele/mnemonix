@@ -81,7 +81,7 @@ defmodule Mnemonix.Features.Map do
   end
 
   @callback drop(Mnemonix.store, Enumerable.t)
-    :: %{Mnemonix.key => Mnemonix.value} | no_return
+    :: Mnemonix.store | no_return
   @doc """
   Drops the given `keys` from the `store`.
 
@@ -97,7 +97,7 @@ defmodule Mnemonix.Features.Map do
 
   """
   @spec drop(Mnemonix.store, Enumerable.t)
-    :: %{Mnemonix.key => Mnemonix.value} | no_return
+    :: Mnemonix.store | no_return
   def drop(store, keys) do
     case GenServer.call(store, {:drop, keys}) do
       :ok                  -> store

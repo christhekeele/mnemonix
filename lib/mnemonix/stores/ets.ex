@@ -20,6 +20,14 @@ defmodule Mnemonix.Stores.ETS do
 
   defmodule Exception do
     defexception [:message]
+
+    def exception(opts) do
+      %__MODULE__{message: if Keyword.has_key?(opts, :reason) do
+        "ets operation failed for reason: `#{Keyword.get(opts, :reason)}`"
+      else
+        "ets operation failed"
+      end}
+    end
   end
 
 ####
@@ -91,9 +99,8 @@ defmodule Mnemonix.Stores.ETS do
       options
     end
 
-    case :ets.new(table, options) do
-      {:error, reason} -> {:stop, reason}
-      state            -> {:ok, state}
+    with table <- :ets.new(table, options) do
+      {:ok, table}
     end
   end
 
@@ -105,13 +112,8 @@ defmodule Mnemonix.Stores.ETS do
   @spec delete(Store.t, Mnemonix.key)
     :: {:ok, Store.t} | Store.Behaviour.exception
   def delete(store = %Store{state: table}, key) do
-    if :ets.delete(table, key) do
-      {:ok, store}
-    else
-      {:raise, Exception,
-        message: "ETS operation failed: `:ets.delete(#{table}, #{key})`"
-      }
-    end
+    :ets.delete(table, key)
+    {:ok, store}
   end
 
   @impl Store.Behaviours.Map
@@ -121,21 +123,16 @@ defmodule Mnemonix.Stores.ETS do
     case :ets.lookup(table, key) do
       [{^key, value} | []] -> {:ok, store, {:ok, value}}
       []                   -> {:ok, store, :error}
-      other                -> {:raise, Exception, [reason: other]}
+      other                -> {:raise, Exception, reason: other}
     end
   end
 
   @impl Store.Behaviours.Map
-  @spec put(Store.t, Mnemonix.key, Store.value)
+  @spec put(Store.t, Mnemonix.key, Mnemonix.value)
     :: {:ok, Store.t} | Store.Behaviour.exception
   def put(store = %Store{state: table}, key, value) do
-    if :ets.insert(table, {key, value}) do
-      {:ok, store}
-    else
-      {:raise, Exception,
-        message: "ETS operation failed: `:ets.insert(#{table}, {#{key}, #{value}})`"
-      }
-    end
+    :ets.insert(table, {key, value})
+    {:ok, store}
   end
 
 ####

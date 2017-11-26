@@ -94,7 +94,7 @@ if Code.ensure_loaded?(Elastix) do
     end
 
     @impl Store.Behaviours.Map
-    @spec put(Store.t, Mnemonix.key, Store.value)
+    @spec put(Store.t, Mnemonix.key, Mnemonix.value)
       :: {:ok, Store.t} | Store.Behaviour.exception
     def put(store = %Store{state: %Conn{url: url, index: index, type: type, refresh: refresh}}, key, value) do
       value = if is_map(value), do: value, else:  %{"_value" => value}

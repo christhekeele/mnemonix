@@ -31,7 +31,7 @@ before_script:
 script:
   - if [ $PULL_REQUEST_ID != false && -z "$GITHUB_ACCESS_TOKEN" ]; then pronto run -f github_pr github_status; fi
   - mix coveralls.travis
-  - mix dialyzer --halt-exit-status
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then mix dialyzer --halt-exit-status; fi
 after_script:
   - mix deps.get
   - mix inch.report

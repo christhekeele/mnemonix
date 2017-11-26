@@ -1,13 +1,8 @@
 defmodule Mnemonix.Store do
   @moduledoc false
 
-  @type spec :: [
-    otp_app: atom,
-    store: options,
-    server: GenServer.options,
-  ]
-
-  @type options :: Keyword.t
+  @type option :: {atom, term}
+  @type options :: [option]
 
   @typedoc """
   Container for store state.

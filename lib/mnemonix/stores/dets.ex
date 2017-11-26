@@ -20,6 +20,14 @@ defmodule Mnemonix.Stores.DETS do
 
   defmodule Exception do
     defexception [:message]
+
+    def exception(opts) do
+      %__MODULE__{message: if Keyword.has_key?(opts, :reason) do
+        "ets operation failed for reason: `#{Keyword.get(opts, :reason)}`"
+      else
+        "ets operation failed"
+      end}
+    end
   end
 
 ####
@@ -74,13 +82,8 @@ defmodule Mnemonix.Stores.DETS do
   @spec delete(Store.t, Mnemonix.key)
     :: {:ok, Store.t} | Store.Behaviour.exception
   def delete(store = %Store{state: table}, key) do
-    if :dets.delete(table, key) do
-      {:ok, store}
-    else
-      {:raise, Exception,
-        "DETS operation failed: `:dets.delete(#{table}, #{key})`"
-      }
-    end
+    :dets.delete(table, key)
+    {:ok, store}
   end
 
   @impl Store.Behaviours.Map
@@ -95,16 +98,11 @@ defmodule Mnemonix.Stores.DETS do
   end
 
   @impl Store.Behaviours.Map
-  @spec put(Store.t, Mnemonix.key, Store.value)
+  @spec put(Store.t, Mnemonix.key, Mnemonix.value)
     :: {:ok, Store.t} | Store.Behaviour.exception
   def put(store = %Store{state: table}, key, value) do
-    if :dets.insert(table, {key, value}) do
-      {:ok, store}
-    else
-      {:raise, Exception,
-        "DETS operation failed: `:dets.insert(#{table}, {#{key}, #{value}})`"
-      }
-    end
+    :dets.insert(table, {key, value})
+    {:ok, store}
   end
 
 end

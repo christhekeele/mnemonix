@@ -6,6 +6,7 @@ defmodule Mnemonix.Supervision do
     store = if singleton, do: Mnemonix.Singleton.Behaviour.determine_singleton(__CALLER__.module, Keyword.get(opts, :singleton))
 
     quote location: :keep do
+      alias Mnemonix.Store
 
       @doc """
       Starts a new store using the default store implementation and options.
@@ -34,7 +35,7 @@ defmodule Mnemonix.Supervision do
           iex> Mnemonix.get(store, :foo)
           :bar
       """
-      @spec start_link(Mnemonix.Store.Behaviour.t)
+      @spec start_link(Store.Server.options)
         :: GenServer.on_start
       def start_link(options) when is_list(options) do
         {impl, default_options} = Mnemonix.Application.default
@@ -56,7 +57,7 @@ defmodule Mnemonix.Supervision do
           iex> Mnemonix.get(store, :foo)
           :bar
       """
-      @spec start_link(Mnemonix.Store.Behaviour.t)
+      @spec start_link(Store.Behaviour.t)
         :: GenServer.on_start
       def start_link(impl) do
         {_impl, default_options} = Mnemonix.Application.default
@@ -92,7 +93,7 @@ defmodule Mnemonix.Supervision do
           iex> Mnemonix.get(NamedStore, :foo)
           :bar
       """
-      @spec start_link(Mnemonix.Store.Behaviour.t, Mnemonix.Supervisor.options)
+      @spec start_link(Store.Behaviour.t, Store.Server.options)
         :: GenServer.on_start
       def start_link(impl, options) do
         impl.start_link(Keyword.put_new(options, :name, unquote(store)))

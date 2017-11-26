@@ -77,7 +77,7 @@ if Code.ensure_loaded?(Redix) do
     end
 
     @impl Store.Behaviours.Map
-    @spec put(Store.t, Mnemonix.key, Store.value)
+    @spec put(Store.t, Mnemonix.key, Mnemonix.value)
       :: {:ok, Store.t} | Store.Behaviour.exception
     def put(store = %Store{state: conn}, key, value) do
       case Redix.command(conn, ~w[SET #{key} #{value}]) do

@@ -53,7 +53,7 @@ defmodule Mnemonix.Stores.Null do
   end
 
   @impl Store.Behaviours.Map
-  @spec put(Store.t, Mnemonix.key, Store.value)
+  @spec put(Store.t, Mnemonix.key, Mnemonix.value)
     :: {:ok, Store.t}
   def put(store = %Store{}, _key, _value) do
     {:ok, store}

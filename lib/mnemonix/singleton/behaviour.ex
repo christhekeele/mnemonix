@@ -1,4 +1,5 @@
 defmodule Mnemonix.Singleton.Behaviour do
+  @moduledoc false
 
   defmacro __using__(opts \\ []) do
     opts = Keyword.put(opts, :source, __CALLER__.module)
@@ -15,6 +16,7 @@ defmodule Mnemonix.Singleton.Behaviour do
 
     quote location: :keep do
       defmodule alias!(Singleton) do
+        @moduledoc false
         use Mnemonix.Behaviour, unquote(opts)
 
         unquote_splicing(

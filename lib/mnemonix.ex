@@ -105,6 +105,8 @@ defmodule Mnemonix do
   """
   @type store :: pid | GenServer.name
 
+  @type spec :: {Mnemonix.Store.Behaviour.t, Mnemonix.Store.Server.options}
+
   @doc """
   Starts a new empty in-memory store.
 

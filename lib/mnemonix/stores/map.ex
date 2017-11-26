@@ -63,7 +63,7 @@ defmodule Mnemonix.Stores.Map do
   end
 
   @impl Store.Behaviours.Map
-  @spec put(Store.t, Mnemonix.key, Store.value)
+  @spec put(Store.t, Mnemonix.key, Mnemonix.value)
     :: {:ok, Store.t} | Store.Behaviour.exception
   def put(store = %Store{state: map}, key, value) do
     {:ok, %{store | state: Map.put(map, key, value)}}

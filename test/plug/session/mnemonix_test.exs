@@ -10,7 +10,7 @@ defmodule Plug.Session.MNEMONIX.Test do
   end
 
   test "put and get session" do
-    opts = MNEMONIX.init(store: @mnemonix_store)
+    opts = MNEMONIX.init(mnemonix: @mnemonix_store)
 
     assert "foo" = MNEMONIX.put(%{}, "foo", %{foo: :bar}, opts)
     assert "bar" = MNEMONIX.put(%{}, "bar", [bar: :foo], opts)
@@ -22,7 +22,7 @@ defmodule Plug.Session.MNEMONIX.Test do
   end
 
   test "delete session" do
-    opts = MNEMONIX.init(store: @mnemonix_store)
+    opts = MNEMONIX.init(mnemonix: @mnemonix_store)
 
     MNEMONIX.put(%{}, "foo", %{foo: :bar}, opts)
     MNEMONIX.put(%{}, "bar", %{bar: :foo}, opts)
@@ -33,13 +33,13 @@ defmodule Plug.Session.MNEMONIX.Test do
   end
 
   test "generate new sid" do
-    opts = MNEMONIX.init(store: @mnemonix_store)
+    opts = MNEMONIX.init(mnemonix: @mnemonix_store)
     sid = MNEMONIX.put(%{}, nil, %{}, opts)
     assert byte_size(sid) == 128
   end
 
   test "invalidate sid if unknown" do
-    opts = MNEMONIX.init(store: @mnemonix_store)
+    opts = MNEMONIX.init(mnemonix: @mnemonix_store)
     assert {nil, %{}} = MNEMONIX.get(%{}, "unknown_sid", opts)
   end
 end

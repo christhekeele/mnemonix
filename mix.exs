@@ -2,24 +2,25 @@ defmodule Mnemonix.Mixfile do
   use Mix.Project
 
   def project, do: [
-    name: "Mnemonix",
     app: :mnemonix,
-
+    name: "Mnemonix",
     version: "0.10.0",
-    elixir: "~> 1.5",
 
     build_embedded: Mix.env == :prod,
     start_permanent: Mix.env == :prod,
 
     deps: deps(),
+    elixir: "~> 1.5",
+
     docs: docs(),
     package: package(),
 
     source_url:   package()[:links][:Source],
     homepage_url: package()[:links][:Homepage],
 
-    test_coverage: coverage(),
+    aliases: aliases(),
     dialyzer: dialyzer(),
+    test_coverage: coverage(),
   ]
 
   def application, do: [
@@ -30,20 +31,18 @@ defmodule Mnemonix.Mixfile do
   defp deps, do: tools() ++ backends() ++ integrations()
 
   defp tools, do: [
-    {:dialyxir,    "~> 0.5",  only: :dev},
-    {:ex_doc,      "~> 0.15", only: :dev},
-
-    {:excoveralls, "~> 0.6",  only: :test},
-
-    {:credo,       "~> 0.6",  only: [:dev, :test]},
     {:benchfella,  "~> 0.3",  only: [:dev, :test]},
+    {:credo,       "~> 0.6",  only: [:dev, :test]},
+    {:dialyxir,    "~> 0.5",  only: [:dev, :test]},
+    {:excoveralls, "~> 0.6",  only: [:dev, :test]},
+    {:ex_doc,      "~> 0.15", only: [:dev, :test]},
     {:inch_ex,     "~> 0.5",  only: [:dev, :test]},
   ]
 
   defp backends, do: [
-    {:redix,     ">= 0.0.0", only: [:dev, :test]},
-    {:memcachex, ">= 0.0.0", only: [:dev, :test]},
     {:elastix,   ">= 0.4.0", only: [:dev, :test]},
+    {:memcachex, ">= 0.0.0", only: [:dev, :test]},
+    {:redix,     ">= 0.0.0", only: [:dev, :test]},
   ]
 
   defp integrations, do: [
@@ -78,6 +77,10 @@ defmodule Mnemonix.Mixfile do
       Tests: "https://travis-ci.org/christhekeele/mnemonix",
       Coverage: "https://coveralls.io/github/christhekeele/mnemonix",
     }
+  ]
+
+  defp aliases, do: [
+    default: ~w[test dialyzer coveralls.html docs],
   ]
 
   defp coverage, do: [

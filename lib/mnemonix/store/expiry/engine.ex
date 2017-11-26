@@ -37,7 +37,6 @@ defmodule Mnemonix.Store.Expiry.Engine do
   # end
   #
   # def handle_call(message, from, state) do
-  #   IO.inspect {message, state}
   #   handle_call({:ok, message}, from, state)
   # end
   #

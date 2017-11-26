@@ -83,10 +83,10 @@ defmodule Mnemonix.Store.Behaviours.Enumerable do
   end
 
   @callback enumerable_reduce(Mnemonix.Store.t, Enumerable.acc, Enumerable.reducer)
-    :: {:ok, Mnemonix.Store.t, Enumerable.result} | Mnemonix.Store.Behaviour.exception
+    :: {:ok, Mnemonix.Store.t, Enumerable.result | {:error, module}} | Mnemonix.Store.Behaviour.exception
   @doc false
   @spec enumerable_reduce(Mnemonix.Store.t, Enumerable.acc, Enumerable.reducer)
-    :: {:ok, Mnemonix.Store.t, Enumerable.result} | Mnemonix.Store.Behaviour.exception
+    :: {:ok, Mnemonix.Store.t, Enumerable.result | {:error, module}} | Mnemonix.Store.Behaviour.exception
   def enumerable_reduce(store, _acc, _reducer) do
     {:ok, store, {:error, store.impl}}
   end
