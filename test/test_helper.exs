@@ -5,6 +5,9 @@ exclusions = []
 # Exclude doctests unless told not to.
 exclusions = if System.get_env("DOCTESTS"), do: exclusions, else: [:doctest | exclusions]
 
+# Determine if we should raise if we can't run a portion of the suite.
+mandatory = System.get_env("ALL_BACKENDS")
+
 # Exclude filesystem-dependent tests if the file system is not writable.
 
 filesystem_dir = String.to_charlist(System.get_env("FILESYSTEM_TEST_DIR") || System.tmp_dir())
@@ -14,11 +17,14 @@ exclusions = case File.touch(Path.join(filesystem_dir, "writable.tmp")) do
     File.rm_rf("writable.tmp")
     exclusions
   {:error, reason} ->
-    Mix.shell.info """
-    Cannot write to filesystem (path://#{filesystem_dir}): #{reason}
-    Skipping file-dependent tests.
-    """
-    [:filesystem | exclusions]
+    message = "Cannot write to filesystem (path://#{filesystem_dir}): #{reason}"
+    if mandatory do
+      raise RuntimeError, message
+    else
+      Mix.shell.info message
+      Mix.shell.info "Skipping file-dependent tests."
+      [:filesystem | exclusions]
+    end
 end
 
 # Exclude redis-dependent tests if redis is not available.
@@ -31,11 +37,14 @@ exclusions = case :gen_tcp.connect(redis_host, redis_port, []) do
     :gen_tcp.close(socket)
     exclusions
   {:error, reason} ->
-    Mix.shell.info """
-    Cannot connect to Redis (redis://#{redis_host}:#{redis_port}): #{:inet.format_error(reason)}
-    Skipping redis tests.
-    """
-    [:redis | exclusions]
+    message = "Cannot connect to Redis (redis://#{redis_host}:#{redis_port}): #{:inet.format_error(reason)}"
+    if mandatory do
+      raise RuntimeError, message
+    else
+      Mix.shell.info message
+      Mix.shell.info "Skipping redis tests."
+      [:redis | exclusions]
+    end
 end
 
 # Exclude memcached-dependent tests if memcached is not available.
@@ -48,11 +57,14 @@ exclusions = case :gen_tcp.connect(memcached_host, memcached_port, []) do
     :gen_tcp.close(socket)
     exclusions
   {:error, reason} ->
-    Mix.shell.info """
-    Cannot connect to Memcached (http://#{memcached_host}:#{memcached_port}): #{:inet.format_error(reason)}
-    Skipping memcached tests.
-    """
-    [:memcached | exclusions]
+    message = "Cannot connect to Memcached (http://#{memcached_host}:#{memcached_port}): #{:inet.format_error(reason)}"
+    if mandatory do
+      raise RuntimeError, message
+    else
+      Mix.shell.info message
+      Mix.shell.info "Skipping memcached tests."
+      [:memcached | exclusions]
+    end
 end
 
 # Exclude elasticsearch-dependent tests if elasticsearch is not available.
@@ -65,11 +77,14 @@ exclusions = case :gen_tcp.connect(elastic_search_host, elastic_search_port, [])
     :gen_tcp.close(socket)
     exclusions
   {:error, reason} ->
-    Mix.shell.info """
-    Cannot connect to Elastic (http://#{elastic_search_host}:#{elastic_search_port}): #{:inet.format_error(reason)}
-    Skipping ElasticSearch tests.
-    """
-    [:elastic_search | exclusions]
+    message = "Cannot connect to Elastic (http://#{elastic_search_host}:#{elastic_search_port}): #{:inet.format_error(reason)}"
+    if mandatory do
+      raise RuntimeError, message
+    else
+      Mix.shell.info message
+      Mix.shell.info "Skipping ElasticSearch tests."
+      [:elastic_search | exclusions]
+    end
 end
 
 ExUnit.configure(exclude: exclusions)
@@ -126,11 +141,6 @@ defmodule Mnemonix.Test.Case do
     quote location: :keep do
       import Mnemonix.Test.Case
       import Filesystem.TestHelpers
-
-      setup context do
-        IO.puts "#{context.test}:"
-        :ok
-      end
     end
   end
 

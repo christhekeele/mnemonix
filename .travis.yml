@@ -23,6 +23,7 @@ env:
     - MIX_ENV=test
     - PULL_REQUEST_ID=$TRAVIS_PULL_REQUEST
     - DOCTESTS=true
+    - ALL_BACKENDS=true
 before_script:
   - rvm install ruby-2.3.1
   - gem install pronto-credo

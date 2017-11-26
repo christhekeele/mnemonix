@@ -32,7 +32,9 @@ defmodule Mnemonix.Mixfile do
   defp tools, do: [
     {:dialyxir,    "~> 0.5",  only: :dev},
     {:ex_doc,      "~> 0.15", only: :dev},
+
     {:excoveralls, "~> 0.6",  only: :test},
+
     {:credo,       "~> 0.6",  only: [:dev, :test]},
     {:benchfella,  "~> 0.3",  only: [:dev, :test]},
     {:inch_ex,     "~> 0.5",  only: [:dev, :test]},
