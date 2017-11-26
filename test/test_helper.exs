@@ -1,4 +1,4 @@
-ExUnit.start()
+ExUnit.start(timeout: 5000)
 
 exclusions = []
 
@@ -126,6 +126,11 @@ defmodule Mnemonix.Test.Case do
     quote location: :keep do
       import Mnemonix.Test.Case
       import Filesystem.TestHelpers
+
+      setup context do
+        IO.puts "#{context.test}:"
+        :ok
+      end
     end
   end
 

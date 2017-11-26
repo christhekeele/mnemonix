@@ -46,7 +46,7 @@ defmodule Mnemonix.Store.Server do
   def init({impl, config}) do
     with {:ok, state} <- impl.setup(config),
          store        <- Mnemonix.Store.new(impl, config, state),
-         {:ok, store} <- impl.setup_expiry(store),
+         # {:ok, store} <- impl.setup_expiry(store), #TODO
          {:ok, store} <- impl.setup_initial(store),
     do: {:ok, store}
   end

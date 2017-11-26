@@ -1,7 +1,10 @@
-defmodule Mnemonix.Supervision.Standard do
+defmodule Mnemonix.Supervision do
   @moduledoc false
 
-  defmacro __using__(_opts \\ []) do
+  defmacro __using__(opts \\ []) do
+    {singleton, opts} = Mnemonix.Singleton.Behaviour.establish_singleton(__CALLER__.module, opts)
+    store = if singleton, do: Mnemonix.Singleton.Behaviour.determine_singleton(__CALLER__.module, Keyword.get(opts, :singleton))
+
     quote location: :keep do
 
       @doc """
@@ -12,7 +15,8 @@ defmodule Mnemonix.Supervision.Standard do
       @spec start_link
         :: GenServer.on_start
       def start_link do
-        start_link __MODULE__, []
+        {impl, options} = Mnemonix.Application.default
+        start_link impl, options
       end
 
       @doc """
@@ -33,7 +37,8 @@ defmodule Mnemonix.Supervision.Standard do
       @spec start_link(Mnemonix.Store.Behaviour.t)
         :: GenServer.on_start
       def start_link(options) when is_list(options) do
-        start_link __MODULE__, options
+        {impl, default_options} = Mnemonix.Application.default
+        start_link impl, Keyword.merge(default_options, options)
       end
 
       @doc """
@@ -54,7 +59,8 @@ defmodule Mnemonix.Supervision.Standard do
       @spec start_link(Mnemonix.Store.Behaviour.t)
         :: GenServer.on_start
       def start_link(impl) do
-        start_link impl, []
+        {_impl, default_options} = Mnemonix.Application.default
+        start_link impl, default_options
       end
 
       @doc """
@@ -89,7 +95,7 @@ defmodule Mnemonix.Supervision.Standard do
       @spec start_link(Mnemonix.Store.Behaviour.t, Mnemonix.Supervisor.options)
         :: GenServer.on_start
       def start_link(impl, options) do
-        impl.start_link options
+        impl.start_link(Keyword.put_new(options, :name, unquote(store)))
       end
 
     end

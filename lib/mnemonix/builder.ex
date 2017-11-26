@@ -59,22 +59,24 @@ defmodule Mnemonix.Builder do
   """
 
   defmacro __using__(opts) do
-    {singleton, opts} = Mnemonix.Singleton.Behaviour.define_singleton(__CALLER__.module, opts)
+    {singleton, opts} = Mnemonix.Singleton.Behaviour.establish_singleton(__CALLER__.module, opts)
     if singleton do
       quote location: :keep do
         def singleton, do: unquote(singleton)
-        use Mnemonix.Supervision.Singleton, unquote(opts)
+        use Mnemonix.Supervision, unquote(opts)
+
         use Mnemonix.Features.Map.Singleton, unquote(opts)
         use Mnemonix.Features.Bump.Singleton, unquote(opts)
-        use Mnemonix.Features.Expiry.Singleton, unquote(opts)
+        # use Mnemonix.Features.Expiry.Singleton, unquote(opts) #TODO
         use Mnemonix.Features.Enumerable.Singleton, unquote(opts)
       end
     else
       quote location: :keep do
-        use Mnemonix.Supervision.Standard, unquote(opts)
+        use Mnemonix.Supervision, unquote(opts)
+
         use Mnemonix.Features.Map, unquote(opts)
         use Mnemonix.Features.Bump, unquote(opts)
-        use Mnemonix.Features.Expiry, unquote(opts)
+        # use Mnemonix.Features.Expiry, unquote(opts) #TODO
         use Mnemonix.Features.Enumerable, unquote(opts)
       end
     end

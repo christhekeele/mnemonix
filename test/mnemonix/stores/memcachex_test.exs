@@ -1,8 +1,10 @@
-defmodule Mnemonix.Stores.Memcachex.Test do
-  use Mnemonix.Test.Case, async: true
+if Code.ensure_loaded?(Memcache) do
+  defmodule Mnemonix.Stores.Memcachex.Test do
+    use Mnemonix.Test.Case, async: true
 
-  @moduletag :memcached
+    @moduletag :memcached
 
-  doctest Mnemonix.Stores.Memcachex
+    doctest Mnemonix.Stores.Memcachex
 
+  end
 end

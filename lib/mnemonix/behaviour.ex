@@ -57,7 +57,7 @@ defmodule Mnemonix.Behaviour do
         inline = Keyword.get(opts, :inline, false)
         source = Keyword.get(opts, :source, unquote(source))
 
-        {singleton, opts} = Mnemonix.Singleton.Behaviour.define_singleton(__CALLER__.module, opts)
+        {singleton, opts} = Mnemonix.Singleton.Behaviour.establish_singleton(__CALLER__.module, opts)
 
         defaults = for {doc, kind, name, params, guards, body} when kind in ~w[def defp]a <- source.__functions__ do
           if String.starts_with?(Atom.to_string(name), "__") do
