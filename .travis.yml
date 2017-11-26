@@ -27,9 +27,11 @@ env:
 before_script:
   - rvm install ruby-2.3.1
   - gem install pronto-credo
+  - mix clean
 script:
   - if [ $PULL_REQUEST_ID != false && -z "$GITHUB_ACCESS_TOKEN" ]; then pronto run -f github_pr github_status; fi
   - mix coveralls.travis
+  - mix dialyzer --halt-exit-status
 after_script:
   - mix deps.get
   - mix inch.report
@@ -40,3 +42,5 @@ services:
 cache:
   directories:
     - "/home/travis/.rvm/"
+    - _build
+    - deps

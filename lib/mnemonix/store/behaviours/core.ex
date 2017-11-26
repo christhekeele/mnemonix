@@ -3,14 +3,17 @@ defmodule Mnemonix.Store.Behaviours.Core do
 
   use Mnemonix.Behaviour do
     quote do
+
       @impl unquote(__MODULE__)
       def start_link() do
         Mnemonix.Store.Server.start_link(__MODULE__, [])
       end
+
       @impl unquote(__MODULE__)
       def start_link(opts) do
         Mnemonix.Store.Server.start_link(__MODULE__, opts)
       end
+
     end
   end
 

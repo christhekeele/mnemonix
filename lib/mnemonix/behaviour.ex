@@ -11,8 +11,6 @@ defmodule Mnemonix.Behaviour do
     doc = Module.get_attribute(env.module, :doc)
     Module.put_attribute(env.module, :__functions__, {doc, kind, name, params, guards, body})
     callback = Module.get_attribute(env.module, :callback)
-    if name == :setup, do: IO.inspect callback
-    # if name == :child_spec, do: IO.inspect callback
     case {kind, callback} do
       {_kind, []} -> nil
       {:def, [callback | _]} -> Module.put_attribute(env.module, :__callbacks__, {callback_signature(env.module, callback)})
@@ -104,11 +102,11 @@ defmodule Mnemonix.Behaviour do
       {:\\, _, [arg, _default]} -> arg
       ast -> ast
     end)
-    delegate = compose_delegate(info, name, args)
-    defn = compose_definition(info, doc, name, params, guards, delegate)
+    delegate = [do: compose_delegate(info, name, args)]
+    definition = compose_definition(info, doc, name, params, guards, delegate)
     [
       (if callback, do: compose_module_attribute(:impl, module)),
-      defn,
+      definition,
     ]
   end
 
@@ -167,18 +165,16 @@ defmodule Mnemonix.Behaviour do
   end
 
   defp compose_function(:def, name, params, guards, body) do
+    definition = compose_definition(name, params, guards)
     quote location: :keep do
-      def unquote(compose_definition(name, params, guards)) do
-        unquote(body)
-      end
+      Kernel.def unquote(definition), unquote(body)
     end
   end
 
   defp compose_function(:defp, name, params, guards, body) do
+    definition = compose_definition(name, params, guards)
     quote location: :keep do
-      defp unquote(compose_definition(name, params, guards)) do
-        unquote(body)
-      end
+      Kernel.defp unquote(definition), unquote(body)
     end
   end
 

@@ -9,8 +9,8 @@ if Code.ensure_loaded?(Elastix) do
     alias Mnemonix.Store
     alias HTTPoison.{Response,Error}
 
-    use Mnemonix.Store.Behaviour
-    use Mnemonix.Store.Translator.Raw
+    use Store.Behaviour
+    use Store.Translator.Raw
 
     defmodule Exception do
       defexception [:message]

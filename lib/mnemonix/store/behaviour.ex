@@ -22,6 +22,7 @@ defmodule Mnemonix.Store.Behaviour do
 
   @doc false
   defmacro __using__(opts \\ []) do
+    opts = Keyword.put(opts, :inline, true)
     quote location: :keep do
       @behaviour Mnemonix.Store.Translator
 

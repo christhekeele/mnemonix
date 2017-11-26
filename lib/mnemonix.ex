@@ -160,9 +160,9 @@ defmodule Mnemonix do
   end
 
   defp do_new(map) do
-    with {:ok, store} <- Mnemonix.Store.Server.start_link(Mnemonix.Stores.Map, initial: map), do: store
+    with {:ok, store} <- start_link(Mnemonix.Stores.Map, initial: map), do: store
   end
 
-  use Mnemonix.Builder#, inline: true
+  use Mnemonix.Builder, inline: true
 
 end

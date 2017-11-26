@@ -1,28 +1,21 @@
-# The directory Mix will write compiled artifacts to.
-/_build
-
-# If you run "mix test --cover", coverage assets end up here.
-/cover
-
-# The directory Mix downloads your dependencies sources to.
-/deps
-
-# Where 3rd-party dependencies like ExDoc output generated docs.
-/doc
-
-# If the VM crashes, it generates a dump, let's ignore it too.
-erl_crash.dump
-
-# Also ignore archive artifacts (built via "mix archive.build").
-*.ez
-
-# Libraries shouldn't include
+# Libraries should never include
 mix.lock
 
+# Ignore compile artifacts
+/_build
+# Ignore VM crash artifacts
+erl_crash.dump
+# Ignore archive artifacts
+*.ez
 # Ignore test artifacts
 writable.tmp
 dump.rdb
-Mnesia.nonode@nohost
+Mnesia*
 
-bench/graphs
-bench/snapshots
+# Ignore tooling directories
+
+/bench/graphs
+/bench/snapshots
+/cover
+/deps
+/doc
