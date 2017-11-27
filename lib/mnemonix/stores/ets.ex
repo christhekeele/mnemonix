@@ -110,15 +110,15 @@ defmodule Mnemonix.Stores.ETS do
 
   @impl Store.Behaviours.Map
   @spec delete(Store.t, Mnemonix.key)
-    :: {:ok, Store.t} | Store.Behaviour.exception
+    :: Store.Server.instruction(:ok)
   def delete(store = %Store{state: table}, key) do
     :ets.delete(table, key)
-    {:ok, store}
+    {:ok, store, :ok}
   end
 
   @impl Store.Behaviours.Map
   @spec fetch(Store.t, Mnemonix.key)
-    :: {:ok, Store.t, {:ok, Mnemonix.value} | :error} | Store.Behaviour.exception
+    :: Store.Server.instruction({:ok, Mnemonix.value} | :error)
   def fetch(store = %Store{state: table}, key) do
     case :ets.lookup(table, key) do
       [{^key, value} | []] -> {:ok, store, {:ok, value}}
@@ -129,10 +129,10 @@ defmodule Mnemonix.Stores.ETS do
 
   @impl Store.Behaviours.Map
   @spec put(Store.t, Mnemonix.key, Mnemonix.value)
-    :: {:ok, Store.t} | Store.Behaviour.exception
+    :: Store.Server.instruction(:ok)
   def put(store = %Store{state: table}, key, value) do
     :ets.insert(table, {key, value})
-    {:ok, store}
+    {:ok, store, :ok}
   end
 
 ####
@@ -144,14 +144,14 @@ defmodule Mnemonix.Stores.ETS do
   """
   @impl Store.Behaviours.Enumerable
   @spec enumerable?(Store.t)
-    :: {:ok, Store.t, boolean} | Store.Behaviour.exception
+    :: {:ok, Store.t, boolean} | Store.Server.exception
   def enumerable?(store) do
     {:ok, store, true}
   end
 
   @impl Store.Behaviours.Enumerable
   @spec to_enumerable(Store.t)
-    :: {:ok, Store.t, Enumerable.t} | Store.Behaviour.exception
+    :: {:ok, Store.t, Enumerable.t} | Store.Server.exception
   def to_enumerable(store = %Store{state: table}) do
     {:ok, store, :ets.tab2list(table)}
   end

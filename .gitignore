@@ -10,7 +10,7 @@ erl_crash.dump
 # Ignore test artifacts
 writable.tmp
 dump.rdb
-Mnesia*
+/Mnesia*
 
 # Ignore tooling directories
 

@@ -50,19 +50,19 @@ if Code.ensure_loaded?(Memcache) do
   # Mnemonix.Store.Behaviours.Map
   ##
 
-  @impl Store.Behaviours.Map
+    @impl Store.Behaviours.Map
     @spec delete(Store.t, Mnemonix.key)
-      :: {:ok, Store.t} | Store.Behaviour.exception
+      :: Store.Server.instruction(:ok)
     def delete(store = %Store{state: conn}, key) do
       case Memcache.delete(conn, key) do
-        {:ok}            -> {:ok, store}
+        {:ok}            -> {:ok, store, :ok}
         {:error, reason} -> {:raise, Exception, [reason: reason]}
       end
     end
 
     @impl Store.Behaviours.Map
     @spec fetch(Store.t, Mnemonix.key)
-      :: {:ok, Store.t, {:ok, Mnemonix.value} | :error} | Store.Behaviour.exception
+      :: Store.Server.instruction({:ok, Mnemonix.value} | :error)
     def fetch(store = %Store{state: conn}, key) do
       case Memcache.get(conn, key) do
         {:error, "Key not found"} -> {:ok, store, :error}
@@ -73,10 +73,10 @@ if Code.ensure_loaded?(Memcache) do
 
     @impl Store.Behaviours.Map
     @spec put(Store.t, Mnemonix.key, Mnemonix.value)
-      :: {:ok, Store.t} | Store.Behaviour.exception
+      :: Store.Server.instruction(:ok)
     def put(store = %Store{state: conn}, key, value) do
       case Memcache.set(conn, key, value) do
-        {:ok}            -> {:ok, store}
+        {:ok}            -> {:ok, store, :ok}
         {:error, reason} -> {:raise, Exception, [reason: reason]}
       end
     end

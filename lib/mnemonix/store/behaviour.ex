@@ -6,11 +6,6 @@ defmodule Mnemonix.Store.Behaviour do
   """
   @type t :: module
 
-  @typedoc """
-  An instruction to a `Mnemonix.Store.Server` to raise an error in the client.
-  """
-  @type exception :: {:raise, module, raise_opts :: Keyword.t}
-
   @doc false
   defmacro __using__(opts \\ []) do
     opts = Keyword.put(opts, :inline, true)

@@ -55,19 +55,19 @@ if Code.ensure_loaded?(Redix) do
   # Mnemonix.Store.Behaviours.Map
   ##
 
-  @impl Store.Behaviours.Map
+    @impl Store.Behaviours.Map
     @spec delete(Store.t, Mnemonix.key)
-      :: {:ok, Store.t} | Store.Behaviour.exception
+      :: Store.Server.instruction(:ok)
     def delete(store = %Store{state: conn}, key) do
       case Redix.command(conn, ~w[DEL #{key}]) do
-        {:ok, 1}         -> {:ok, store}
+        {:ok, 1}         -> {:ok, store, :ok}
         {:error, reason} -> {:raise, Exception, [reason: reason]}
       end
     end
 
     @impl Store.Behaviours.Map
     @spec fetch(Store.t, Mnemonix.key)
-      :: {:ok, Store.t, {:ok, Mnemonix.value} | :error} | Store.Behaviour.exception
+      :: Store.Server.instruction({:ok, Mnemonix.value} | :error)
     def fetch(store = %Store{state: conn}, key) do
       case Redix.command(conn, ~w[GET #{key}]) do
         {:ok, nil}       -> {:ok, store, :error}
@@ -78,10 +78,10 @@ if Code.ensure_loaded?(Redix) do
 
     @impl Store.Behaviours.Map
     @spec put(Store.t, Mnemonix.key, Mnemonix.value)
-      :: {:ok, Store.t} | Store.Behaviour.exception
+      :: Store.Server.instruction(:ok)
     def put(store = %Store{state: conn}, key, value) do
       case Redix.command(conn, ~w[SET #{key} #{value}]) do
-        {:ok, "OK"}      -> {:ok, store}
+        {:ok, "OK"}      -> {:ok, store, :ok}
         {:error, reason} -> {:raise, Exception, [reason: reason]}
       end
     end

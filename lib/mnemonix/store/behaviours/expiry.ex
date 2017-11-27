@@ -19,10 +19,10 @@ defmodule Mnemonix.Store.Behaviours.Expiry do
   # end
   #
   # @callback expire(Mnemonix.Store.t, Mnemonix.key, Mnemonix.Features.Bump.ttl)
-  #   :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+  #   :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Server.exception
   # @doc false
   # @spec expire(Mnemonix.Store.t, Mnemonix.key, Mnemonix.Features.Bump.ttl)
-  #   :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+  #   :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Server.exception
   # def expire(store, key, ttl) do
   #   with :ok <- Expiry.Engine.expire(store, key, ttl) do
   #     {:ok, store}
@@ -30,10 +30,10 @@ defmodule Mnemonix.Store.Behaviours.Expiry do
   # end
   #
   # @callback persist(Mnemonix.Store.t, Mnemonix.key)
-  #   :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+  #   :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Server.exception
   # @doc false
   # @spec persist(Mnemonix.Store.t, Mnemonix.key)
-  #   :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+  #   :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Server.exception
   # def persist(store, key) do
   #   with :ok <- Expiry.Engine.persist(store, key) do
   #     {:ok, store}
@@ -41,10 +41,10 @@ defmodule Mnemonix.Store.Behaviours.Expiry do
   # end
   #
   # @callback put_and_expire(Mnemonix.Store.t, Mnemonix.key, Mnemonix.value, Mnemonix.Features.Bump.ttl)
-  #   :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+  #   :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Server.exception
   # @doc false
   # @spec put_and_expire(Mnemonix.Store.t, Mnemonix.key, Mnemonix.value, Mnemonix.Features.Bump.ttl)
-  #   :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+  #   :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Server.exception
   # def put_and_expire(store, key, value, ttl) do
   #   with {:ok, store} <- store.impl.put(store, key, value),
   #        {:ok, store} <- expire(store, key, ttl),

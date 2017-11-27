@@ -50,23 +50,23 @@ defmodule Mnemonix.Stores.Map do
 
   @impl Store.Behaviours.Map
   @spec delete(Store.t, Mnemonix.key)
-    :: {:ok, Store.t} | Store.Behaviour.exception
+    :: Store.Server.instruction(:ok)
   def delete(store = %Store{state: map}, key) do
-    {:ok, %{store | state: Map.delete(map, key)}}
+    {:ok, %{store | state: Map.delete(map, key)}, :ok}
   end
 
   @impl Store.Behaviours.Map
   @spec fetch(Store.t, Mnemonix.key)
-    :: {:ok, Store.t, {:ok, Mnemonix.value} | :error} | Store.Behaviour.exception
+    :: Store.Server.instruction({:ok, Mnemonix.value} | :error)
   def fetch(store = %Store{state: map}, key) do
     {:ok, store, Map.fetch(map, key)}
   end
 
   @impl Store.Behaviours.Map
   @spec put(Store.t, Mnemonix.key, Mnemonix.value)
-    :: {:ok, Store.t} | Store.Behaviour.exception
+    :: Store.Server.instruction(:ok)
   def put(store = %Store{state: map}, key, value) do
-    {:ok, %{store | state: Map.put(map, key, value)}}
+    {:ok, %{store | state: Map.put(map, key, value)}, :ok}
   end
 
 ####
@@ -76,16 +76,16 @@ defmodule Mnemonix.Stores.Map do
   @doc """
   Returns `true`: this store supports the functions in `Mnemonix.Features.Enumerable`.
   """
-  @impl Mnemonix.Store.Behaviours.Enumerable
+  @impl Store.Behaviours.Enumerable
   @spec enumerable?(Mnemonix.Store.t)
-    :: {:ok, Mnemonix.Store.t, boolean} | Mnemonix.Store.Behaviour.exception
+    :: Store.Server.instruction(boolean)
   def enumerable?(store) do
     {:ok, store, true}
   end
 
-  @impl Mnemonix.Store.Behaviours.Enumerable
+  @impl Store.Behaviours.Enumerable
   @spec to_enumerable(Mnemonix.Store.t)
-    :: {:ok, Mnemonix.Store.t, Enumerable.t} | Mnemonix.Store.Behaviour.exception
+    :: Store.Server.instruction(Enumerable.t)
   def to_enumerable(store = %Store{state: map}) do
     {:ok, store, map}
   end

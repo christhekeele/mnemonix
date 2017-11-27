@@ -9,9 +9,14 @@ defmodule Mnemonix.Features.Bump do
   use Mnemonix.Singleton.Behaviour
 
   @typedoc """
+  The value of a bump operation.
+  """
+  @type amount :: integer
+
+  @typedoc """
   The return value of a bump operation.
   """
-  @type bump_op :: :ok | {:error, :no_integer}
+  @type result :: :ok | {:error, :no_integer}
 
   @doc """
   Adds `amount` to the value of the integer entry under `key` in `store`.
@@ -45,9 +50,9 @@ defmodule Mnemonix.Features.Bump do
       {:error, :no_integer}
   """
   @callback bump(Mnemonix.store, Mnemonix.key, amount :: term)
-    :: bump_op | no_return
+    :: result | no_return
   @spec bump(Mnemonix.store, Mnemonix.key, amount :: term)
-    :: bump_op | no_return
+    :: result | no_return
   def bump(store, key, amount) do
     with {:raise, type, args} <- GenServer.call(store, {:bump, key, amount}) do
       raise type, args

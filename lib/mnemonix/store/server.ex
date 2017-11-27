@@ -7,10 +7,27 @@ defmodule Mnemonix.Store.Server do
 
   use GenServer
 
-  @type reply :: :ok | {:ok, term} | Mnemonix.Store.Behaviour.exception
-
   @type option :: GenServer.option | {atom, term}
   @type options :: [option]
+
+  @typedoc """
+  An instruction to a `Mnemonix.Store.Server` to return successfully in the client.
+  """
+  @type success(return) :: {:ok, Mnemonix.Store.t, return}
+
+  @typedoc """
+  An instruction to a `Mnemonix.Store.Server` to emit a warning when returning in the client.
+  """
+  @type warning(return) :: {:warn, message :: String.t, Mnemonix.Store.t, return}
+
+  @typedoc """
+  An instruction to a `Mnemonix.Store.Server` to raise an error in the client.
+  """
+  @type exception :: {:raise, exception :: module, raise_opts :: Keyword.t}
+
+  @type instruction(return) :: success(return) | warning(return) | exception
+
+  @type reply :: :ok | {:ok, term} | exception
 
   @doc """
   Starts a new store using store `impl`, `store` options, and `server` options.
@@ -95,7 +112,7 @@ defmodule Mnemonix.Store.Server do
 
   def handle_call({:delete, key}, _, store = %Store{impl: impl}) do
     case impl.delete(store, serialize_key(store, key)) do
-      {:ok, store}         -> {:reply, :ok, store}
+      {:ok, store, :ok}    -> {:reply, :ok, store}
       {:raise, type, args} -> reply_with_error(store, type, args)
     end
   end
@@ -110,7 +127,7 @@ defmodule Mnemonix.Store.Server do
 
   def handle_call({:put, key, value}, _, store = %Store{impl: impl}) do
     case impl.put(store, serialize_key(store, key), serialize_value(store, value)) do
-      {:ok, store}         -> {:reply, :ok, store}
+      {:ok, store, :ok}    -> {:reply, :ok, store}
       {:raise, type, args} -> reply_with_error(store, type, args)
     end
   end
@@ -119,7 +136,7 @@ defmodule Mnemonix.Store.Server do
 
   def handle_call({:drop, keys}, _, store = %Store{impl: impl}) do
     case impl.drop(store, keys) do
-      {:ok, store}         -> {:reply, :ok, store}
+      {:ok, store, :ok}    -> {:reply, :ok, store}
       {:raise, type, args} -> reply_with_error(store, type, args)
     end
   end
@@ -196,28 +213,28 @@ defmodule Mnemonix.Store.Server do
 
   def handle_call({:put_new, key, value}, _, store = %Store{impl: impl}) do
     case impl.put_new(store, serialize_key(store, key), serialize_value(store, value)) do
-      {:ok, store}         -> {:reply, :ok, store}
+      {:ok, store, :ok}    -> {:reply, :ok, store}
       {:raise, type, args} -> reply_with_error(store, type, args)
     end
   end
 
   def handle_call({:put_new_lazy, key, fun}, _, store = %Store{impl: impl}) do
     case impl.put_new_lazy(store, serialize_key(store, key), produce_value_fun(store, fun)) do
-      {:ok, store}         -> {:reply, :ok, store}
+      {:ok, store, :ok}    -> {:reply, :ok, store}
       {:raise, type, args} -> reply_with_error(store, type, args)
     end
   end
 
   def handle_call({:replace, key, value}, _, store = %Store{impl: impl}) do
     case impl.replace(store, serialize_key(store, key), serialize_value(store, value)) do
-      {:ok, store}         -> {:reply, :ok, store}
+      {:ok, store, :ok}    -> {:reply, :ok, store}
       {:raise, type, args} -> reply_with_error(store, type, args)
     end
   end
 
   def handle_call({:replace!, key, value}, _, store = %Store{impl: impl}) do
     case impl.replace!(store, serialize_key(store, key), serialize_value(store, value)) do
-      {:ok, store}         -> {:reply, :ok, store}
+      {:ok, store, :ok}    -> {:reply, :ok, store}
       {:raise, type, args} -> reply_with_error(store, type, args)
     end
   end
@@ -238,7 +255,7 @@ defmodule Mnemonix.Store.Server do
 
   def handle_call({:update, key, initial, fun}, _, store = %Store{impl: impl}) do
     case impl.update(store, serialize_key(store, key), serialize_value(store, initial), update_value_fun(store, fun)) do
-      {:ok, store}         -> {:reply, :ok, store}
+      {:ok, store, :ok}    -> {:reply, :ok, store}
       {:raise, type, args} -> reply_with_error(store, type, args)
     end
   end
@@ -276,7 +293,7 @@ defmodule Mnemonix.Store.Server do
 
   def handle_call({:bump, key, amount}, _, store = %Store{impl: impl}) do
     case impl.bump(store, serialize_key(store, key), amount) do
-      {:ok, store, bump_op}  -> {:reply, bump_op, store}
+      {:ok, store, operation}  -> {:reply, operation, store}
       {:raise, type, args} -> reply_with_error(store, type, args)
     end
   end
@@ -285,35 +302,35 @@ defmodule Mnemonix.Store.Server do
 
   def handle_call({:bump!, key, amount}, _, store = %Store{impl: impl}) do
     case impl.bump!(store, serialize_key(store, key), amount) do
-      {:ok, store}         -> {:reply, :ok, store}
+      {:ok, store, :ok}    -> {:reply, :ok, store}
       {:raise, type, args} -> reply_with_error(store, type, args)
     end
   end
 
   def handle_call({:increment, key}, _, store = %Store{impl: impl}) do
     case impl.increment(store, serialize_key(store, key)) do
-      {:ok, store}         -> {:reply, :ok, store}
+      {:ok, store, :ok}    -> {:reply, :ok, store}
       {:raise, type, args} -> reply_with_error(store, type, args)
     end
   end
 
   def handle_call({:increment, key, amount}, _, store = %Store{impl: impl}) do
     case impl.increment(store, serialize_key(store, key), amount) do
-      {:ok, store}         -> {:reply, :ok, store}
+      {:ok, store, :ok}    -> {:reply, :ok, store}
       {:raise, type, args} -> reply_with_error(store, type, args)
     end
   end
 
   def handle_call({:decrement, key}, _, store = %Store{impl: impl}) do
     case impl.decrement(store, serialize_key(store, key)) do
-      {:ok, store}         -> {:reply, :ok, store}
+      {:ok, store, :ok}    -> {:reply, :ok, store}
       {:raise, type, args} -> reply_with_error(store, type, args)
     end
   end
 
   def handle_call({:decrement, key, amount}, _, store = %Store{impl: impl}) do
     case impl.decrement(store, serialize_key(store, key), amount) do
-      {:ok, store}         -> {:reply, :ok, store}
+      {:ok, store, :ok}    -> {:reply, :ok, store}
       {:raise, type, args} -> reply_with_error(store, type, args)
     end
   end

@@ -77,16 +77,16 @@ defmodule Mnemonix.Stores.Mnesia do
 
   @impl Store.Behaviours.Map
   @spec delete(Store.t, Mnemonix.key)
-    :: {:ok, Store.t} | Store.Behaviour.exception
+    :: Store.Server.instruction(:ok)
   def delete(store = %Store{state: table}, key) do
     with :ok <- :mnesia.dirty_delete(table, key) do
-      {:ok, store}
+      {:ok, store, :ok}
     end
   end
 
   @impl Store.Behaviours.Map
   @spec fetch(Store.t, Mnemonix.key)
-    :: {:ok, Store.t, {:ok, Mnemonix.value} | :error} | Store.Behaviour.exception
+    :: Store.Server.instruction({:ok, Mnemonix.value} | :error)
   def fetch(store = %Store{state: table}, key) do
     case :mnesia.dirty_read(table, key) do
       [{^table, ^key, value} | []] -> {:ok, store, {:ok, value}}
@@ -97,10 +97,10 @@ defmodule Mnemonix.Stores.Mnesia do
 
   @impl Store.Behaviours.Map
   @spec put(Store.t, Mnemonix.key, Store.value)
-    :: {:ok, Store.t} | Store.Behaviour.exception
+    :: Store.Server.instruction(:ok)
   def put(store = %Store{state: table}, key, value) do
     with :ok <- :mnesia.dirty_write({table, key, value}) do
-      {:ok, store}
+      {:ok, store, :ok}
     end
   end
 

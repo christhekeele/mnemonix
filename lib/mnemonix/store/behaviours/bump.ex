@@ -1,17 +1,20 @@
 defmodule Mnemonix.Store.Behaviours.Bump do
   @moduledoc false
 
+  alias Mnemonix.Features.Bump
+  alias Mnemonix.Store.Server
+
   use Mnemonix.Behaviour
 
 ####
 # DERIVABLE
 ##
 
-  @callback bump(Mnemonix.Store.t, Mnemonix.key, Mnemonix.amount :: term)
-    :: {:ok, Mnemonix.Store.t, Mnemonix.Features.Bump.bump_op} | Mnemonix.Store.Behaviour.exception
+  @callback bump(Mnemonix.Store.t, Mnemonix.key, Bump.amount)
+    :: Server.instruction(Bump.result)
   @doc false
-  @spec bump(Mnemonix.Store.t, Mnemonix.key, Mnemonix.amount :: term)
-    :: {:ok, Mnemonix.Store.t, Mnemonix.Features.Bump.bump_op} | Mnemonix.Store.Behaviour.exception
+  @spec bump(Mnemonix.Store.t, Mnemonix.key, Bump.amount)
+    :: Server.instruction(Bump.result)
   def bump(store, key, amount) do
     with {:ok, store, result} <- do_bump(store, :increment, key, amount) do
       case result do
@@ -22,52 +25,52 @@ defmodule Mnemonix.Store.Behaviours.Bump do
   end
 
   @callback bump!(Mnemonix.Store.t, Mnemonix.key, amount :: term)
-    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+    :: Server.instruction(:ok)
   @doc false
   @spec bump!(Mnemonix.Store.t, Mnemonix.key, amount :: term)
-    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+    :: Server.instruction(:ok)
   def bump!(store, key, amount) do
     with {:ok, store, result} <- do_bump(store, :increment, key, amount) do
       case result do
-        :ok                  -> {:ok, store}
+        :ok                  -> {:ok, store, :ok}
         {:error, no_integer} -> {:raise, ArithmeticError, [message: msg_for(no_integer, store.impl.deserialize_key(store, key))]}
       end
     end
   end
 
   @callback increment(Mnemonix.Store.t, Mnemonix.key)
-    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+    :: Server.instruction(:ok)
   @doc false
   @spec increment(Mnemonix.Store.t, Mnemonix.key)
-    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+    :: Server.instruction(:ok)
   def increment(store, key), do: increment(store, key, 1)
 
   @callback increment(Mnemonix.Store.t, Mnemonix.key, amount :: term)
-    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+    :: Server.instruction(:ok)
   @doc false
   @spec increment(Mnemonix.Store.t, Mnemonix.key, amount :: term)
-    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+    :: Server.instruction(:ok)
   def increment(store, key, amount) do
-    with {:ok, store, _result} <- do_bump(store, :increment, key, amount) do
-      {:ok, store}
+    with {:ok, store, :ok} <- do_bump(store, :increment, key, amount) do
+      {:ok, store, :ok}
     end
   end
 
   @callback decrement(Mnemonix.Store.t, Mnemonix.key)
-    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+    :: Server.instruction(:ok)
   @doc false
   @spec decrement(Mnemonix.Store.t, Mnemonix.key)
-    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+    :: Server.instruction(:ok)
   def decrement(store, key), do: decrement(store, key, 1)
 
   @callback decrement(Mnemonix.Store.t, Mnemonix.key, amount :: term)
-    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+    :: Server.instruction(:ok)
   @doc false
   @spec decrement(Mnemonix.Store.t, Mnemonix.key, amount :: term)
-    :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Behaviour.exception
+    :: Server.instruction(:ok)
   def decrement(store, key, amount) do
-    with {:ok, store, _result} <- do_bump(store, :decrement, key, amount) do
-      {:ok, store}
+    with {:ok, store, :ok} <- do_bump(store, :decrement, key, amount) do
+      {:ok, store, :ok}
     end
   end
 
