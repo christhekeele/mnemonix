@@ -101,11 +101,31 @@ defmodule Mnemonix do
   @type value :: term
 
   @typedoc """
+  Valid key/value pairs allowed as Mnemonix entries.
+  """
+  @type pair :: {key, value}
+
+  @typedoc """
   Values representing a store that Mnemonix functions can operate on.
   """
   @type store :: pid | GenServer.name
 
   @type spec :: {Mnemonix.Store.Behaviour.t, Mnemonix.Store.Server.options}
+
+  @typedoc """
+  An instruction from a `Mnemonix.Store.Server` to return given value successfully in the client.
+  """
+  @type success(value) :: {:ok, value}
+
+  @typedoc """
+  An instruction from a `Mnemonix.Store.Server` to emit a warning when returning given value in the client.
+  """
+  @type warning(value) :: {:warn, message :: String.t, value}
+
+  @typedoc """
+  An instruction from a `Mnemonix.Store.Server` to raise an error in the client.
+  """
+  @type exception :: {:raise, exception :: module, raise_opts :: Keyword.t}
 
   @doc """
   Starts a new empty in-memory store.

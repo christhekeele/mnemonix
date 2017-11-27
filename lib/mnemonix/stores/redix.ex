@@ -11,7 +11,7 @@ if Code.ensure_loaded?(Redix) do
         iex> Mnemonix.get(store, "foo")
         nil
 
-    This store raises errors on the functions in `Mnemonix.Features.Enumerable`.
+    This store supports the functions in `Mnemonix.Features.Enumerable`.
     """
 
     alias Mnemonix.Store
@@ -61,7 +61,7 @@ if Code.ensure_loaded?(Redix) do
     def delete(store = %Store{state: conn}, key) do
       case Redix.command(conn, ~w[DEL #{key}]) do
         {:ok, 1}         -> {:ok, store, :ok}
-        {:error, reason} -> {:raise, Exception, [reason: reason]}
+        {:error, reason} -> {:raise, store, Exception, [reason: reason]}
       end
     end
 
@@ -72,7 +72,7 @@ if Code.ensure_loaded?(Redix) do
       case Redix.command(conn, ~w[GET #{key}]) do
         {:ok, nil}       -> {:ok, store, :error}
         {:ok, value}     -> {:ok, store, {:ok, value}}
-        {:error, reason} -> {:raise, Exception, [reason: reason]}
+        {:error, reason} -> {:raise, store, Exception, [reason: reason]}
       end
     end
 
@@ -82,7 +82,78 @@ if Code.ensure_loaded?(Redix) do
     def put(store = %Store{state: conn}, key, value) do
       case Redix.command(conn, ~w[SET #{key} #{value}]) do
         {:ok, "OK"}      -> {:ok, store, :ok}
-        {:error, reason} -> {:raise, Exception, [reason: reason]}
+        {:error, reason} -> {:raise, store, Exception, [reason: reason]}
+      end
+    end
+
+  ####
+  # Mnemonix.Store.Behaviours.Enumerable
+  ##
+
+    @doc """
+    Returns `true`: this store supports the functions in `Mnemonix.Features.Enumerable`.
+    """
+    @impl Store.Behaviours.Enumerable
+    @spec enumerable?(Mnemonix.Store.t)
+      :: Store.Server.instruction(boolean)
+    def enumerable?(store = %Store{}) do
+      {:ok, store, true}
+    end
+
+    @impl Store.Behaviours.Enumerable
+    @spec to_enumerable(Mnemonix.Store.t)
+      :: Store.Server.instruction(Enumerable.t)
+    def to_enumerable(store = %Store{}) do
+      to_list(store)
+    end
+
+  # Overrides
+
+    @impl Store.Behaviours.Enumerable
+    @spec keys(Mnemonix.Store.t)
+      :: Server.instruction([Mnemonix.key])
+    def keys(store = %Store{state: conn}) do
+      case Redix.command(conn, ~w[KEYS *]) do
+        {:ok, keys}      -> {:ok, store, keys}
+        {:error, reason} -> {:raise, store, Exception, [reason: reason]}
+      end
+    end
+
+    @impl Store.Behaviours.Enumerable
+    @spec to_list(Mnemonix.Store.t)
+      :: Server.instruction([{Mnemonix.key, Mnemonix.value}])
+    def to_list(store = %Store{}) do
+      with {:ok, store = %Store{state: conn}, keys} <- keys(store) do
+        case Redix.command(conn, ["MGET" | keys]) do
+          {:ok, values}    -> {:ok, store, Enum.zip(keys, values)}
+          {:error, reason} -> {:raise, store, Exception, [reason: reason]}
+        end
+      end
+    end
+
+    @impl Store.Behaviours.Enumerable
+    @spec values(Mnemonix.Store.t)
+      :: Server.instruction([Mnemonix.key])
+    def values(store = %Store{}) do
+      with {:ok, store = %Store{state: conn}, keys} <- keys(store) do
+        case Redix.command(conn, ["MGET" | keys]) do
+          {:ok, values}    -> {:ok, store, values}
+          {:error, reason} -> {:raise, store, Exception, [reason: reason]}
+        end
+      end
+    end
+
+  ####
+  # Enumerable Protocol Overrides
+  ##
+
+    @impl Store.Behaviours.Enumerable
+    @spec enumerable_count(Mnemonix.Store.t)
+      :: Server.instruction(non_neg_integer)
+    def enumerable_count(store = %Store{state: conn}) do
+      case Redix.command(conn, ["DBSIZE"]) do
+        {:ok, count}     -> {:ok, store, count}
+        {:error, reason} -> {:raise, store, Exception, [reason: reason]}
       end
     end
 

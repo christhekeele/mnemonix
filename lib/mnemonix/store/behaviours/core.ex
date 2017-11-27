@@ -56,17 +56,15 @@ defmodule Mnemonix.Store.Behaviours.Core do
   @callback setup_initial(Mnemonix.Store.t)
     :: {:ok, Mnemonix.store} | no_return
   def setup_initial(store = %Mnemonix.Store{impl: impl, opts: opts}) do
-    opts
+    {:ok, store, :ok} = opts
     |> Keyword.get(:initial, %{})
     |> Enum.map(fn {key, value} ->
-      {impl.serialize_key(store, key), value}
+      {impl.serialize_key(store, key), impl.serialize_value(store, value)}
     end)
-    |> Enum.map(fn {key, value} ->
-      {key, impl.serialize_value(store, value)}
-    end)
-    |> Enum.reduce({:ok, store}, fn {key, value}, {:ok, store} ->
+    |> Enum.reduce({:ok, store, :ok}, fn {key, value}, {:ok, store, :ok} ->
       impl.put(store, key, value)
     end)
+    {:ok, store}
   end
 
   @callback teardown(reason, Mnemonix.Store.t)

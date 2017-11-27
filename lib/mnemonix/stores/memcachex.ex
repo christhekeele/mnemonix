@@ -56,7 +56,7 @@ if Code.ensure_loaded?(Memcache) do
     def delete(store = %Store{state: conn}, key) do
       case Memcache.delete(conn, key) do
         {:ok}            -> {:ok, store, :ok}
-        {:error, reason} -> {:raise, Exception, [reason: reason]}
+        {:error, reason} -> {:raise, store, Exception, [reason: reason]}
       end
     end
 
@@ -67,7 +67,7 @@ if Code.ensure_loaded?(Memcache) do
       case Memcache.get(conn, key) do
         {:error, "Key not found"} -> {:ok, store, :error}
         {:ok, value}              -> {:ok, store, {:ok, value}}
-        {:error, reason}          -> {:raise, Exception, [reason: reason]}
+        {:error, reason}          -> {:raise, store, Exception, [reason: reason]}
       end
     end
 
@@ -77,7 +77,7 @@ if Code.ensure_loaded?(Memcache) do
     def put(store = %Store{state: conn}, key, value) do
       case Memcache.set(conn, key, value) do
         {:ok}            -> {:ok, store, :ok}
-        {:error, reason} -> {:raise, Exception, [reason: reason]}
+        {:error, reason} -> {:raise, store, Exception, [reason: reason]}
       end
     end
 

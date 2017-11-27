@@ -123,7 +123,7 @@ defmodule Mnemonix.Stores.ETS do
     case :ets.lookup(table, key) do
       [{^key, value} | []] -> {:ok, store, {:ok, value}}
       []                   -> {:ok, store, :error}
-      other                -> {:raise, Exception, reason: other}
+      other                -> {:raise, store, Exception, reason: other}
     end
   end
 

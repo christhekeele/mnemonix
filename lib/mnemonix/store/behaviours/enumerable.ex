@@ -32,7 +32,7 @@ defmodule Mnemonix.Store.Behaviours.Enumerable do
   @spec to_enumerable(Mnemonix.Store.t)
     :: Server.instruction(Enumerable.t)
   def to_enumerable(store) do
-    {:raise, Mnemonix.Features.Enumerable.Error, [module: store.impl]}
+    {:raise, store, Mnemonix.Features.Enumerable.Error, [module: store.impl]}
   end
 
   @callback keys(Mnemonix.Store.t)
@@ -45,10 +45,10 @@ defmodule Mnemonix.Store.Behaviours.Enumerable do
   end
 
   @callback to_list(Mnemonix.Store.t)
-    :: Server.instruction([{Mnemonix.key, Mnemonix.value}] | {:default, module})
+    :: Server.instruction([Mnemonix.pair] | {:default, module})
   @doc false
   @spec to_list(Mnemonix.Store.t)
-    :: Server.instruction([{Mnemonix.key, Mnemonix.value}] | {:default, module})
+    :: Server.instruction([Mnemonix.pair] | {:default, module})
   def to_list(store) do
     {:ok, store, {:default, store.impl}}
   end
@@ -75,12 +75,12 @@ defmodule Mnemonix.Store.Behaviours.Enumerable do
     {:ok, store, {:error, store.impl}}
   end
 
-  @callback enumerable_member?(Mnemonix.Store.t, {Mnemonix.key, Mnemonix.value})
+  @callback enumerable_member?(Mnemonix.Store.t, Mnemonix.pair | term)
     :: Server.instruction(boolean | {:error, module})
   @doc false
-  @spec enumerable_member?(Mnemonix.Store.t, {Mnemonix.key, Mnemonix.value})
+  @spec enumerable_member?(Mnemonix.Store.t, Mnemonix.pair | term)
     :: Server.instruction(boolean | {:error, module})
-  def enumerable_member?(store, {_key, _value}) do
+  def enumerable_member?(store, _maybe_pair) do
     {:ok, store, {:error, store.impl}}
   end
 

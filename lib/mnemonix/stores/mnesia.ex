@@ -91,7 +91,7 @@ defmodule Mnemonix.Stores.Mnesia do
     case :mnesia.dirty_read(table, key) do
       [{^table, ^key, value} | []] -> {:ok, store, {:ok, value}}
       []                           -> {:ok, store, :error}
-      other                        -> {:raise, Exception, [reason: other]}
+      other                        -> {:raise, store, Exception, [reason: other]}
     end
   end
 

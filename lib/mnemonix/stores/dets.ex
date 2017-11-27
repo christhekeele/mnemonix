@@ -93,7 +93,7 @@ defmodule Mnemonix.Stores.DETS do
     case :dets.lookup(table, key) do
       [{^key, value} | []] -> {:ok, store, {:ok, value}}
       []                   -> {:ok, store, :error}
-      other                -> {:raise, Exception, other}
+      other                -> {:raise, store, Exception, other}
     end
   end
 

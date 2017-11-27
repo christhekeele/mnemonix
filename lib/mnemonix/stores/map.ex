@@ -44,9 +44,9 @@ defmodule Mnemonix.Stores.Map do
     {:ok, %{}}
   end
 
-  ####
-  # Mnemonix.Store.Behaviours.Map
-  ##
+####
+# Mnemonix.Store.Behaviours.Map
+##
 
   @impl Store.Behaviours.Map
   @spec delete(Store.t, Mnemonix.key)

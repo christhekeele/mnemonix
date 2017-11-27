@@ -27,15 +27,15 @@ exclusions = case File.touch(Path.join(filesystem_dir, "writable.tmp")) do
 end
 
 # Exclude redis-dependent tests if redis is not available.
-redis_host = String.to_charlist(System.get_env("REDIS_TEST_HOST") || "localhost")
+redis_host = System.get_env("REDIS_TEST_HOST") || "localhost"
 redis_port = String.to_integer(System.get_env("REDIS_TEST_PORT") || "6379")
 
 # Exclude memcached-dependent tests if memcached is not available.
-memcached_host = String.to_charlist(System.get_env("REDIS_TEST_HOST") || "localhost")
+memcached_host = System.get_env("REDIS_TEST_HOST") || "localhost"
 memcached_port = String.to_integer(System.get_env("REDIS_TEST_PORT") || "11211")
 
 # Exclude elasticsearch-dependent tests if elasticsearch is not available.
-elastic_search_host = String.to_charlist(System.get_env("ELASTIC_SEARCH_TEST_HOST") || "127.0.0.1")
+elastic_search_host = System.get_env("ELASTIC_SEARCH_TEST_HOST") || "127.0.0.1"
 elastic_search_port = String.to_integer(System.get_env("ELASTIC_SEARCH_TEST_PORT") || "9200")
 
 tcp_backends = [
@@ -45,7 +45,7 @@ tcp_backends = [
 ]
 
 exclusions = Enum.reduce(tcp_backends, exclusions, fn {backend, tag, host, port}, exclusions ->
-  case :gen_tcp.connect(host, port, []) do
+  case :gen_tcp.connect(String.to_charlist(host), port, []) do
   {:ok, socket} ->
     :gen_tcp.close(socket)
     exclusions

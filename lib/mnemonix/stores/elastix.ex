@@ -70,7 +70,7 @@ if Code.ensure_loaded?(Elastix) do
     def delete(store = %Store{state: %Conn{url: url, index: index, type: type, refresh: refresh}}, key) do
       case Elastix.Document.delete(url, index, type, key, %{refresh: refresh}) do
         {:ok, %Response{body: _}} -> {:ok, store, :ok}
-        {:error, %Error{reason: reason}} -> {:raise, Exception, [message: reason]}
+        {:error, %Error{reason: reason}} -> {:raise, store, Exception, [message: reason]}
       end
 
     end
@@ -88,7 +88,7 @@ if Code.ensure_loaded?(Elastix) do
           []                                     -> {:ok, store, :error}
           nil                                    -> {:ok, store, :error}
         end
-        {:error, %Error{reason: reason}} -> {:raise, Exception, [message: reason]}
+        {:error, %Error{reason: reason}} -> {:raise, store, Exception, [message: reason]}
       end
 
     end
@@ -101,8 +101,8 @@ if Code.ensure_loaded?(Elastix) do
 
       case Elastix.Document.index(url, index, type, key, value, %{refresh: refresh}) do
         {:ok, %Response{status_code: code}} when code in [200, 201] -> {:ok, store, :ok}
-        {:ok, %Response{body: body }} -> {:raise, Exception, [message: get_in(body, ["error", "reason"]) ]}
-        {:error, %Error{reason: reason}} -> {:raise, Exception, [message: reason]}
+        {:ok, %Response{body: body }} -> {:raise, store, Exception, [message: get_in(body, ["error", "reason"]) ]}
+        {:error, %Error{reason: reason}} -> {:raise, store, Exception, [message: reason]}
       end
     end
 
