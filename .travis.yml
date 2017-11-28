@@ -23,36 +23,23 @@ env:
     - MIX_ENV=test
     - DOCTESTS=true
     - ALL_BACKENDS=true
-    - GITHUB_ACCESS=$GITHUB_ACCESS_TOKEN
 install:
   - mix local.rebar --force
   - mix local.hex --force
   - mix deps.get
   - mix clean
   - mix compile
+script: mix coveralls
 stages:
+  - name: checks
   - name: test
-  - name: docs
-  - name: style
-  - if: (type = pull_request OR branch = master) AND env(GITHUB_ACCESS) IS present
-  - name: types
-  - if: type != pull_request
 jobs:
   include:
+    - stage: checks
+    - script: mix credo list
+    - script: mix dialyzer --halt-exit-status
+    - script: mix inch.report
     - stage: test
-    - script:
-      - mix coveralls
-    - stage: docs
-    - script:
-      - mix inch.report
-    - stage: style
-    - script:
-      - rvm install ruby-2.3.1
-      - gem install pronto-credo
-      - pronto run -f github_status github_pr_review
-    - stage: types
-    - script:
-      - mix dialyzer --halt-exit-status
 services:
   - redis-server
   - memcached
