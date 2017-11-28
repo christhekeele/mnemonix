@@ -103,7 +103,7 @@ if Code.ensure_loaded?(Redix) do
 
     @impl Store.Behaviours.Enumerable
     @spec to_enumerable(Store.t)
-      :: Server.instruction(Enumerable.t)
+      :: Server.instruction([Mnemonix.pair])
     def to_enumerable(store = %Store{}) do
       to_list(store)
     end
@@ -122,7 +122,7 @@ if Code.ensure_loaded?(Redix) do
 
     @impl Store.Behaviours.Enumerable
     @spec to_list(Store.t)
-      :: Server.instruction([{Mnemonix.key, Mnemonix.value}])
+      :: Server.instruction([Mnemonix.pair])
     def to_list(store = %Store{}) do
       with {:ok, store = %Store{state: conn}, keys} <- keys(store) do
         case Redix.command(conn, ["MGET" | keys]) do

@@ -85,9 +85,9 @@ defmodule Mnemonix.Stores.Map do
 
   @impl Store.Behaviours.Enumerable
   @spec to_enumerable(Mnemonix.Store.t)
-    :: Store.Server.instruction(Enumerable.t)
+    :: Store.Server.instruction([Mnemonix.pair])
   def to_enumerable(store = %Store{state: map}) do
-    {:ok, store, map}
+    {:ok, store, Map.to_list(map)}
   end
 
 end

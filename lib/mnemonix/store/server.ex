@@ -127,6 +127,8 @@ defmodule Mnemonix.Store.Server do
     case impl.delete(store, serialize_key(store, key)) do
       {:ok, store} ->
         {:reply, :ok, store}
+      {:warn, store, message} ->
+        {:reply, {:warn, message}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -140,6 +142,10 @@ defmodule Mnemonix.Store.Server do
         {:reply, {:ok, :error}, store}
       {:ok, store, {:ok, value}} ->
         {:reply, {:ok, {:ok, deserialize_value(store, value)}}, store}
+      {:warn, store, message, :error} ->
+        {:reply, {:warn, message, :error}, store}
+      {:warn, store, message, {:ok, value}} ->
+        {:reply, {:warn, message, {:ok, deserialize_value(store, value)}}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -151,6 +157,8 @@ defmodule Mnemonix.Store.Server do
     case impl.put(store, serialize_key(store, key), serialize_value(store, value)) do
       {:ok, store} ->
         {:reply, :ok, store}
+      {:warn, store, message} ->
+        {:reply, {:warn, message}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -164,6 +172,8 @@ defmodule Mnemonix.Store.Server do
     case impl.drop(store, serialize_keys(store, keys)) do
       {:ok, store} ->
         {:reply, :ok, store}
+      {:warn, store, message} ->
+        {:reply, {:warn, message}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -175,6 +185,8 @@ defmodule Mnemonix.Store.Server do
     case impl.fetch!(store, serialize_key(store, key)) do
       {:ok, store, value} ->
         {:reply, {:ok, deserialize_value(store, value)}, store}
+      {:warn, store, message, value} ->
+        {:reply, {:warn, message, deserialize_value(store, value)}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -186,6 +198,8 @@ defmodule Mnemonix.Store.Server do
     case impl.get(store, serialize_key(store, key)) do
       {:ok, store, value} ->
         {:reply, {:ok, deserialize_value(store, value)}, store}
+      {:warn, store, message, value} ->
+        {:reply, {:warn, message, deserialize_value(store, value)}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -197,6 +211,8 @@ defmodule Mnemonix.Store.Server do
     case impl.get(store, serialize_key(store, key), serialize_value(store, default)) do
       {:ok, store, value} ->
         {:reply, {:ok, deserialize_value(store, value)}, store}
+      {:warn, store, message, value} ->
+        {:reply, {:warn, message, deserialize_value(store, value)}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -208,6 +224,8 @@ defmodule Mnemonix.Store.Server do
     case impl.get_and_update(store, serialize_key(store, key), get_and_update_fun(store, fun)) do
       {:ok, store, value} ->
         {:reply, {:ok, deserialize_value(store, value)}, store}
+      {:warn, store, message, value} ->
+        {:reply, {:warn, message, deserialize_value(store, value)}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -219,6 +237,8 @@ defmodule Mnemonix.Store.Server do
     case impl.get_and_update!(store, serialize_key(store, key), get_and_update_fun(store, fun)) do
       {:ok, store, value} ->
         {:reply, {:ok, deserialize_value(store, value)}, store}
+      {:warn, store, message, value} ->
+        {:reply, {:warn, message, deserialize_value(store, value)}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -230,6 +250,8 @@ defmodule Mnemonix.Store.Server do
     case impl.get_lazy(store, serialize_key(store, key), produce_value_fun(store, fun)) do
       {:ok, store, value} ->
         {:reply, {:ok, deserialize_value(store, value)}, store}
+      {:warn, store, message, value} ->
+        {:reply, {:warn, message, deserialize_value(store, value)}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -241,6 +263,8 @@ defmodule Mnemonix.Store.Server do
     case impl.has_key?(store, serialize_key(store, key)) do
       {:ok, store, bool} ->
         {:reply, {:ok, bool}, store}
+      {:warn, store, message, bool} ->
+        {:reply, {:warn, message, bool}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -252,6 +276,8 @@ defmodule Mnemonix.Store.Server do
     case impl.pop(store, serialize_key(store, key)) do
       {:ok, store, value} ->
         {:reply, {:ok, deserialize_value(store, value)}, store}
+      {:warn, store, message, value} ->
+        {:reply, {:warn, message, deserialize_value(store, value)}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -263,6 +289,8 @@ defmodule Mnemonix.Store.Server do
     case impl.pop(store, serialize_key(store, key), serialize_value(store, default)) do
       {:ok, store, value} ->
         {:reply, {:ok, deserialize_value(store, value)}, store}
+      {:warn, store, message, value} ->
+        {:reply, {:warn, message, deserialize_value(store, value)}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -274,6 +302,8 @@ defmodule Mnemonix.Store.Server do
     case impl.pop_lazy(store, serialize_key(store, key), produce_value_fun(store, fun)) do
       {:ok, store, value} ->
         {:reply, {:ok, deserialize_value(store, value)}, store}
+      {:warn, store, message, value} ->
+        {:reply, {:warn, message, deserialize_value(store, value)}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -285,6 +315,8 @@ defmodule Mnemonix.Store.Server do
     case impl.put_new(store, serialize_key(store, key), serialize_value(store, value)) do
       {:ok, store} ->
         {:reply, :ok, store}
+      {:warn, store, message} ->
+        {:reply, {:warn, message}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -296,6 +328,8 @@ defmodule Mnemonix.Store.Server do
     case impl.put_new_lazy(store, serialize_key(store, key), produce_value_fun(store, fun)) do
       {:ok, store} ->
         {:reply, :ok, store}
+      {:warn, store, message} ->
+        {:reply, {:warn, message}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -307,6 +341,8 @@ defmodule Mnemonix.Store.Server do
     case impl.replace(store, serialize_key(store, key), serialize_value(store, value)) do
       {:ok, store} ->
         {:reply, :ok, store}
+      {:warn, store, message} ->
+        {:reply, {:warn, message}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -318,17 +354,8 @@ defmodule Mnemonix.Store.Server do
     case impl.replace!(store, serialize_key(store, key), serialize_value(store, value)) do
       {:ok, store} ->
         {:reply, :ok, store}
-      {:raise, store, type, args} ->
-        reply_with_error(store, type, args)
-    end
-  end
-
-  @spec handle_call({:take, [Mnemonix.key]}, GenServer.from, Store.t)
-    :: {:reply, reply(%{Mnemonix.key => Mnemonix.value}), Store.t}
-  def handle_call({:take, keys}, _, store = %Store{impl: impl}) do
-    case impl.take(store, serialize_keys(store, keys)) do
-      {:ok, store, result} ->
-        {:reply, {:ok, result}, store}
+      {:warn, store, message} ->
+        {:reply, {:warn, message}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -338,8 +365,23 @@ defmodule Mnemonix.Store.Server do
     :: {:reply, reply(%{Mnemonix.key => Mnemonix.value}), Store.t}
   def handle_call({:split, keys}, _, store = %Store{impl: impl}) do
     case impl.split(store, serialize_keys(store, keys)) do
-      {:ok, store, result} ->
-        {:reply, {:ok, result}, store}
+      {:ok, store, pairs} when is_list(pairs) ->
+        {:reply, {:ok, Enum.into(deserialize_pairs(store, pairs), %{})}, store}
+      {:warn, store, message, pairs} when is_list(pairs) ->
+        {:reply, {:warn, message, Enum.into(deserialize_pairs(store, pairs), %{})}, store}
+      {:raise, store, type, args} ->
+        reply_with_error(store, type, args)
+    end
+  end
+
+  @spec handle_call({:take, [Mnemonix.key]}, GenServer.from, Store.t)
+    :: {:reply, reply(%{Mnemonix.key => Mnemonix.value}), Store.t}
+  def handle_call({:take, keys}, _, store = %Store{impl: impl}) do
+    case impl.take(store, serialize_keys(store, keys)) do
+      {:ok, store, pairs} when is_list(pairs) ->
+        {:reply, {:ok, Enum.into(deserialize_pairs(store, pairs), %{})}, store}
+      {:warn, store, message, pairs} when is_list(pairs) ->
+        {:reply, {:warn, message, Enum.into(deserialize_pairs(store, pairs), %{})}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -351,6 +393,8 @@ defmodule Mnemonix.Store.Server do
     case impl.update(store, serialize_key(store, key), serialize_value(store, initial), update_value_fun(store, fun)) do
       {:ok, store} ->
         {:reply, :ok, store}
+      {:warn, store, message} ->
+        {:reply, {:warn, message}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -362,6 +406,8 @@ defmodule Mnemonix.Store.Server do
     case impl.update!(store, serialize_key(store, key), update_value_fun(store, fun)) do
       {:ok, store} ->
         {:reply, :ok, store}
+      {:warn, store, message} ->
+        {:reply, {:warn, message}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -403,8 +449,10 @@ defmodule Mnemonix.Store.Server do
     :: {:reply, reply(Bump.result), Store.t}
   def handle_call({:bump, key, amount}, _, store = %Store{impl: impl}) do
     case impl.bump(store, serialize_key(store, key), amount) do
-      {:ok, store, operation} ->
-        {:reply, operation, store}
+      {:ok, store, result} ->
+        {:reply, result, store}
+      {:warn, store, message, result} ->
+        {:reply, {:warn, message, result}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -418,6 +466,8 @@ defmodule Mnemonix.Store.Server do
     case impl.bump!(store, serialize_key(store, key), amount) do
       {:ok, store} ->
         {:reply, :ok, store}
+      {:warn, store, message} ->
+        {:reply, {:warn, message}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -429,6 +479,8 @@ defmodule Mnemonix.Store.Server do
     case impl.increment(store, serialize_key(store, key)) do
       {:ok, store} ->
         {:reply, :ok, store}
+      {:warn, store, message} ->
+        {:reply, {:warn, message}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -440,6 +492,8 @@ defmodule Mnemonix.Store.Server do
     case impl.increment(store, serialize_key(store, key), amount) do
       {:ok, store} ->
         {:reply, :ok, store}
+      {:warn, store, message} ->
+        {:reply, {:warn, message}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -451,6 +505,8 @@ defmodule Mnemonix.Store.Server do
     case impl.decrement(store, serialize_key(store, key)) do
       {:ok, store} ->
         {:reply, :ok, store}
+      {:warn, store, message} ->
+        {:reply, {:warn, message}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -462,6 +518,8 @@ defmodule Mnemonix.Store.Server do
     case impl.decrement(store, serialize_key(store, key), amount) do
       {:ok, store} ->
         {:reply, :ok, store}
+      {:warn, store, message} ->
+        {:reply, {:warn, message}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -479,6 +537,8 @@ defmodule Mnemonix.Store.Server do
     case impl.expire(store, serialize_key(store, key), ttl) do
       {:ok, store} ->
         {:reply, :ok, store}
+      {:warn, store, message} ->
+        {:reply, {:warn, message}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -490,6 +550,8 @@ defmodule Mnemonix.Store.Server do
     case impl.persist(store, serialize_key(store, key)) do
       {:ok, store} ->
         {:reply, :ok, store}
+      {:warn, store, message} ->
+        {:reply, {:warn, message}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -503,6 +565,8 @@ defmodule Mnemonix.Store.Server do
     case impl.put_and_expire(store, serialize_key(store, key), serialize_value(store, value), ttl) do
       {:ok, store} ->
         {:reply, :ok, store}
+      {:warn, store, message} ->
+        {:reply, {:warn, message}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -520,17 +584,21 @@ defmodule Mnemonix.Store.Server do
     case impl.enumerable?(store) do
       {:ok, store, enumerability} ->
         {:reply, {:ok, enumerability}, store}
+      {:warn, store, message, enumerability} ->
+        {:reply, {:warn, message, enumerability}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
   end
 
   @spec handle_call(:to_enumerable, GenServer.from, Store.t)
-    :: {:reply, reply(Enumerable.t), Store.t}
+    :: {:reply, reply([Mnemonix.pair]), Store.t}
   def handle_call(:to_enumerable, _, store = %Store{impl: impl}) do
     case impl.to_enumerable(store) do
-      {:ok, store, enumerable} ->
-        {:reply, {:ok, enumerable}, store}
+      {:ok, store, pairs} when is_list(pairs) ->
+        {:reply, {:ok, deserialize_pairs(store, pairs)}, store}
+      {:warn, store, message, pairs} when is_list(pairs) ->
+        {:reply, {:warn, message, deserialize_pairs(store, pairs)}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -544,13 +612,17 @@ defmodule Mnemonix.Store.Server do
     case impl.keys(store) do
       {:ok, store, {:default, ^impl}} ->
         case impl.to_enumerable(store) do
-          {:ok, store, enumerable} ->
-            {:reply, {:ok, deserialize_keys(store, Enum.map(enumerable, &(elem &1, 0)))}, store}
+          {:ok, store, pairs} when is_list(pairs) ->
+            {:reply, {:ok, deserialize_keys(store, Enum.map(pairs, &(elem &1, 0)))}, store}
+          {:warn, store, message, pairs} when is_list(pairs) ->
+            {:reply, {:warn, message, deserialize_keys(store, Enum.map(pairs, &(elem &1, 0)))}, store}
           {:raise, store, type, args} ->
             reply_with_error(store, type, args)
         end
       {:ok, store, keys} when is_list(keys) ->
         {:reply, {:ok, deserialize_keys(store, keys)}, store}
+      {:warn, store, message, keys} when is_list(keys) ->
+        {:reply, {:warn, message, deserialize_keys(store, keys)}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -562,13 +634,17 @@ defmodule Mnemonix.Store.Server do
     case impl.to_list(store) do
       {:ok, store, {:default, ^impl}} ->
         case impl.to_enumerable(store) do
-          {:ok, store, enumerable} ->
-            {:reply, {:ok, deserialize_pairs(store, Enum.into(enumerable, []))}, store}
+          {:ok, store, pairs} when is_list(pairs) ->
+            {:reply, {:ok, deserialize_pairs(store, pairs)}, store}
+          {:warn, store, message, pairs} when is_list(pairs) ->
+            {:reply, {:warn, message, deserialize_pairs(store, pairs)}, store}
           {:raise, store, type, args} ->
             reply_with_error(store, type, args)
         end
-      {:ok, store, list} when is_list(list) ->
-        {:reply, {:ok, deserialize_pairs(store, list)}, store}
+      {:ok, store, pairs} when is_list(pairs) ->
+        {:reply, {:ok, deserialize_pairs(store, pairs)}, store}
+      {:warn, store, message, pairs} when is_list(pairs) ->
+        {:reply, {:warn, message, deserialize_pairs(store, pairs)}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end
@@ -580,13 +656,17 @@ defmodule Mnemonix.Store.Server do
     case impl.values(store) do
       {:ok, store, {:default, ^impl}} ->
         case impl.to_enumerable(store) do
-          {:ok, store, enumerable} ->
-            {:reply, {:ok, deserialize_values(store, Enum.map(enumerable, &(elem &1, 1)))}, store}
+          {:ok, store, pairs} when is_list(pairs) ->
+            {:reply, {:ok, deserialize_values(store, Enum.map(pairs, &(elem &1, 1)))}, store}
+          {:warn, store, message, pairs} when is_list(pairs) ->
+            {:reply, {:warn, message, deserialize_keys(store, Enum.map(pairs, &(elem &1, 1)))}, store}
           {:raise, store, type, args} ->
             reply_with_error(store, type, args)
         end
       {:ok, store, values} when is_list(values) ->
         {:reply, {:ok, deserialize_values(store, values)}, store}
+      {:warn, store, message, values} when is_list(values) ->
+        {:reply, {:warn, message, deserialize_values(store, values)}, store}
       {:raise, store, type, args} ->
         reply_with_error(store, type, args)
     end

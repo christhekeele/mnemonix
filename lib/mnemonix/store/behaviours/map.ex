@@ -2,7 +2,6 @@ defmodule Mnemonix.Store.Behaviours.Map do
   @moduledoc false
 
   alias Mnemonix.Store
-  alias Mnemonix.Store.Server
 
   use Mnemonix.Behaviour
 
@@ -11,23 +10,23 @@ defmodule Mnemonix.Store.Behaviours.Map do
 ##
 
   @callback delete(Store.t, Mnemonix.key)
-    :: Server.instruction
+    :: Store.Server.instruction
 
   @callback fetch(Store.t, Mnemonix.key)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
 
   @callback put(Store.t, Mnemonix.key, Mnemonix.value)
-    :: Server.instruction
+    :: Store.Server.instruction
 
 ####
 # DERIVABLE
 ##
 
   @callback drop(Store.t, [Mnemonix.key])
-    :: Server.instruction
+    :: Store.Server.instruction
   @doc false
   @spec drop(Store.t, [Mnemonix.key])
-    :: Server.instruction
+    :: Store.Server.instruction
   def drop(store, keys) do
     try do
       Enum.reduce(keys, store, fn key, store ->
@@ -45,10 +44,10 @@ defmodule Mnemonix.Store.Behaviours.Map do
   end
 
   @callback fetch!(Store.t, Mnemonix.key)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
   @doc false
   @spec fetch!(Store.t, Mnemonix.key)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
   def fetch!(store, key) do
     with {:ok, store, current} <- store.impl.fetch(store, key) do
       case current do
@@ -59,17 +58,17 @@ defmodule Mnemonix.Store.Behaviours.Map do
   end
 
   @callback get(Store.t, Mnemonix.key)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
   @doc false
   @spec get(Store.t, Mnemonix.key)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
   def get(store, key), do: get(store, key, nil)
 
   @callback get(Store.t, Mnemonix.key, Mnemonix.value)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
   @doc false
   @spec get(Store.t, Mnemonix.key, Mnemonix.value)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
   def get(store, key, default) do
     with {:ok, store, current} <- store.impl.fetch(store, key) do
       case current do
@@ -80,10 +79,10 @@ defmodule Mnemonix.Store.Behaviours.Map do
   end
 
   @callback get_and_update(Store.t, Mnemonix.key, fun)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
   @doc false
   @spec get_and_update(Store.t, Mnemonix.key, fun)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
   def get_and_update(store, key, fun) do
     with {:ok, store, current} <- store.impl.fetch(store, key) do
       value = case current do
@@ -103,10 +102,10 @@ defmodule Mnemonix.Store.Behaviours.Map do
   end
 
   @callback get_and_update!(Store.t, Mnemonix.key, fun)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
   @doc false
   @spec get_and_update!(Store.t, Mnemonix.key, fun)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
   def get_and_update!(store, key, fun) do
     with {:ok, store, current} <- store.impl.fetch(store, key) do
       case current do
@@ -124,10 +123,10 @@ defmodule Mnemonix.Store.Behaviours.Map do
   end
 
   @callback get_lazy(Store.t, Mnemonix.key, fun)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
   @doc false
   @spec get_lazy(Store.t, Mnemonix.key, fun)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
   def get_lazy(store, key, fun) when is_function(fun, 0) do
     with {:ok, store, current} <- store.impl.fetch(store, key) do
       value = case current do
@@ -139,10 +138,10 @@ defmodule Mnemonix.Store.Behaviours.Map do
   end
 
   @callback has_key?(Store.t, Mnemonix.key)
-    :: Server.instruction(boolean)
+    :: Store.Server.instruction(boolean)
   @doc false
   @spec has_key?(Store.t, Mnemonix.key)
-    :: Server.instruction(boolean)
+    :: Store.Server.instruction(boolean)
   def has_key?(store, key) do
     with {:ok, store, current} <- store.impl.fetch(store, key) do
       case current do
@@ -153,17 +152,17 @@ defmodule Mnemonix.Store.Behaviours.Map do
   end
 
   @callback pop(Store.t, Mnemonix.key)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
   @doc false
   @spec pop(Store.t, Mnemonix.key)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
   def pop(store, key), do: pop(store, key, nil)
 
   @callback pop(Store.t, Mnemonix.key, Mnemonix.value)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
   @doc false
   @spec pop(Store.t, Mnemonix.key, Mnemonix.value)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
   def pop(store, key, default) do
     with {:ok, store, current} <- store.impl.fetch(store, key) do
       case current do
@@ -176,10 +175,10 @@ defmodule Mnemonix.Store.Behaviours.Map do
   end
 
   @callback pop_lazy(Store.t, Mnemonix.key, fun)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
   @doc false
   @spec pop_lazy(Store.t, Mnemonix.key, fun)
-    :: Server.instruction(Mnemonix.value)
+    :: Store.Server.instruction(Mnemonix.value)
   def pop_lazy(store, key, fun) when is_function(fun, 0) do
     with {:ok, store, current} <- store.impl.fetch(store, key) do
       case current do
@@ -192,10 +191,10 @@ defmodule Mnemonix.Store.Behaviours.Map do
   end
 
   @callback put_new(Store.t, Mnemonix.key, Mnemonix.value)
-    :: Server.instruction
+    :: Store.Server.instruction
   @doc false
   @spec put_new(Store.t, Mnemonix.key, Mnemonix.value)
-    :: Server.instruction
+    :: Store.Server.instruction
   def put_new(store, key, value) do
     with {:ok, store, current} <- store.impl.fetch(store, key) do
       case current do
@@ -206,10 +205,10 @@ defmodule Mnemonix.Store.Behaviours.Map do
   end
 
   @callback put_new_lazy(Store.t, Mnemonix.key, fun)
-    :: Server.instruction
+    :: Store.Server.instruction
   @doc false
   @spec put_new_lazy(Store.t, Mnemonix.key, fun)
-    :: Server.instruction
+    :: Store.Server.instruction
   def put_new_lazy(store, key, fun) when is_function(fun, 0) do
     with {:ok, store, current} <- store.impl.fetch(store, key) do
       case current do
@@ -220,10 +219,10 @@ defmodule Mnemonix.Store.Behaviours.Map do
   end
 
   @callback replace(Store.t, Mnemonix.key, Mnemonix.value)
-    :: Server.instruction
+    :: Store.Server.instruction
   @doc false
   @spec replace(Store.t, Mnemonix.key, Mnemonix.value)
-    :: Server.instruction
+    :: Store.Server.instruction
   def replace(store, key, value) do
     with {:ok, store, current} <- store.impl.fetch(store, key) do
       case current do
@@ -234,10 +233,10 @@ defmodule Mnemonix.Store.Behaviours.Map do
   end
 
   @callback replace!(Store.t, Mnemonix.key, Mnemonix.value)
-    :: Server.instruction
+    :: Store.Server.instruction
   @doc false
   @spec replace!(Store.t, Mnemonix.key, Mnemonix.value)
-    :: Server.instruction
+    :: Store.Server.instruction
   def replace!(store, key, value) do
     with {:ok, store, current} <- store.impl.fetch(store, key) do
       case current do
@@ -248,18 +247,18 @@ defmodule Mnemonix.Store.Behaviours.Map do
   end
 
   @callback split(Store.t, [Mnemonix.key])
-    :: Server.instruction(%{Mnemonix.key => Mnemonix.value})
+    :: Store.Server.instruction([Mnemonix.pair])
   @doc false
   @spec split(Store.t, [Mnemonix.key])
-    :: Server.instruction(%{Mnemonix.key => Mnemonix.value})
+    :: Store.Server.instruction([Mnemonix.pair])
   def split(store, keys) do
     try do
-      Enum.reduce(keys, {store, %{}}, fn key, {store, result} ->
+      Enum.reduce(keys, {store, []}, fn key, {store, result} ->
         with {:ok, store, value} <- store.impl.fetch(store, key) do
           case value do
             :error       -> {store, result}
             {:ok, value} -> case store.impl.delete(store, key) do
-              {:ok, store} -> {store, Map.put(result, key, value)}
+              {:ok, store} -> {store, Keyword.put(result, key, value)}
               error -> throw {:error, error}
             end
             error -> throw {:error, error}
@@ -276,16 +275,16 @@ defmodule Mnemonix.Store.Behaviours.Map do
   end
 
   @callback take(Store.t, [Mnemonix.key])
-    :: Server.instruction(%{Mnemonix.key => Mnemonix.value})
+    :: Store.Server.instruction([Mnemonix.pair])
   @doc false
   @spec take(Store.t, [Mnemonix.key])
-    :: Server.instruction(%{Mnemonix.key => Mnemonix.value})
+    :: Store.Server.instruction([Mnemonix.pair])
   def take(store, keys) do
     try do
-      Enum.reduce(keys, {store, %{}}, fn key, {store, result} ->
+      Enum.reduce(keys, {store, []}, fn key, {store, result} ->
         with {:ok, store, value} <- store.impl.fetch(store, key) do
           case value do
-            {:ok, value} -> {store, Map.put(result, key, value)}
+            {:ok, value} -> {store, Keyword.put(result, key, value)}
             :error       -> {store, result}
           end
         else
@@ -300,10 +299,10 @@ defmodule Mnemonix.Store.Behaviours.Map do
   end
 
   @callback update(Store.t, Mnemonix.key, Mnemonix.value, fun)
-    :: Server.instruction
+    :: Store.Server.instruction
   @doc false
   @spec update(Store.t, Mnemonix.key, Mnemonix.value, fun)
-    :: Server.instruction
+    :: Store.Server.instruction
   def update(store, key, initial, fun) do
     with {:ok, store, current} <- store.impl.fetch(store, key) do
       case current do
@@ -314,10 +313,10 @@ defmodule Mnemonix.Store.Behaviours.Map do
   end
 
   @callback update!(Store.t, Mnemonix.key, fun)
-    :: Server.instruction
+    :: Store.Server.instruction
   @doc false
   @spec update!(Store.t, Mnemonix.key, fun)
-    :: Server.instruction
+    :: Store.Server.instruction
   def update!(store, key, fun) do
     with {:ok, store, current} <- store.impl.fetch(store, key) do
       case current do

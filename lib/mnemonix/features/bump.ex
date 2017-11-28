@@ -54,8 +54,9 @@ defmodule Mnemonix.Features.Bump do
   @spec bump(Mnemonix.store, Mnemonix.key, amount :: term)
     :: result | no_return
   def bump(store, key, amount) do
-    with {:raise, type, args} <- GenServer.call(store, {:bump, key, amount}) do
-      raise type, args
+    case GenServer.call(store, {:bump, key, amount}) do
+      :ok                  -> :ok
+      {:raise, type, args} -> raise type, args
     end
   end
 
@@ -94,8 +95,9 @@ defmodule Mnemonix.Features.Bump do
   @spec bump!(Mnemonix.store, Mnemonix.key, amount :: term)
     :: :ok | no_return
   def bump!(store, key, amount) do
-    with {:raise, type, args} <- GenServer.call(store, {:bump!, key, amount}) do
-      raise type, args
+    case GenServer.call(store, {:bump!, key, amount}) do
+      :ok                  -> :ok
+      {:raise, type, args} -> raise type, args
     end
   end
 

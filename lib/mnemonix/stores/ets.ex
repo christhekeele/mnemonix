@@ -144,14 +144,14 @@ defmodule Mnemonix.Stores.ETS do
   """
   @impl Store.Behaviours.Enumerable
   @spec enumerable?(Store.t)
-    :: {:ok, Store.t, boolean} | Store.Server.exception
+    :: Store.Server.instruction(boolean)
   def enumerable?(store) do
     {:ok, store, true}
   end
 
   @impl Store.Behaviours.Enumerable
   @spec to_enumerable(Store.t)
-    :: {:ok, Store.t, Enumerable.t} | Store.Server.exception
+    :: Store.Server.instruction([Mnemonix.pair])
   def to_enumerable(store = %Store{state: table}) do
     {:ok, store, :ets.tab2list(table)}
   end

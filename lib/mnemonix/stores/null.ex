@@ -75,7 +75,7 @@ defmodule Mnemonix.Stores.Null do
 
   @impl Store.Behaviours.Enumerable
   @spec to_enumerable(Store.t)
-    :: Store.Server.instruction(Enumerable.t)
+    :: Store.Server.instruction([Mnemonix.pair])
   def to_enumerable(store = %Store{}) do
     {:ok, store, []}
   end
