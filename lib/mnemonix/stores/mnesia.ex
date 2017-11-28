@@ -77,10 +77,10 @@ defmodule Mnemonix.Stores.Mnesia do
 
   @impl Store.Behaviours.Map
   @spec delete(Store.t, Mnemonix.key)
-    :: Store.Server.instruction(:ok)
+    :: Store.Server.instruction
   def delete(store = %Store{state: table}, key) do
     with :ok <- :mnesia.dirty_delete(table, key) do
-      {:ok, store, :ok}
+      {:ok, store}
     end
   end
 
@@ -96,11 +96,11 @@ defmodule Mnemonix.Stores.Mnesia do
   end
 
   @impl Store.Behaviours.Map
-  @spec put(Store.t, Mnemonix.key, Store.value)
-    :: Store.Server.instruction(:ok)
+  @spec put(Store.t, Mnemonix.key, Mnemonix.value)
+    :: Store.Server.instruction
   def put(store = %Store{state: table}, key, value) do
     with :ok <- :mnesia.dirty_write({table, key, value}) do
-      {:ok, store, :ok}
+      {:ok, store}
     end
   end
 

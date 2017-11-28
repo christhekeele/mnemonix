@@ -89,10 +89,11 @@ defmodule Mnemonix.Mixfile do
   ]
 
   defp dialyzer, do: [
+    ignore_warnings: ".dialyzer.ignore-warnings",
     plt_add_apps: [
       :mnesia,
       # :ecto,
-    ]
+    ],
   ]
 
 end

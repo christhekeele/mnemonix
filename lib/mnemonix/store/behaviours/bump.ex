@@ -1,8 +1,8 @@
 defmodule Mnemonix.Store.Behaviours.Bump do
   @moduledoc false
 
-  alias Mnemonix.Features.Bump
   alias Mnemonix.Store.Server
+  alias Mnemonix.Features.Bump
 
   use Mnemonix.Behaviour
 
@@ -19,7 +19,7 @@ defmodule Mnemonix.Store.Behaviours.Bump do
     with {:ok, store, result} <- do_bump(store, :increment, key, amount) do
       case result do
         :ok ->
-          {:ok, store, :ok}
+          {:ok, store}
         {:error, no_integer} ->
           {:ok, store, {:error, no_integer}}
       end
@@ -35,7 +35,7 @@ defmodule Mnemonix.Store.Behaviours.Bump do
     with {:ok, store, result} <- do_bump(store, :increment, key, amount) do
       case result do
         :ok ->
-          {:ok, store, :ok}
+          {:ok, store}
         {:error, no_integer} ->
           {:raise, store, ArithmeticError, [message: msg_for(no_integer, store.impl.deserialize_key(store, key))]}
       end
@@ -55,8 +55,8 @@ defmodule Mnemonix.Store.Behaviours.Bump do
   @spec increment(Mnemonix.Store.t, Mnemonix.key, amount :: term)
     :: Server.instruction
   def increment(store, key, amount) do
-    with {:ok, store, :ok} <- do_bump(store, :increment, key, amount) do
-      {:ok, store, :ok}
+    with {:ok, store} <- do_bump(store, :increment, key, amount) do
+      {:ok, store}
     end
   end
 
@@ -73,8 +73,8 @@ defmodule Mnemonix.Store.Behaviours.Bump do
   @spec decrement(Mnemonix.Store.t, Mnemonix.key, amount :: term)
     :: Server.instruction
   def decrement(store, key, amount) do
-    with {:ok, store, :ok} <- do_bump(store, :decrement, key, amount) do
-      {:ok, store, :ok}
+    with {:ok, store} <- do_bump(store, :decrement, key, amount) do
+      {:ok, store}
     end
   end
 
@@ -91,7 +91,7 @@ defmodule Mnemonix.Store.Behaviours.Bump do
         end
         {:ok, value} -> case do_bump_calculation(operation, store.impl.deserialize_value(store, value), amount) do
           {:ok, result} -> with {:ok, store} <- store.impl.put(store, key, store.impl.serialize_value(store, result)) do
-            {:ok, store, :ok}
+            {:ok, store}
           end
           {:error, no_integer} -> {:ok, store, {:error, no_integer}}
         end

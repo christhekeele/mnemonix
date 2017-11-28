@@ -15,6 +15,7 @@ if Code.ensure_loaded?(Redix) do
     """
 
     alias Mnemonix.Store
+    alias Mnemonix.Store.Server
 
     use Store.Behaviour
     use Store.Translator.Term
@@ -57,17 +58,17 @@ if Code.ensure_loaded?(Redix) do
 
     @impl Store.Behaviours.Map
     @spec delete(Store.t, Mnemonix.key)
-      :: Store.Server.instruction(:ok)
+      :: Server.instruction
     def delete(store = %Store{state: conn}, key) do
       case Redix.command(conn, ~w[DEL #{key}]) do
-        {:ok, 1}         -> {:ok, store, :ok}
+        {:ok, 1}         -> {:ok, store}
         {:error, reason} -> {:raise, store, Exception, [reason: reason]}
       end
     end
 
     @impl Store.Behaviours.Map
     @spec fetch(Store.t, Mnemonix.key)
-      :: Store.Server.instruction({:ok, Mnemonix.value} | :error)
+      :: Server.instruction({:ok, Mnemonix.value} | :error)
     def fetch(store = %Store{state: conn}, key) do
       case Redix.command(conn, ~w[GET #{key}]) do
         {:ok, nil}       -> {:ok, store, :error}
@@ -78,10 +79,10 @@ if Code.ensure_loaded?(Redix) do
 
     @impl Store.Behaviours.Map
     @spec put(Store.t, Mnemonix.key, Mnemonix.value)
-      :: Store.Server.instruction(:ok)
+      :: Server.instruction
     def put(store = %Store{state: conn}, key, value) do
       case Redix.command(conn, ~w[SET #{key} #{value}]) do
-        {:ok, "OK"}      -> {:ok, store, :ok}
+        {:ok, "OK"}      -> {:ok, store}
         {:error, reason} -> {:raise, store, Exception, [reason: reason]}
       end
     end
@@ -94,15 +95,15 @@ if Code.ensure_loaded?(Redix) do
     Returns `true`: this store supports the functions in `Mnemonix.Features.Enumerable`.
     """
     @impl Store.Behaviours.Enumerable
-    @spec enumerable?(Mnemonix.Store.t)
-      :: Store.Server.instruction(boolean)
+    @spec enumerable?(Store.t)
+      :: Server.instruction(boolean)
     def enumerable?(store = %Store{}) do
       {:ok, store, true}
     end
 
     @impl Store.Behaviours.Enumerable
-    @spec to_enumerable(Mnemonix.Store.t)
-      :: Store.Server.instruction(Enumerable.t)
+    @spec to_enumerable(Store.t)
+      :: Server.instruction(Enumerable.t)
     def to_enumerable(store = %Store{}) do
       to_list(store)
     end
@@ -110,7 +111,7 @@ if Code.ensure_loaded?(Redix) do
   # Overrides
 
     @impl Store.Behaviours.Enumerable
-    @spec keys(Mnemonix.Store.t)
+    @spec keys(Store.t)
       :: Server.instruction([Mnemonix.key])
     def keys(store = %Store{state: conn}) do
       case Redix.command(conn, ~w[KEYS *]) do
@@ -120,7 +121,7 @@ if Code.ensure_loaded?(Redix) do
     end
 
     @impl Store.Behaviours.Enumerable
-    @spec to_list(Mnemonix.Store.t)
+    @spec to_list(Store.t)
       :: Server.instruction([{Mnemonix.key, Mnemonix.value}])
     def to_list(store = %Store{}) do
       with {:ok, store = %Store{state: conn}, keys} <- keys(store) do
@@ -132,7 +133,7 @@ if Code.ensure_loaded?(Redix) do
     end
 
     @impl Store.Behaviours.Enumerable
-    @spec values(Mnemonix.Store.t)
+    @spec values(Store.t)
       :: Server.instruction([Mnemonix.key])
     def values(store = %Store{}) do
       with {:ok, store = %Store{state: conn}, keys} <- keys(store) do
@@ -148,7 +149,7 @@ if Code.ensure_loaded?(Redix) do
   ##
 
     @impl Store.Behaviours.Enumerable
-    @spec enumerable_count(Mnemonix.Store.t)
+    @spec enumerable_count(Store.t)
       :: Server.instruction(non_neg_integer)
     def enumerable_count(store = %Store{state: conn}) do
       case Redix.command(conn, ["DBSIZE"]) do

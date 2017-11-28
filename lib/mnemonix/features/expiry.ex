@@ -6,14 +6,14 @@ defmodule Mnemonix.Features.Expiry do
   """ && false
 
   #  #TODO
-  # use Mnemonix.Behaviour
-  # use Mnemonix.Singleton.Behaviour
-  #
-  # @typedoc """
-  # The number of milliseconds an entry will be allowed to be retreived.
-  # """
-  # @type ttl :: non_neg_integer | nil
-  #
+  use Mnemonix.Behaviour
+  use Mnemonix.Singleton.Behaviour
+
+  @typedoc """
+  The number of milliseconds an entry will be allowed to be retreived.
+  """
+  @type ttl :: non_neg_integer | nil
+
   # @callback expire(Mnemonix.store, Mnemonix.key)
   #   :: Mnemonix.store | no_return
   # @doc """

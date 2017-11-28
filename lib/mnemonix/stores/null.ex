@@ -40,9 +40,9 @@ defmodule Mnemonix.Stores.Null do
 
   @impl Store.Behaviours.Map
   @spec delete(Store.t, Mnemonix.key)
-    :: Store.Server.instruction(:ok)
+    :: Store.Server.instruction
   def delete(store = %Store{}, _key) do
-    {:ok, store, :ok}
+    {:ok, store}
   end
 
   @impl Store.Behaviours.Map
@@ -54,9 +54,9 @@ defmodule Mnemonix.Stores.Null do
 
   @impl Store.Behaviours.Map
   @spec put(Store.t, Mnemonix.key, Mnemonix.value)
-    :: Store.Server.instruction(:ok)
+    :: Store.Server.instruction
   def put(store = %Store{}, _key, _value) do
-    {:ok, store, :ok}
+    {:ok, store}
   end
 
 ####

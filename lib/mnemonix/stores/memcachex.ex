@@ -52,10 +52,10 @@ if Code.ensure_loaded?(Memcache) do
 
     @impl Store.Behaviours.Map
     @spec delete(Store.t, Mnemonix.key)
-      :: Store.Server.instruction(:ok)
+      :: Store.Server.instruction
     def delete(store = %Store{state: conn}, key) do
       case Memcache.delete(conn, key) do
-        {:ok}            -> {:ok, store, :ok}
+        {:ok}            -> {:ok, store}
         {:error, reason} -> {:raise, store, Exception, [reason: reason]}
       end
     end
@@ -73,10 +73,10 @@ if Code.ensure_loaded?(Memcache) do
 
     @impl Store.Behaviours.Map
     @spec put(Store.t, Mnemonix.key, Mnemonix.value)
-      :: Store.Server.instruction(:ok)
+      :: Store.Server.instruction
     def put(store = %Store{state: conn}, key, value) do
       case Memcache.set(conn, key, value) do
-        {:ok}            -> {:ok, store, :ok}
+        {:ok}            -> {:ok, store}
         {:error, reason} -> {:raise, store, Exception, [reason: reason]}
       end
     end

@@ -110,10 +110,10 @@ defmodule Mnemonix.Stores.ETS do
 
   @impl Store.Behaviours.Map
   @spec delete(Store.t, Mnemonix.key)
-    :: Store.Server.instruction(:ok)
+    :: Store.Server.instruction
   def delete(store = %Store{state: table}, key) do
     :ets.delete(table, key)
-    {:ok, store, :ok}
+    {:ok, store}
   end
 
   @impl Store.Behaviours.Map
@@ -129,10 +129,10 @@ defmodule Mnemonix.Stores.ETS do
 
   @impl Store.Behaviours.Map
   @spec put(Store.t, Mnemonix.key, Mnemonix.value)
-    :: Store.Server.instruction(:ok)
+    :: Store.Server.instruction
   def put(store = %Store{state: table}, key, value) do
     :ets.insert(table, {key, value})
-    {:ok, store, :ok}
+    {:ok, store}
   end
 
 ####

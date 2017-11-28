@@ -113,10 +113,18 @@ defmodule Mnemonix do
   @type spec :: {Mnemonix.Store.Behaviour.t, Mnemonix.Store.Server.options}
 
   @typedoc """
+  An instruction from a `Mnemonix.Store.Server` to return successfully in the client.
+  """
+  @type success :: :ok
+  @typedoc """
   An instruction from a `Mnemonix.Store.Server` to return given value successfully in the client.
   """
   @type success(value) :: {:ok, value}
 
+  @typedoc """
+  An instruction from a `Mnemonix.Store.Server` to emit a warning when returning in the client.
+  """
+  @type warning :: {:warn, message :: String.t}
   @typedoc """
   An instruction from a `Mnemonix.Store.Server` to emit a warning when returning given value in the client.
   """
