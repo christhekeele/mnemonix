@@ -64,8 +64,9 @@ if Code.ensure_loaded?(Plug) do
     end
 
     def put(_conn, sid, data, opts) when is_map data do
-      Mnemonix.put(Keyword.fetch!(opts, :mnemonix), sid, data)
-      sid
+      with :ok <- Mnemonix.put(Keyword.fetch!(opts, :mnemonix), sid, data) do
+        sid
+      end
     end
 
     def put(conn, sid, data, opts) do
@@ -77,8 +78,9 @@ if Code.ensure_loaded?(Plug) do
     def delete(conn, sid, opts)
 
     def delete(_conn, sid, opts) do
-      Mnemonix.delete(Keyword.fetch!(opts, :mnemonix), sid)
-      :ok
+      with :ok <- Mnemonix.delete(Keyword.fetch!(opts, :mnemonix), sid) do
+        :ok
+      end
     end
 
     defp make_sid() do

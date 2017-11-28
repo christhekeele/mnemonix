@@ -1,4 +1,6 @@
 language: elixir
+
+# MATRIX
 otp_release:
   - 20.1
   - 20.0
@@ -18,6 +20,8 @@ branches:
   only:
     - master
     - development
+
+# TESTS
 env:
   global:
     - MIX_ENV=test
@@ -27,25 +31,37 @@ install:
   - mix local.rebar --force
   - mix local.hex --force
   - mix deps.get
-  - mix clean
-  - mix compile
 script: mix coveralls
+
+# VARIANTS
 stages:
   - name: checks
   - name: test
+  - name: other operating systems
 jobs:
   include:
     - stage: checks
     - script: mix credo list
-    - script: mix dialyzer --halt-exit-status
+    - script: mix dialyzer --check=false
     - script: mix inch.report
+    
     - stage: test
+    
+    - stage: other operating systems
+    - os:
+      - osx
+      # - windows
+    
+
+# DEPENDENCIES
 services:
   - redis-server
   - memcached
   - elasticsearch
+
+# OPTIMIZATIONS
 cache:
   directories:
-    - "/home/travis/.rvm/"
-    - _build
     - deps
+    - "/home/travis/.rvm"
+    - "/home/travis/.cache"
