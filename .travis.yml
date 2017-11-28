@@ -1,19 +1,19 @@
 language: elixir
 otp_release:
-  - 18.0
-  # - 18.1
-  # - 18.2
-  - 18.3
-  - 19.0
-  # - 19.1
-  - 19.2
-  - 20.0
   - 20.1
+  - 20.0
+  - 19.2
+    # - 19.1
+  - 19.0
+  - 18.3
+  # - 18.2
+  # - 18.1
+  - 18.0
 elixir:
-  - 1.5.0
-  # - 1.5.1
-  - 1.5.2
   # - 1.6.0
+  - 1.5.2
+  # - 1.5.1
+  - 1.5.0
 branches:
   only:
     - master
@@ -21,20 +21,38 @@ branches:
 env:
   global:
     - MIX_ENV=test
-    - PULL_REQUEST_ID=$TRAVIS_PULL_REQUEST
     - DOCTESTS=true
     - ALL_BACKENDS=true
-before_script:
-  - rvm install ruby-2.3.1
-  - gem install pronto-credo
-  - mix clean
-script:
-  - if [ $PULL_REQUEST_ID != false && -z "$GITHUB_ACCESS_TOKEN" ]; then pronto run -f github_pr github_status; fi
-  - mix coveralls.travis
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then mix dialyzer --halt-exit-status; fi
-after_script:
+    - GITHUB_ACCESS=$GITHUB_ACCESS_TOKEN
+install:
+  - mix local.rebar --force
+  - mix local.hex --force
   - mix deps.get
-  - mix inch.report
+  - mix clean
+  - mix compile
+stages:
+  - name: test
+  - name: docs
+  - name: style
+  - if: (type = pull_request OR branch = master) AND env(GITHUB_ACCESS) IS present
+  - name: types
+  - if: type != pull_request
+jobs:
+  include:
+    - stage: test
+    - script:
+      - mix coveralls
+    - stage: docs
+    - script:
+      - mix inch.report
+    - stage: style
+    - script:
+      - rvm install ruby-2.3.1
+      - gem install pronto-credo
+      - pronto run -f github_status github_pr_review
+    - stage: types
+    - script:
+      - mix dialyzer --halt-exit-status
 services:
   - redis-server
   - memcached
