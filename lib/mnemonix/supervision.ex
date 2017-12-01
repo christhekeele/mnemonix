@@ -1,5 +1,14 @@
 defmodule Mnemonix.Supervision do
-  @moduledoc false
+  @moduledoc """
+  Functions to start a store server.
+
+  Using this module will define `start_link` functions that allow your module to offer an API for
+  booting up a `Mnemonix.Store.Server`.
+
+  Providing a `:default` option will allow you to override the configuration described in
+  `Mnemonix.Application.default/0` with your own defaults that are used to expand the arguments given
+  to `start_link/0` and `start_link/1` into a fully-specified `start_link/2` call.
+  """
 
   defmacro __using__(opts \\ []) do
     {singleton, opts} = Mnemonix.Singleton.Behaviour.establish_singleton(__CALLER__.module, opts)
@@ -8,25 +17,29 @@ defmodule Mnemonix.Supervision do
     quote location: :keep do
       alias Mnemonix.Store
 
+      @doc false
+      def defaults do
+        case Keyword.get(unquote(opts), :default, Mnemonix.Application.default()) do
+          impl when is_atom(impl) -> {impl, Mnemonix.Application.default(:opts)}
+          opts when is_list(opts) -> {Mnemonix.Application.default(:impl), opts}
+          {impl, opts}            -> {impl, opts}
+        end
+      end
+
       @doc """
       Starts a new store using the default store implementation and options.
 
-      See `start_link/2` for more control.
+      The returned `t:GenServer.server/0` reference can be used in the `Mnemonix` API.
       """
       @spec start_link
         :: GenServer.on_start
       def start_link do
-        {impl, options} = Mnemonix.Application.default
-        start_link impl, options
+        {implementation, options} = defaults()
+        start_link implementation, options
       end
 
       @doc """
       Starts a new store using the default store implementation and provided `options`.
-
-      Checks under `config :mnemonix, implementation, [options]` for options:
-      see `start_link/2` for a summary of the options you can set there.
-
-      The returned `t:GenServer.server/0` reference can be used in the `Mnemonix` API.
 
       ## Examples
 
@@ -38,15 +51,12 @@ defmodule Mnemonix.Supervision do
       @spec start_link(Store.Server.options)
         :: GenServer.on_start
       def start_link(options) when is_list(options) do
-        {impl, default_options} = Mnemonix.Application.default
-        start_link impl, Keyword.merge(default_options, options)
+        {implementation, default_options} = defaults()
+        start_link implementation, Keyword.merge(default_options, options)
       end
 
       @doc """
       Starts a new store using the provided store `implementation` and default options.
-
-      Checks under `config :mnemonix, implementation, [options]` for options:
-      see `start_link/2` for a summary of the options you can set there.
 
       The returned `t:GenServer.server/0` reference can be used in the `Mnemonix` API.
 
@@ -59,30 +69,13 @@ defmodule Mnemonix.Supervision do
       """
       @spec start_link(Store.Behaviour.t)
         :: GenServer.on_start
-      def start_link(impl) do
-        {_impl, default_options} = Mnemonix.Application.default
-        start_link impl, default_options
+      def start_link(implementation) do
+        {_implementation, default_options} = defaults()
+        start_link implementation, default_options
       end
 
       @doc """
       Starts a new store using the provided store `implementation` and `options`.
-
-      Available `options` are:
-
-      - `:store`
-
-        Options to be given to the store on setup. Study the store `implementation` for more information.
-
-      - `:server`
-
-        A keyword list of options to be given to `GenServer.start_link/3`.
-
-      - `:otp_app`
-
-        Fetches more options for the above from `config otp_app, implementation, [options]`, and merges them together.
-        If no `otp_app` is specified, will check under `config :mnemonix, implementation, [options]` for default
-        options. Options supplied directly to this function always take precedence over any found in
-        your configuration.
 
       The returned `t:GenServer.server/0` reference can be used in the `Mnemonix` API.
 
@@ -95,8 +88,8 @@ defmodule Mnemonix.Supervision do
       """
       @spec start_link(Store.Behaviour.t, Store.Server.options)
         :: GenServer.on_start
-      def start_link(impl, options) do
-        impl.start_link(Keyword.put_new(options, :name, unquote(store)))
+      def start_link(implementation, options) do
+        implementation.start_link(Keyword.put_new(options, :name, unquote(store)))
       end
 
     end

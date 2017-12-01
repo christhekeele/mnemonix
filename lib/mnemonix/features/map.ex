@@ -2,8 +2,9 @@ defmodule Mnemonix.Features.Map do
   @moduledoc """
   Functions to operate on key/value pairs within a store.
 
-  All of these functions are available on the main `Mnemonix` module.
-  """ && false
+  Using this feature will define all of its Mnemonix client API functions on your module.
+  Refer to `Mnemonix.Builder` for documentation on options you can use when doing so.
+  """
 
   use Mnemonix.Behaviour
   use Mnemonix.Singleton.Behaviour

@@ -2,13 +2,15 @@ defmodule Mnemonix.Features.Enumerable do
   @moduledoc """
   Functions that rely on enumerating over all key/value pairs within a store.
 
-  All of these functions are available on the main `Mnemonix` module. However, not all stores
-  support exhaustive iteration. Consult your store's docs for more information.
+  Not all stores support exhaustive iteration. Consult your store's docs for more information.
 
   Stores that do not support enumeration will raise a `Mnemonix.Features.Enumerable.Error`
   when these functions are called. You can validate that a store is enumerable before you
   invoke enumerable functions via `enumerable?/1`.
-  """ && false
+
+  Using this feature will define all of its Mnemonix client API functions on your module.
+  Refer to `Mnemonix.Builder` for documentation on options you can use when doing so.
+  """
 
   use Mnemonix.Behaviour
   use Mnemonix.Singleton.Behaviour

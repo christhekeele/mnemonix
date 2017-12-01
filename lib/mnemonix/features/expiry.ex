@@ -2,8 +2,9 @@ defmodule Mnemonix.Features.Expiry do
   @moduledoc """
   Functions to manage the time-to-live of entries within a store.
 
-  All of these functions are available on the main `Mnemonix` module.
-  """ && false
+  Using this feature will define all of its Mnemonix client API functions on your module.
+  Refer to `Mnemonix.Builder` for documentation on options you can use when doing so.
+  """
 
   #  #TODO
   use Mnemonix.Behaviour

@@ -2,8 +2,9 @@ defmodule Mnemonix.Features.Bump do
   @moduledoc """
   Functions to increment/decrement integer values within a store.
 
-  All of these functions are available on the main `Mnemonix` module.
-  """ && false
+  Using this feature will define all of its Mnemonix client API functions on your module.
+  Refer to `Mnemonix.Builder` for documentation on options you can use when doing so.
+  """
 
   use Mnemonix.Behaviour
   use Mnemonix.Singleton.Behaviour

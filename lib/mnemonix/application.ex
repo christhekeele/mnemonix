@@ -8,18 +8,16 @@ defmodule Mnemonix.Application do
 
   For all stores so listed, it will check for store-specific configuration:
 
-      config :mnemonix, :foo, {Memonix.ETS.Store, [
-        store: [table: :my_ets_table],
-        server: []
-      ]}
+      config :mnemonix, :foo, {Memonix.ETS.Store, table: :my_ets_table, name: :my_ets}
 
-  If no configuration is found for a named store, it will use a default configuration
-  of `{Mnemonix.Stores.Map, []}`.
+  If no configuration is found for a named store, it will use the default configuration specified
+  in `default/0`.
 
-  The name of the store in your config will be the reference you pass to `Mnemonix`
-  to interact with it.
-  Given the config above, `:foo` would refer to an ETS-backed store,
-  and `:bar` to a default Map-backed store,
+  The name of the store in your config will be the reference you pass to `Mnemonix` to interact with it.
+  This can be overriden by providing a `:name` in the options.
+
+  Given the config above, `:foo` would refer to a default Map-backed store,
+  and `:bar` to an ETS-backed store named `:my_ets` that uses a table named `:my_ets_table`,
   both available to you at boot time without writing a line of code:
 
       Application.ensure_started(:mnemonix)
@@ -28,19 +26,14 @@ defmodule Mnemonix.Application do
       Mnemonix.get(:foo, :a)
       #=> :b
 
-      Mnemonix.put(:bar, :a, :b)
-      Mnemonix.get(:bar, :a)
+      Mnemonix.put(:my_ets, :a, :b)
+      Mnemonix.get(:my_ets, :a)
       #=> :b
   """
 
   use Application
 
-  @typedoc """
-  Default options used by `Mnemonix.start/2` to start stores with no specified config.
-
-  The default options are `[{Mnemonix.Stores.Map, []}]`.
-  """
-  @type options :: [{Mnemonix.Store.Behaviour.t, Mnemonix.Store.Server.options}]
+  @type config :: {Mnemonix.Store.Behaviour.t, Mnemonix.Store.Server.options}
 
   @doc """
   Starts the `:mnemonix` application.
@@ -50,15 +43,16 @@ defmodule Mnemonix.Application do
   Reads from the `:mnemonix` application `:stores` configuration to detect stores to automatically supervise.
 
   If a store listed in the configuration has its own entry under the `:mnemonix` application configuration,
-  that entry will be used to configure the store.
+  that entry will be used to configure the store. If no configuration is provided, uses the `default` options
+  documented in `default/0`.
 
   ### Examples
 
       config :mnemonix, stores: [Foo, Bar]
-      config :mnemonix, Bar: {Mnemonix.Stores.ETS, server: [name: Baz]}
+      config :mnemonix, Bar: {Mnemonix.Stores.ETS, table: Baz}
   """
   @impl Application
-  @spec start(Application.start_type, Mnemonix.Application.options)
+  @spec start(Application.start_type, [Mnemonix.Application.config])
     :: {:ok, pid} | {:error, reason :: term}
   def start(_type, [default]) do
     :mnemonix
@@ -76,15 +70,20 @@ defmodule Mnemonix.Application do
   end
 
   @doc """
-  The default Mnemonix.Application options defined in the project's `mix.exs`.
+  The default Mnemonix store configuration defined in the project's `mix.exs`.
 
   This is the configuration used for stores named in `config :mnemonix, :stores`
   without corresponding configuration under `config :mnemonix, <name>`.
   """
+  @spec default :: config
   def default, do: :mnemonix
     |> Application.spec
     |> Keyword.get(:mod)
     |> elem(1)
     |> List.first
+
+  @doc false
+  def default(:impl), do: default() |> elem(0)
+  def default(:opts), do: default() |> elem(1)
 
 end

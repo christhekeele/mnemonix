@@ -16,6 +16,11 @@ elixir:
   - 1.5.2
   # - 1.5.1
   - 1.5.0
+- os:
+  - linux
+  - osx
+  # - windows
+  
 branches:
   only:
     - master
@@ -38,7 +43,6 @@ script: mix coveralls
 stages:
   - name: checks
   - name: test
-  - name: other operating systems
 jobs:
   include:
     - stage: checks
@@ -47,12 +51,6 @@ jobs:
     - script: mix inch.report
     
     - stage: test
-    
-    - stage: other operating systems
-    - os:
-      - osx
-      # - windows
-    
 
 # DEPENDENCIES
 services:

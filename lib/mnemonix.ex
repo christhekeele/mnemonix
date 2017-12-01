@@ -5,13 +5,6 @@ defmodule Mnemonix do
   Rather than a map, use the `t:GenServer.server/0` reference returned
   by a store's `start_link/2` to perform operations on them.
 
-  All functions defined in the `Mnemonix.Features` modules are available on the `Mnemonix` module:
-
-  - `Mnemonix.Features.Map`
-  - `Mnemonix.Features.Bump`
-  - `Mnemonix.Features.Expiry`
-  - `Mnemonix.Features.Enumerable`
-
   ## Map Features
 
   `Mnemonix.Features.Map` lets you manipulate a store just like a `Map`.
@@ -62,15 +55,14 @@ defmodule Mnemonix do
       iex> Mnemonix.get(store, :fizz)
       1
 
-  ## Expiry Features
-   #TODO
-  # `Mnemonix.Features.Expiry` lets you set entries to expire after a given time-to-live on any store.
-  #
-  #     iex> store = Mnemonix.new(fizz: 1)
-  #     iex> Mnemonix.expire(store, :fizz, 100)
-  #     iex> :timer.sleep(1000)
-  #     iex> Mnemonix.get(store, :fizz)
-  #     nil
+  / # Expiry Features
+  / `Mnemonix.Features.Expiry` lets you set entries to expire after a given time-to-live on any store.
+  /
+  / iex> store = Mnemonix.new(fizz: 1)
+  / iex> Mnemonix.expire(store, :fizz, 100)
+  / iex> :timer.sleep(1000)
+  / iex> Mnemonix.get(store, :fizz)
+  / nil
 
   ## Enumerable Features
 

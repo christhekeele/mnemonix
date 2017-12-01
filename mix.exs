@@ -57,7 +57,7 @@ defmodule Mnemonix.Mixfile do
       "LICENSE.md",
     ],
     groups_for_modules: [
-      # Features: ~r<Mnemonix.Features>,
+      Functions: [Mnemonix.Builder, Mnemonix.Supervision, ~r<Mnemonix.Features>],
       Integrations: [Plug.Session.MNEMONIX],
       # Supervision: [Mnemonix.Application, Mnemonix.Supervisor],
       Stores: ~r<Mnemonix.Stores>,
@@ -81,7 +81,7 @@ defmodule Mnemonix.Mixfile do
   ]
 
   defp aliases, do: [
-    default: ~w[test dialyzer coveralls.html docs],
+    status: ~w[test dialyzer coveralls.html docs],
   ]
 
   defp coverage, do: [

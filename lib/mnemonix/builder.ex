@@ -2,21 +2,44 @@ defmodule Mnemonix.Builder do
   @moduledoc """
   Creates functions that proxy to Mnemonix ones.
 
-  `use Mnemonix.Builder` to add all `Mnemonix.Feature` functions to a module:
+  `use Mnemonix.Builder` to instrument a module with the `Mnemonix` client API.
+  It will define the `Mnemonix.Supervision` functions and all `Mnemonix.Feature` functions on the module:
 
-      iex> defmodule My.Store do
+  - `Mnemonix.Features.Map`
+  - `Mnemonix.Features.Bump`
+  - `Mnemonix.Features.Expiry`
+  - `Mnemonix.Features.Enumerable`
+
+  This allows you to define a custom Mnemonix client API:
+
+      iex> defmodule My.Store.API do
       ...>   use Mnemonix.Builder
       ...> end
-      iex> {:ok, store} = My.Store.start_link
-      iex> My.Store.get(store, :a)
+      iex> {:ok, store} = My.Store.API.start_link
+      iex> My.Store.API.get(store, :a)
       nil
-      iex> My.Store.put(store, :a, 1)
-      iex> My.Store.get(store, :a)
+      iex> My.Store.API.put(store, :a, 1)
+      iex> My.Store.API.get(store, :a)
       1
 
-  You can pass in the `:singleton` option to create a module that uses its own name
-  as a store reference, omitting the need for the first argument to all
-  `Mnemonix.Feature` functions:
+  If you want to create a Mnemonix client API with access to only a subset of Mnemonix features, simply
+  use those modules as you would the `Mnemonix.Builder` itself.
+
+  #### Documentation
+
+  By default, the builder will include the `@doc` for each function.
+  To disable this and leave the functions undocumented, provide `docs: false` when using.
+
+  #### Inlining
+
+  Additionally, all functions are defined as simple delegates to their source module.
+  If you would rather have their implementations inlined into your module for a small performance boost at the cost
+  of longer compile times, provide the `inline: true` option when using.
+
+  #### Singletons
+
+  You can pass in the `singleton: true` option to have your module use its own name
+  as a store reference, omitting the need for the first argument to all `Mnemonix.Feature` functions:
 
       iex> defmodule My.Singleton do
       ...>   use Mnemonix.Builder, singleton: true
@@ -42,12 +65,14 @@ defmodule Mnemonix.Builder do
       iex> My.Other.Singleton.get(:a)
       1
 
-    Singletons use their own names as references names to work.
+    Singletons use their own module names as references names to work.
     You can change the name used when defining the singleton:
 
       iex> defmodule My.Singleton.Interface do
       ...>   use Mnemonix.Builder, singleton: :store
       ...> end
+      iex> My.Singleton.Interface.singleton
+      :store
       iex> My.Singleton.Interface.start_link
       iex> My.Singleton.Interface.get(:a)
       nil
@@ -60,9 +85,15 @@ defmodule Mnemonix.Builder do
 
   defmacro __using__(opts) do
     {singleton, opts} = Mnemonix.Singleton.Behaviour.establish_singleton(__CALLER__.module, opts)
+    store = if singleton, do: Mnemonix.Singleton.Behaviour.determine_singleton(__CALLER__.module, Keyword.get(opts, :singleton))
+
     if singleton do
       quote location: :keep do
-        def singleton, do: unquote(singleton)
+        @doc """
+        Retreives the name of the GenServer that this singleton makes calls to.
+        """
+        def singleton, do: unquote(store)
+
         use Mnemonix.Supervision, unquote(opts)
 
         use Mnemonix.Features.Map.Singleton, unquote(opts)
