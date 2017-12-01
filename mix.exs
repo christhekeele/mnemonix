@@ -53,8 +53,11 @@ defmodule Mnemonix.Mixfile do
   defp docs, do: [
     main: "Mnemonix",
     extras: [
-      "CREDITS.md",
+      "README.md",
       "LICENSE.md",
+      "CREDITS.md",
+      "CONTRIBUTING.md",
+      "CODE_OF_CONDUCT.md",
     ],
     groups_for_modules: [
       Functions: [Mnemonix.Builder, Mnemonix.Supervision, ~r<Mnemonix.Features>],
@@ -81,7 +84,7 @@ defmodule Mnemonix.Mixfile do
   ]
 
   defp aliases, do: [
-    status: ~w[test dialyzer coveralls.html docs],
+    all: ~w[deps.get coveralls.html dialyzer docs inch],
   ]
 
   defp coverage, do: [

@@ -69,20 +69,23 @@ defmodule Mnemonix.Application do
   end
 
   @doc """
-  The default Mnemonix store specification defined in the project's `mix.exs`.
+  Convenience function to access the default `Mnemonix` store specification defined in its `mix.exs`.
 
-  This is the configuration used for stores named in `config :mnemonix, :stores`
-  without corresponding configuration under `config :mnemonix, <name>`.
+  This is the specification used for stores named in `config :mnemonix, :stores`
+  without corresponding configuration under `config :mnemonix, <store_name>`.
   """
-  @spec default :: Mnemonix.spec
-  def default, do: :mnemonix
+  @spec specification :: Mnemonix.spec
+  def specification, do: :mnemonix
     |> Application.spec
     |> Keyword.get(:mod)
     |> elem(1)
     |> List.first
 
-  @doc false
-  def default(:impl), do: default() |> elem(0)
-  def default(:opts), do: default() |> elem(1)
+  @doc """
+  Convenience function to access the current hex version of the `Mnemonix` application.
+  """
+  def version do
+    with {:ok, version} = :application.get_key(:mnemonix, :vsn), do: version
+  end
 
 end

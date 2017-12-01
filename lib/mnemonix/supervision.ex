@@ -19,9 +19,10 @@ defmodule Mnemonix.Supervision do
 
       @doc false
       def defaults do
-        case Keyword.get(unquote(opts), :default, Mnemonix.Application.default()) do
-          impl when is_atom(impl) -> {impl, Mnemonix.Application.default(:opts)}
-          opts when is_list(opts) -> {Mnemonix.Application.default(:impl), opts}
+        {default_impl, default_opts} = Mnemonix.Application.specification()
+        case Keyword.get(unquote(opts), :default, Mnemonix.Application.specification()) do
+          impl when is_atom(impl) -> {impl, default_impl}
+          opts when is_list(opts) -> {default_opts, opts}
           {impl, opts}            -> {impl, opts}
         end
       end

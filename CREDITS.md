@@ -13,7 +13,7 @@ Thanks for taking the time to work on Mnemonix!
 Moneta
 ------
 
-All glory to the authors of [`moneta`](https://github.com/minad/moneta), the inspiration for this project, particularly:
+All glory to the authors of [`moneta`](https://github.com/minad/moneta), the inspiration for this project, especially:
 
 - [​wycats](https://github.com/​wycats)
 - [minad](https://github.com/minad)
