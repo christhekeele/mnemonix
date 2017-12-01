@@ -16,7 +16,7 @@ elixir:
   - 1.5.2
   # - 1.5.1
   - 1.5.0
-- os:
+os:
   - linux
   - osx
   # - windows
@@ -36,7 +36,6 @@ install:
   - mix local.rebar --force
   - mix local.hex --force
   - mix deps.get
-  - travis_wait mix dialyzer --check=false
 script: mix coveralls
 
 # VARIANTS
@@ -47,7 +46,7 @@ jobs:
   include:
     - stage: checks
     - script: mix credo list
-    - script: mix dialyzer
+    - script: travis_wait mix dialyzer --check=false
     - script: mix inch.report
     
     - stage: test

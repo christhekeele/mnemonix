@@ -1,7 +1,7 @@
 if Code.ensure_loaded?(Plug) do
   defmodule Plug.Session.MNEMONIX do
     @moduledoc """
-    Stores the session in a store.
+    Stores the session in a Mnemonix store.
 
     This store does not create the Mnemonix store; it expects that a reference
     to an existing store server is passed in as an argument.
@@ -9,8 +9,16 @@ if Code.ensure_loaded?(Plug) do
     We recommend carefully choosing the store type for production usage.
     Consider: persistence, cleanup, and cross-node availability (or lack thereof).
 
+    The session id is used as a key to reference the session within the store;
+    the session itself is encoded as the two-tuple:
+
+        {timestamp :: :erlang.timestamp, session :: map}
+
+    The timestamp is updated whenever there is a read or write to the table,
+    and may be used to detect if a session is still active.
+
     ## Options
-      * `:store` - `t:Mnemonix.store/0` reference (required)
+      * `:mnemonix` - `t:GenServer.name/0` reference (required)
 
     ## Examples
 
@@ -35,56 +43,55 @@ if Code.ensure_loaded?(Plug) do
     @sid_bytes 96
 
     @spec init(Plug.opts)
-      :: Plug.opts | no_return
+      :: GenServer.name | no_return
     def init(opts) do
-      if Keyword.has_key?(opts, :mnemonix) do
-        opts
-      else
-        raise Exception, message: "Mnemonix session plug must be given a `:mnemonix` reference in options"
-      end
+      Keyword.fetch!(opts, :mnemonix)
     end
 
-    @spec get(Plug.Conn.t, Store.cookie, Plug.opts)
+    @spec get(Plug.Conn.t, Store.cookie, GenServer.name)
       :: {Store.sid, Store.session}
-    def get(conn, cookie, store)
-
-    def get(_conn, sid, opts) do
-      case Mnemonix.fetch(Keyword.fetch!(opts, :mnemonix), sid) do
-        {:ok, data} -> {sid, data}
-        :error      -> {nil, %{}}
+    def get(conn, cookie, store) do
+      with {:ok, {_ts, data}} <- Mnemonix.fetch(store, cookie) do
+        {put(conn, cookie, data, store), data}
+      else :error ->
+        {nil, %{}}
       end
     end
 
-    @spec put(Plug.Conn.t, Store.sid, any, Plug.opts)
+    @spec put(Plug.Conn.t, Store.sid, any, GenServer.name)
       :: Store.cookie
-    def put(conn, sid, data, opts)
+    def put(conn, sid, data, store)
 
-    def put(conn, nil, data, opts) do
-      put conn, make_sid(), data, opts
+    def put(conn, nil, data, store) do
+      put conn, make_sid(), data, store
     end
 
-    def put(_conn, sid, data, opts) when is_map data do
-      with :ok <- Mnemonix.put(Keyword.fetch!(opts, :mnemonix), sid, data) do
+    def put(_conn, sid, data, store) when is_map data do
+      with ^store <- Mnemonix.put(store, sid, {timestamp(), data}) do
         sid
       end
     end
 
-    def put(conn, sid, data, opts) do
-      put conn, sid, Enum.into(data, %{}), opts
+    def put(conn, sid, data, store) do
+      put conn, sid, Enum.into(data, %{}), store
     end
 
-    @spec delete(Plug.Conn.t, Store.sid, Plug.opts)
+    @spec delete(Plug.Conn.t, Store.sid, GenServer.name)
       :: :ok
-    def delete(conn, sid, opts)
+    def delete(conn, sid, store)
 
-    def delete(_conn, sid, opts) do
-      with :ok <- Mnemonix.delete(Keyword.fetch!(opts, :mnemonix), sid) do
+    def delete(_conn, sid, store) do
+      with ^store <- Mnemonix.delete(store, sid) do
         :ok
       end
     end
 
-    defp make_sid() do
+    defp make_sid do
       @sid_bytes |> :crypto.strong_rand_bytes |> Base.encode64
+    end
+
+    defp timestamp() do
+      :os.timestamp()
     end
 
   end

@@ -33,18 +33,17 @@ defmodule Mnemonix.Application do
 
   use Application
 
-  @type config :: {Mnemonix.Store.Behaviour.t, Mnemonix.Store.Server.options}
-
   @doc """
   Starts the `:mnemonix` application.
 
   Finds stores in your application configuration and brings them up when your app starts.
 
-  Reads from the `:mnemonix` application `:stores` configuration to detect stores to automatically supervise.
+  Reads from the `:mnemonix` application's `:stores` configuration
+  to detect store specifications to automatically supervise.
 
-  If a store listed in the configuration has its own entry under the `:mnemonix` application configuration,
-  that entry will be used to configure the store. If no configuration is provided, uses the `default` options
-  documented in `default/0`.
+  If a store named in the configuration has its own entry under the `:mnemonix` application configuration,
+  that specification will be used to configure the store. If no specification is provided, Mnemonix will use
+  the `default` specification documented in `default/0`.
 
   ### Examples
 
@@ -52,7 +51,7 @@ defmodule Mnemonix.Application do
       config :mnemonix, Bar: {Mnemonix.Stores.ETS, table: Baz}
   """
   @impl Application
-  @spec start(Application.start_type, [Mnemonix.Application.config])
+  @spec start(Application.start_type, [Mnemonix.spec])
     :: {:ok, pid} | {:error, reason :: term}
   def start(_type, [default]) do
     :mnemonix
@@ -70,12 +69,12 @@ defmodule Mnemonix.Application do
   end
 
   @doc """
-  The default Mnemonix store configuration defined in the project's `mix.exs`.
+  The default Mnemonix store specification defined in the project's `mix.exs`.
 
   This is the configuration used for stores named in `config :mnemonix, :stores`
   without corresponding configuration under `config :mnemonix, <name>`.
   """
-  @spec default :: config
+  @spec default :: Mnemonix.spec
   def default, do: :mnemonix
     |> Application.spec
     |> Keyword.get(:mod)

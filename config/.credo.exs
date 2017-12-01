@@ -1,12 +1,11 @@
-# Custom checks can be created using `mix credo.gen.check`.
-
 %{
   configs: [
     %{
       name: "default",
       files: %{
-        included: ["lib/", "src/", "web/", "apps/"],
-        excluded: [~r"/_build/", ~r"/deps/"]
+        # included: ["lib/", "src/", "web/", "apps/"],
+        included: ["bench/", "lib/", "test/"],
+        excluded: [~r"/_build/", ~r"/deps/"],
       },
       #
       # If you create your own checks, you must specify the source files for
@@ -41,6 +40,7 @@
 
         {Credo.Check.Readability.FunctionNames},
         {Credo.Check.Readability.LargeNumbers},
+        # {Credo.Check.Readability.MaxLineLength},
         {Credo.Check.Readability.MaxLineLength, priority: :low,  max_length: 100},
         {Credo.Check.Readability.MaxLineLength, priority: :high, max_length: 120},
         {Credo.Check.Readability.MaxLineLength, priority: :high, max_length: 140, exit_status: 0},
