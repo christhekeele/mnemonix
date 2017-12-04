@@ -1,5 +1,6 @@
 # Libraries should never include
 mix.lock
+.exenv-version
 
 # Ignore compile artifacts
 /_build

@@ -917,15 +917,18 @@ defmodule Mnemonix.Store.Server do
   defp serialize_keys(store = %Store{}, keys), do: Enum.map(keys, &serialize_key(store, &1))
   defp deserialize_keys(store = %Store{}, keys), do: Enum.map(keys, &deserialize_key(store, &1))
 
-  # defp serialize_values(store = %Store{}, values),   do: Enum.map(values, &(serialize_value(store, &1)))
+  # defp serialize_values(store = %Store{}, values),
+  #   do: Enum.map(values, &(serialize_value(store, &1)))
   defp deserialize_values(store = %Store{}, values),
     do: Enum.map(values, &deserialize_value(store, &1))
 
-  # defp serialize_pair(store = %Store{}, {key, value}),   do: {serialize_key(store, key), serialize_value(store, value)}
+  # defp serialize_pair(store = %Store{}, {key, value}),
+  #   do: {serialize_key(store, key), serialize_value(store, value)}
   defp deserialize_pair(store = %Store{}, {key, value}),
     do: {deserialize_key(store, key), deserialize_value(store, value)}
 
-  # defp serialize_pairs(store = %Store{}, pairs),     do: Enum.map(pairs, &(serialize_pair(store, &1)))
+  # defp serialize_pairs(store = %Store{}, pairs),
+  #   do: Enum.map(pairs, &(serialize_pair(store, &1)))
   defp deserialize_pairs(store = %Store{}, pairs),
     do: Enum.map(pairs, &deserialize_pair(store, &1))
 

@@ -4,7 +4,7 @@ defmodule Mnemonix.Features.Enumerable do
 
   Not all stores support exhaustive iteration. Consult your store's docs for more information.
 
-  Stores that do not support enumeration will raise a `Mnemonix.Features.Enumerable.Error`
+  Stores that do not support enumeration will raise a `Mnemonix.Features.Enumerable.Exception`
   when these functions are called. You can validate that a store is enumerable before you
   invoke enumerable functions via `enumerable?/1`.
 
@@ -15,7 +15,7 @@ defmodule Mnemonix.Features.Enumerable do
   use Mnemonix.Behaviour
   use Mnemonix.Singleton.Behaviour
 
-  defmodule Error do
+  defmodule Exception do
     defexception [:message]
 
     def exception(args) do
@@ -30,7 +30,7 @@ defmodule Mnemonix.Features.Enumerable do
   @doc """
   Returns `true` if the `store` is enumerable.
 
-  Stores that return `false` will raise a `Mnemonix.Features.Enumerable.Error` for other functions
+  Stores that return `false` will raise a `Mnemonix.Features.Enumerable.Exception` for other functions
   in this module.
 
   ## Examples
@@ -70,7 +70,7 @@ defmodule Mnemonix.Features.Enumerable do
 
   ## Notes
 
-  If `enumerable?/1` returns `false` for either store then this function will raise a `Mnemonix.Features.Enumerable.Error`.
+  If `enumerable?/1` returns `false` for either store then this function will raise a `Mnemonix.Features.Enumerable.Exception`.
 
   Depending on the underlying store types this function may be very inefficient.
   """
@@ -88,7 +88,7 @@ defmodule Mnemonix.Features.Enumerable do
   @doc """
   Returns all keys in `store`.
 
-  If `enumerable?/1` returns false then this function will raise a `Mnemonix.Features.Enumerable.Error`.
+  If `enumerable?/1` returns false then this function will raise a `Mnemonix.Features.Enumerable.Exception`.
 
   ## Examples
 
@@ -100,7 +100,7 @@ defmodule Mnemonix.Features.Enumerable do
 
   ## Notes
 
-  If `enumerable?/1` returns false then this function will raise a `Mnemonix.Features.Enumerable.Error`.
+  If `enumerable?/1` returns false then this function will raise a `Mnemonix.Features.Enumerable.Exception`.
 
   Depending on the underlying store this function may be very inefficient.
   """
@@ -116,7 +116,7 @@ defmodule Mnemonix.Features.Enumerable do
   @doc """
   Returns all key/value pairs in `store` as a list of two-tuples.
 
-  If `enumerable?/1` returns false then this function will raise a `Mnemonix.Features.Enumerable.Error`.
+  If `enumerable?/1` returns false then this function will raise a `Mnemonix.Features.Enumerable.Exception`.
 
   ## Examples
 
@@ -131,11 +131,11 @@ defmodule Mnemonix.Features.Enumerable do
 
       iex> {:ok, store} = Mnemonix.start_link(Mnemonix.Stores.Memcachex)
       iex> Mnemonix.to_list store
-      ** (Mnemonix.Features.Enumerable.Error) Mnemonix.Stores.Memcachex cannot be exhaustively iterated over
+      ** (Mnemonix.Features.Enumerable.Exception) Mnemonix.Stores.Memcachex cannot be exhaustively iterated over
 
   ## Notes
 
-  If `enumerable?/1` returns false then this function will raise a `Mnemonix.Features.Enumerable.Error`.
+  If `enumerable?/1` returns false then this function will raise a `Mnemonix.Features.Enumerable.Exception`.
 
   Depending on the underlying store this function may be very inefficient.
   """
@@ -151,7 +151,7 @@ defmodule Mnemonix.Features.Enumerable do
   @doc """
   Returns all values in `store`.
 
-  If `enumerable?/1` returns false then this function will raise a `Mnemonix.Features.Enumerable.Error`.
+  If `enumerable?/1` returns false then this function will raise a `Mnemonix.Features.Enumerable.Exception`.
 
   ## Examples
 
@@ -162,7 +162,7 @@ defmodule Mnemonix.Features.Enumerable do
 
   ## Notes
 
-  If `enumerable?/1` returns false then this function will raise a `Mnemonix.Features.Enumerable.Error`.
+  If `enumerable?/1` returns false then this function will raise a `Mnemonix.Features.Enumerable.Exception`.
 
   Depending on the underlying store this function may be very inefficient.
   """
