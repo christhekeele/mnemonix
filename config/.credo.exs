@@ -55,7 +55,7 @@
 
         {Credo.Check.Refactor.ABCSize},
         {Credo.Check.Refactor.CondStatements},
-        {Credo.Check.Refactor.FunctionArity},
+        {Credo.Check.Refactor.FunctionArity, max_arity: 6, ignore_defp: true},
         {Credo.Check.Refactor.MatchInCondition},
         {Credo.Check.Refactor.PipeChainStart},
         {Credo.Check.Refactor.CyclomaticComplexity},
@@ -66,10 +66,10 @@
 
         {Credo.Check.Warning.IExPry},
         {Credo.Check.Warning.IoInspect},
-        {Credo.Check.Warning.NameRedeclarationByAssignment},
-        {Credo.Check.Warning.NameRedeclarationByCase},
-        {Credo.Check.Warning.NameRedeclarationByDef},
-        {Credo.Check.Warning.NameRedeclarationByFn},
+        # {Credo.Check.Warning.NameRedeclarationByAssignment},
+        # {Credo.Check.Warning.NameRedeclarationByCase},
+        # {Credo.Check.Warning.NameRedeclarationByDef},
+        # {Credo.Check.Warning.NameRedeclarationByFn},
         {Credo.Check.Warning.OperationOnSameValues},
         {Credo.Check.Warning.BoolOperationOnSameValues},
         {Credo.Check.Warning.UnusedEnumOperation},
