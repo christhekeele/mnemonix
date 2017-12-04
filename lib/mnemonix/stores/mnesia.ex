@@ -25,9 +25,9 @@ defmodule Mnemonix.Stores.Mnesia do
     defexception [:message]
   end
 
-####
-# Mnemonix.Store.Behaviours.Core
-##
+  ####
+  # Mnemonix.Store.Behaviours.Core
+  ##
 
   @doc """
   Creates a Mnesia table to store state in using provided `opts`.
@@ -54,15 +54,15 @@ defmodule Mnemonix.Stores.Mnesia do
   for `type:`, which will always be `:set`.
   """
   @impl Store.Behaviours.Core
-  @spec setup(Store.options)
-    :: {:ok, state :: term} | {:stop, reason :: any}
+  @spec setup(Store.options()) :: {:ok, state :: term} | {:stop, reason :: any}
   def setup(opts) do
     {table, opts} = Keyword.get_and_update(opts, :table, fn _ -> :pop end)
     table = if table, do: table, else: Module.concat(__MODULE__, Table)
 
-    options = opts
-    |> Keyword.put(:type, :set)
-    |> Keyword.put(:attributes, [:key, :value])
+    options =
+      opts
+      |> Keyword.put(:type, :set)
+      |> Keyword.put(:attributes, [:key, :value])
 
     case :mnesia.create_table(table, options) do
       {:atomic, :ok} -> {:ok, table}
@@ -71,13 +71,12 @@ defmodule Mnemonix.Stores.Mnesia do
     end
   end
 
-####
-# Mnemonix.Store.Behaviours.Map
-##
+  ####
+  # Mnemonix.Store.Behaviours.Map
+  ##
 
   @impl Store.Behaviours.Map
-  @spec delete(Store.t, Mnemonix.key)
-    :: Store.Server.instruction
+  @spec delete(Store.t(), Mnemonix.key()) :: Store.Server.instruction()
   def delete(store = %Store{state: table}, key) do
     with :ok <- :mnesia.dirty_delete(table, key) do
       {:ok, store}
@@ -85,23 +84,21 @@ defmodule Mnemonix.Stores.Mnesia do
   end
 
   @impl Store.Behaviours.Map
-  @spec fetch(Store.t, Mnemonix.key)
-    :: Store.Server.instruction({:ok, Mnemonix.value} | :error)
+  @spec fetch(Store.t(), Mnemonix.key()) ::
+          Store.Server.instruction({:ok, Mnemonix.value()} | :error)
   def fetch(store = %Store{state: table}, key) do
     case :mnesia.dirty_read(table, key) do
       [{^table, ^key, value} | []] -> {:ok, store, {:ok, value}}
-      []                           -> {:ok, store, :error}
-      other                        -> {:raise, store, Exception, [reason: other]}
+      [] -> {:ok, store, :error}
+      other -> {:raise, store, Exception, [reason: other]}
     end
   end
 
   @impl Store.Behaviours.Map
-  @spec put(Store.t, Mnemonix.key, Mnemonix.value)
-    :: Store.Server.instruction
+  @spec put(Store.t(), Mnemonix.key(), Mnemonix.value()) :: Store.Server.instruction()
   def put(store = %Store{state: table}, key, value) do
     with :ok <- :mnesia.dirty_write({table, key, value}) do
       {:ok, store}
     end
   end
-
 end

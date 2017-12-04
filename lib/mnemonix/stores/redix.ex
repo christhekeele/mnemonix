@@ -24,9 +24,9 @@ if Code.ensure_loaded?(Redix) do
       defexception [:message]
     end
 
-  ####
-  # Mnemonix.Store.Behaviours.Core
-  ##
+    ####
+    # Mnemonix.Store.Behaviours.Core
+    ##
 
     @doc """
     Connects to redis to store data using provided `opts`.
@@ -44,119 +44,108 @@ if Code.ensure_loaded?(Redix) do
     All other options are passed verbatim to `Redix.start_link/2`.
     """
     @impl Store.Behaviours.Core
-    @spec setup(Store.options)
-      :: {:ok, state :: term} | {:stop, reason :: any}
+    @spec setup(Store.options()) :: {:ok, state :: term} | {:stop, reason :: any}
     def setup(opts) do
       {conn, options} = Keyword.get_and_update(opts, :conn, fn _ -> :pop end)
 
       Redix.start_link(conn || "redis://localhost:6379", options)
     end
 
-  ####
-  # Mnemonix.Store.Behaviours.Map
-  ##
+    ####
+    # Mnemonix.Store.Behaviours.Map
+    ##
 
     @impl Store.Behaviours.Map
-    @spec delete(Store.t, Mnemonix.key)
-      :: Server.instruction
+    @spec delete(Store.t(), Mnemonix.key()) :: Server.instruction()
     def delete(store = %Store{state: conn}, key) do
       case Redix.command(conn, ~w[DEL #{key}]) do
-        {:ok, 1}         -> {:ok, store}
+        {:ok, 1} -> {:ok, store}
         {:error, reason} -> {:raise, store, Exception, [reason: reason]}
       end
     end
 
     @impl Store.Behaviours.Map
-    @spec fetch(Store.t, Mnemonix.key)
-      :: Server.instruction({:ok, Mnemonix.value} | :error)
+    @spec fetch(Store.t(), Mnemonix.key()) :: Server.instruction({:ok, Mnemonix.value()} | :error)
     def fetch(store = %Store{state: conn}, key) do
       case Redix.command(conn, ~w[GET #{key}]) do
-        {:ok, nil}       -> {:ok, store, :error}
-        {:ok, value}     -> {:ok, store, {:ok, value}}
+        {:ok, nil} -> {:ok, store, :error}
+        {:ok, value} -> {:ok, store, {:ok, value}}
         {:error, reason} -> {:raise, store, Exception, [reason: reason]}
       end
     end
 
     @impl Store.Behaviours.Map
-    @spec put(Store.t, Mnemonix.key, Mnemonix.value)
-      :: Server.instruction
+    @spec put(Store.t(), Mnemonix.key(), Mnemonix.value()) :: Server.instruction()
     def put(store = %Store{state: conn}, key, value) do
       case Redix.command(conn, ~w[SET #{key} #{value}]) do
-        {:ok, "OK"}      -> {:ok, store}
+        {:ok, "OK"} -> {:ok, store}
         {:error, reason} -> {:raise, store, Exception, [reason: reason]}
       end
     end
 
-  ####
-  # Mnemonix.Store.Behaviours.Enumerable
-  ##
+    ####
+    # Mnemonix.Store.Behaviours.Enumerable
+    ##
 
     @doc """
     Returns `true`: this store supports the functions in `Mnemonix.Features.Enumerable`.
     """
     @impl Store.Behaviours.Enumerable
-    @spec enumerable?(Store.t)
-      :: Server.instruction(boolean)
+    @spec enumerable?(Store.t()) :: Server.instruction(boolean)
     def enumerable?(store = %Store{}) do
       {:ok, store, true}
     end
 
     @impl Store.Behaviours.Enumerable
-    @spec to_enumerable(Store.t)
-      :: Server.instruction([Mnemonix.pair])
+    @spec to_enumerable(Store.t()) :: Server.instruction([Mnemonix.pair()])
     def to_enumerable(store = %Store{}) do
       to_list(store)
     end
 
-  # Overrides
+    # Overrides
 
     @impl Store.Behaviours.Enumerable
-    @spec keys(Store.t)
-      :: Server.instruction([Mnemonix.key])
+    @spec keys(Store.t()) :: Server.instruction([Mnemonix.key()])
     def keys(store = %Store{state: conn}) do
       case Redix.command(conn, ~w[KEYS *]) do
-        {:ok, keys}      -> {:ok, store, keys}
+        {:ok, keys} -> {:ok, store, keys}
         {:error, reason} -> {:raise, store, Exception, [reason: reason]}
       end
     end
 
     @impl Store.Behaviours.Enumerable
-    @spec to_list(Store.t)
-      :: Server.instruction([Mnemonix.pair])
+    @spec to_list(Store.t()) :: Server.instruction([Mnemonix.pair()])
     def to_list(store = %Store{}) do
       with {:ok, store = %Store{state: conn}, keys} <- keys(store) do
         case Redix.command(conn, ["MGET" | keys]) do
-          {:ok, values}    -> {:ok, store, Enum.zip(keys, values)}
+          {:ok, values} -> {:ok, store, Enum.zip(keys, values)}
           {:error, reason} -> {:raise, store, Exception, [reason: reason]}
         end
       end
     end
 
     @impl Store.Behaviours.Enumerable
-    @spec values(Store.t)
-      :: Server.instruction([Mnemonix.key])
+    @spec values(Store.t()) :: Server.instruction([Mnemonix.key()])
     def values(store = %Store{}) do
       with {:ok, store = %Store{state: conn}, keys} <- keys(store) do
         case Redix.command(conn, ["MGET" | keys]) do
-          {:ok, values}    -> {:ok, store, values}
+          {:ok, values} -> {:ok, store, values}
           {:error, reason} -> {:raise, store, Exception, [reason: reason]}
         end
       end
     end
 
-  ####
-  # Enumerable Protocol Overrides
-  ##
+    ####
+    # Enumerable Protocol Overrides
+    ##
 
     @impl Store.Behaviours.Enumerable
-    @spec enumerable_count(Store.t)
-      :: Server.instruction(non_neg_integer)
+    @spec enumerable_count(Store.t()) :: Server.instruction(non_neg_integer)
     def enumerable_count(store = %Store{state: conn}) do
       case Redix.command(conn, ["DBSIZE"]) do
-        {:ok, count}     -> {:ok, store, count}
+        {:ok, count} -> {:ok, store, count}
         {:error, reason} -> {:raise, store, Exception, [reason: reason]}
       end
     end
-
   end
 end

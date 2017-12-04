@@ -9,8 +9,7 @@ defmodule Mnemonix.Features.Map do
   use Mnemonix.Behaviour
   use Mnemonix.Singleton.Behaviour
 
-  @callback delete(Mnemonix.store, Mnemonix.key)
-    :: Mnemonix.store | no_return
+  @callback delete(Mnemonix.store(), Mnemonix.key()) :: Mnemonix.store() | no_return
   @doc """
   Removes the entry under `key` in `store`.
 
@@ -25,17 +24,16 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get(store, :a)
       nil
   """
-  @spec delete(Mnemonix.store, Mnemonix.key)
-    :: Mnemonix.store | no_return
+  @spec delete(Mnemonix.store(), Mnemonix.key()) :: Mnemonix.store() | no_return
   def delete(store, key) do
     case GenServer.call(store, {:delete, key}) do
-      :ok                  -> store
+      :ok -> store
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback fetch(Mnemonix.store, Mnemonix.key)
-    :: {:ok, Mnemonix.value} | :error | no_return
+  @callback fetch(Mnemonix.store(), Mnemonix.key()) ::
+              {:ok, Mnemonix.value()} | :error | no_return
   @doc """
   Retrievs the value of the entry under `key` in `store`.
 
@@ -49,17 +47,16 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.fetch(store, :b)
       :error
   """
-  @spec fetch(Mnemonix.store, Mnemonix.key)
-    :: {:ok, Mnemonix.value} | :error | no_return
+  @spec fetch(Mnemonix.store(), Mnemonix.key()) :: {:ok, Mnemonix.value()} | :error | no_return
   def fetch(store, key) do
     case GenServer.call(store, {:fetch, key}) do
-      {:ok, value}         -> value
+      {:ok, value} -> value
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback put(Mnemonix.store, Mnemonix.key, Mnemonix.value)
-    :: Mnemonix.store | no_return
+  @callback put(Mnemonix.store(), Mnemonix.key(), Mnemonix.value()) ::
+              Mnemonix.store() | no_return
   @doc """
   Creates a new entry for `value` under `key` in `store`.
 
@@ -72,17 +69,15 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get(store, :b)
       2
   """
-  @spec put(Mnemonix.store, Mnemonix.key, Mnemonix.value)
-    :: Mnemonix.store | no_return
+  @spec put(Mnemonix.store(), Mnemonix.key(), Mnemonix.value()) :: Mnemonix.store() | no_return
   def put(store, key, value) do
     case GenServer.call(store, {:put, key, value}) do
-      :ok                  -> store
+      :ok -> store
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback drop(Mnemonix.store, Enumerable.t)
-    :: Mnemonix.store | no_return
+  @callback drop(Mnemonix.store(), Enumerable.t()) :: Mnemonix.store() | no_return
   @doc """
   Drops the given `keys` from the `store`.
 
@@ -97,17 +92,16 @@ defmodule Mnemonix.Features.Map do
       4
 
   """
-  @spec drop(Mnemonix.store, Enumerable.t)
-    :: Mnemonix.store | no_return
+  @spec drop(Mnemonix.store(), Enumerable.t()) :: Mnemonix.store() | no_return
   def drop(store, keys) do
     case GenServer.call(store, {:drop, keys}) do
-      :ok                  -> store
+      :ok -> store
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback fetch!(Mnemonix.store, Mnemonix.key)
-    :: {:ok, Mnemonix.value} | :error | no_return
+  @callback fetch!(Mnemonix.store(), Mnemonix.key()) ::
+              {:ok, Mnemonix.value()} | :error | no_return
   @doc """
   Fetches the value for specific `key`.
 
@@ -121,17 +115,15 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.fetch!(store, :b)
       ** (KeyError) key :b not found in: Mnemonix.Stores.Map
   """
-  @spec fetch!(Mnemonix.store, Mnemonix.key)
-    :: {:ok, Mnemonix.value} | :error | no_return
+  @spec fetch!(Mnemonix.store(), Mnemonix.key()) :: {:ok, Mnemonix.value()} | :error | no_return
   def fetch!(store, key) do
     case GenServer.call(store, {:fetch!, key}) do
-      {:ok, value}         -> value
+      {:ok, value} -> value
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback get(Mnemonix.store, Mnemonix.key)
-    :: Mnemonix.value | no_return
+  @callback get(Mnemonix.store(), Mnemonix.key()) :: Mnemonix.value() | no_return
   @doc """
   Gets the value for a specific `key`.
 
@@ -145,17 +137,16 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get(store, :b)
       nil
   """
-  @spec get(Mnemonix.store, Mnemonix.key)
-    :: Mnemonix.value | no_return
+  @spec get(Mnemonix.store(), Mnemonix.key()) :: Mnemonix.value() | no_return
   def get(store, key) do
     case GenServer.call(store, {:get, key}) do
-      {:ok, value}         -> value
+      {:ok, value} -> value
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback get(Mnemonix.store, Mnemonix.key, Mnemonix.value)
-    :: Mnemonix.value | no_return
+  @callback get(Mnemonix.store(), Mnemonix.key(), Mnemonix.value()) ::
+              Mnemonix.value() | no_return
   @doc """
   Gets the value for a specific `key` with `default`.
 
@@ -169,17 +160,20 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get(store, :b, 2)
       2
   """
-  @spec get(Mnemonix.store, Mnemonix.key, Mnemonix.value)
-    :: Mnemonix.value | no_return
+  @spec get(Mnemonix.store(), Mnemonix.key(), Mnemonix.value()) :: Mnemonix.value() | no_return
   def get(store, key, default) do
     case GenServer.call(store, {:get, key, default}) do
-      {:ok, value}         -> value
+      {:ok, value} -> value
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback get_and_update(Mnemonix.store, Mnemonix.key, (Mnemonix.value -> {get, Mnemonix.value} | :pop))
-    :: {get, Mnemonix.store} | no_return when get: term
+  @callback get_and_update(
+              Mnemonix.store(),
+              Mnemonix.key(),
+              (Mnemonix.value() -> {get, Mnemonix.value()} | :pop)
+            ) :: {get, Mnemonix.store()} | no_return
+            when get: term
   @doc """
   Gets the value from `key` and updates it, all in one pass.
 
@@ -227,17 +221,25 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get(store, :b)
       nil
   """
-  @spec get_and_update(Mnemonix.store, Mnemonix.key, (Mnemonix.value -> {get, Mnemonix.value} | :pop))
-    :: {get, Mnemonix.store} | no_return when get: term
+  @spec get_and_update(
+          Mnemonix.store(),
+          Mnemonix.key(),
+          (Mnemonix.value() -> {get, Mnemonix.value()} | :pop)
+        ) :: {get, Mnemonix.store()} | no_return
+        when get: term
   def get_and_update(store, key, fun) do
     case GenServer.call(store, {:get_and_update, key, fun}) do
-      {:ok, value}         -> {value, store}
+      {:ok, value} -> {value, store}
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback get_and_update!(Mnemonix.store, Mnemonix.key, (Mnemonix.value -> {get, Mnemonix.value}))
-    :: {get, Mnemonix.store} | no_return when get: term
+  @callback get_and_update!(
+              Mnemonix.store(),
+              Mnemonix.key(),
+              (Mnemonix.value() -> {get, Mnemonix.value()})
+            ) :: {get, Mnemonix.store()} | no_return
+            when get: term
   @doc """
   Gets the value from `key` and updates it. Raises if there is no `key`.
 
@@ -277,17 +279,21 @@ defmodule Mnemonix.Features.Map do
       iex> {_value, ^store} = Mnemonix.get_and_update!(store, :b, fn _ -> :pop end)
       ** (KeyError) key :b not found in: Mnemonix.Stores.Map
   """
-  @spec get_and_update!(Mnemonix.store, Mnemonix.key, (Mnemonix.value -> {get, Mnemonix.value}))
-    :: {get, Mnemonix.store} | no_return when get: term
+  @spec get_and_update!(
+          Mnemonix.store(),
+          Mnemonix.key(),
+          (Mnemonix.value() -> {get, Mnemonix.value()})
+        ) :: {get, Mnemonix.store()} | no_return
+        when get: term
   def get_and_update!(store, key, fun) do
     case GenServer.call(store, {:get_and_update!, key, fun}) do
-      {:ok, value}         -> {value, store}
+      {:ok, value} -> {value, store}
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback get_lazy(Mnemonix.store, Mnemonix.key, (() -> Mnemonix.value))
-    :: Mnemonix.value | no_return
+  @callback get_lazy(Mnemonix.store(), Mnemonix.key(), (() -> Mnemonix.value())) ::
+              Mnemonix.value() | no_return
   @doc """
   Gets the value for a specific `key`.
 
@@ -308,17 +314,16 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get_lazy(store, :b, fun)
       13
   """
-  @spec get_lazy(Mnemonix.store, Mnemonix.key, (() -> Mnemonix.value))
-    :: Mnemonix.value | no_return
+  @spec get_lazy(Mnemonix.store(), Mnemonix.key(), (() -> Mnemonix.value())) ::
+          Mnemonix.value() | no_return
   def get_lazy(store, key, fun) when is_function(fun, 0) do
     case GenServer.call(store, {:get_lazy, key, fun}) do
-      {:ok, value}         -> value
+      {:ok, value} -> value
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback has_key?(Mnemonix.store, Mnemonix.key)
-    :: boolean
+  @callback has_key?(Mnemonix.store(), Mnemonix.key()) :: boolean
   @doc """
   Returns whether a given `key` exists in the given `store`.
 
@@ -330,17 +335,15 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.has_key?(store, :b)
       false
   """
-  @spec has_key?(Mnemonix.store, Mnemonix.key)
-    :: boolean
+  @spec has_key?(Mnemonix.store(), Mnemonix.key()) :: boolean
   def has_key?(store, key) do
     case GenServer.call(store, {:has_key?, key}) do
-      {:ok, value}         -> value
+      {:ok, value} -> value
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback pop(Mnemonix.store, Mnemonix.key)
-    :: {Mnemonix.value, Mnemonix.store}
+  @callback pop(Mnemonix.store(), Mnemonix.key()) :: {Mnemonix.value(), Mnemonix.store()}
   @doc """
   Returns and removes the value associated with `key` in `store`.
 
@@ -358,18 +361,16 @@ defmodule Mnemonix.Features.Map do
       iex> value
       nil
   """
-  @spec pop(Mnemonix.store, Mnemonix.key)
-    :: {Mnemonix.value, Mnemonix.store}
+  @spec pop(Mnemonix.store(), Mnemonix.key()) :: {Mnemonix.value(), Mnemonix.store()}
   def pop(store, key) do
     case GenServer.call(store, {:pop, key}) do
-      {:ok, value}         -> {value, store}
+      {:ok, value} -> {value, store}
       {:raise, type, args} -> raise type, args
     end
   end
 
-
-  @callback pop(Mnemonix.store, Mnemonix.key, default :: term)
-    :: {Mnemonix.value, Mnemonix.store}
+  @callback pop(Mnemonix.store(), Mnemonix.key(), default :: term) ::
+              {Mnemonix.value(), Mnemonix.store()}
   @doc """
   Returns and removes the value associated with `key` in `store` with `default`.
 
@@ -386,17 +387,17 @@ defmodule Mnemonix.Features.Map do
       iex> value
       2
   """
-  @spec pop(Mnemonix.store, Mnemonix.key, default :: term)
-    :: {Mnemonix.value, Mnemonix.store}
+  @spec pop(Mnemonix.store(), Mnemonix.key(), default :: term) ::
+          {Mnemonix.value(), Mnemonix.store()}
   def pop(store, key, default) do
     case GenServer.call(store, {:pop, key, default}) do
-      {:ok, value}         -> {value, store}
+      {:ok, value} -> {value, store}
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback pop_lazy(Mnemonix.store, Mnemonix.key, (() -> Mnemonix.value))
-    :: {Mnemonix.value, Mnemonix.store}
+  @callback pop_lazy(Mnemonix.store(), Mnemonix.key(), (() -> Mnemonix.value())) ::
+              {Mnemonix.value(), Mnemonix.store()}
   @doc """
   Lazily returns and removes the value associated with `key` in `store`.
 
@@ -417,17 +418,16 @@ defmodule Mnemonix.Features.Map do
       iex> value
       13
   """
-  @spec pop_lazy(Mnemonix.store, Mnemonix.key, (() -> Mnemonix.value))
-    :: {Mnemonix.value, Mnemonix.store}
+  @spec pop_lazy(Mnemonix.store(), Mnemonix.key(), (() -> Mnemonix.value())) ::
+          {Mnemonix.value(), Mnemonix.store()}
   def pop_lazy(store, key, fun) when is_function(fun, 0) do
     case GenServer.call(store, {:pop_lazy, key, fun}) do
-      {:ok, value}         -> {value, store}
+      {:ok, value} -> {value, store}
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback put_new(Mnemonix.store, Mnemonix.key, Mnemonix.value)
-    :: Mnemonix.store
+  @callback put_new(Mnemonix.store(), Mnemonix.key(), Mnemonix.value()) :: Mnemonix.store()
   @doc """
   Puts the given `value` under `key` unless the entry `key` already exists.
 
@@ -441,17 +441,16 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get(store, :b)
       2
   """
-  @spec put_new(Mnemonix.store, Mnemonix.key, Mnemonix.value)
-    :: Mnemonix.store
+  @spec put_new(Mnemonix.store(), Mnemonix.key(), Mnemonix.value()) :: Mnemonix.store()
   def put_new(store, key, value) do
     case GenServer.call(store, {:put_new, key, value}) do
-      :ok                  -> store
+      :ok -> store
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback put_new_lazy(Mnemonix.store, Mnemonix.key, (() -> Mnemonix.value))
-    :: Mnemonix.store | no_return
+  @callback put_new_lazy(Mnemonix.store(), Mnemonix.key(), (() -> Mnemonix.value())) ::
+              Mnemonix.store() | no_return
   @doc """
   Evaluates `fun` and puts the result under `key` in `store` unless `key` is already present.
 
@@ -471,17 +470,17 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get(store, :a)
       1
   """
-  @spec put_new_lazy(Mnemonix.store, Mnemonix.key, (() -> Mnemonix.value))
-    :: Mnemonix.store | no_return
+  @spec put_new_lazy(Mnemonix.store(), Mnemonix.key(), (() -> Mnemonix.value())) ::
+          Mnemonix.store() | no_return
   def put_new_lazy(store, key, fun) when is_function(fun, 0) do
     case GenServer.call(store, {:put_new_lazy, key, fun}) do
-      :ok                  -> store
+      :ok -> store
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback replace(Mnemonix.store, Mnemonix.key, Mnemonix.value)
-    :: Mnemonix.store | no_return
+  @callback replace(Mnemonix.store(), Mnemonix.key(), Mnemonix.value()) ::
+              Mnemonix.store() | no_return
   @doc """
   Alters the value stored under `key` to `value` if it already exists in `store`.
 
@@ -497,17 +496,17 @@ defmodule Mnemonix.Features.Map do
      nil
 
   """
-  @spec replace(Mnemonix.store, Mnemonix.key, Mnemonix.value)
-    :: Mnemonix.store | no_return
+  @spec replace(Mnemonix.store(), Mnemonix.key(), Mnemonix.value()) ::
+          Mnemonix.store() | no_return
   def replace(store, key, value) do
     case GenServer.call(store, {:replace, key, value}) do
-      :ok                  -> store
+      :ok -> store
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback replace!(Mnemonix.store, Mnemonix.key, Mnemonix.value)
-    :: Mnemonix.store | no_return
+  @callback replace!(Mnemonix.store(), Mnemonix.key(), Mnemonix.value()) ::
+              Mnemonix.store() | no_return
   @doc """
   Alters the value stored under `key` to `value` if it already exists in `store`.
 
@@ -522,17 +521,17 @@ defmodule Mnemonix.Features.Map do
      ** (KeyError) key :b not found in: Mnemonix.Stores.Map
 
   """
-  @spec replace!(Mnemonix.store, Mnemonix.key, Mnemonix.value)
-    :: Mnemonix.store | no_return
+  @spec replace!(Mnemonix.store(), Mnemonix.key(), Mnemonix.value()) ::
+          Mnemonix.store() | no_return
   def replace!(store, key, value) do
     case GenServer.call(store, {:replace!, key, value}) do
-      :ok                  -> store
+      :ok -> store
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback split(Mnemonix.store, Enumerable.t)
-    :: {%{Mnemonix.key => Mnemonix.value}, Mnemonix.store} | no_return
+  @callback split(Mnemonix.store(), Enumerable.t()) ::
+              {%{Mnemonix.key() => Mnemonix.value()}, Mnemonix.store()} | no_return
   @doc """
   Takes all entries corresponding to the given `keys` and removes them from the `store` into a separate map.
 
@@ -557,17 +556,17 @@ defmodule Mnemonix.Features.Map do
       %{}
 
   """
-  @spec split(Mnemonix.store, Enumerable.t)
-    :: {%{Mnemonix.key => Mnemonix.value}, Mnemonix.store} | no_return
+  @spec split(Mnemonix.store(), Enumerable.t()) ::
+          {%{Mnemonix.key() => Mnemonix.value()}, Mnemonix.store()} | no_return
   def split(store, keys) do
     case GenServer.call(store, {:split, keys}) do
-      {:ok, result}        -> {result, store}
+      {:ok, result} -> {result, store}
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback take(Mnemonix.store, Enumerable.t)
-    :: %{Mnemonix.key => Mnemonix.value} | no_return
+  @callback take(Mnemonix.store(), Enumerable.t()) ::
+              %{Mnemonix.key() => Mnemonix.value()} | no_return
   @doc """
   Returns a map of all key/value pairs in `store` where the key is in `keys`.
 
@@ -582,17 +581,21 @@ defmodule Mnemonix.Features.Map do
       %{}
 
   """
-  @spec take(Mnemonix.store, Enumerable.t)
-    :: %{Mnemonix.key => Mnemonix.value} | no_return
+  @spec take(Mnemonix.store(), Enumerable.t()) ::
+          %{Mnemonix.key() => Mnemonix.value()} | no_return
   def take(store, keys) do
     case GenServer.call(store, {:take, keys}) do
-      {:ok, result}        -> result
+      {:ok, result} -> result
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback update(Mnemonix.store, Mnemonix.key, Mnemonix.value, (Mnemonix.value -> Mnemonix.value))
-    :: Mnemonix.store
+  @callback update(
+              Mnemonix.store(),
+              Mnemonix.key(),
+              Mnemonix.value(),
+              (Mnemonix.value() -> Mnemonix.value())
+            ) :: Mnemonix.store()
   @doc """
   Updates the value at `key` in `store` with the given `function`.
 
@@ -608,17 +611,21 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get(store, :b)
       13
   """
-  @spec update(Mnemonix.store, Mnemonix.key, Mnemonix.value, (Mnemonix.value -> Mnemonix.value))
-    :: Mnemonix.store
+  @spec update(
+          Mnemonix.store(),
+          Mnemonix.key(),
+          Mnemonix.value(),
+          (Mnemonix.value() -> Mnemonix.value())
+        ) :: Mnemonix.store()
   def update(store, key, initial, function) do
     case GenServer.call(store, {:update, key, initial, function}) do
-      :ok                  -> store
+      :ok -> store
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback update!(Mnemonix.store, Mnemonix.key, (Mnemonix.value -> Mnemonix.value))
-    :: Mnemonix.store | no_return
+  @callback update!(Mnemonix.store(), Mnemonix.key(), (Mnemonix.value() -> Mnemonix.value())) ::
+              Mnemonix.store() | no_return
   @doc """
   Updates the value at `key` in `store` with the given `function`.
 
@@ -633,13 +640,12 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.update!(store, :b, &(&1 * 2))
       ** (KeyError) key :b not found in: Mnemonix.Stores.Map
   """
-  @spec update!(Mnemonix.store, Mnemonix.key, (Mnemonix.value -> Mnemonix.value))
-    :: Mnemonix.store | no_return
+  @spec update!(Mnemonix.store(), Mnemonix.key(), (Mnemonix.value() -> Mnemonix.value())) ::
+          Mnemonix.store() | no_return
   def update!(store, key, function) do
     case GenServer.call(store, {:update!, key, function}) do
-      :ok                  -> store
+      :ok -> store
       {:raise, type, args} -> raise type, args
     end
   end
-
 end

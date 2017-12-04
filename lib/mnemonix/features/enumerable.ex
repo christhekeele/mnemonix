@@ -19,12 +19,14 @@ defmodule Mnemonix.Features.Enumerable do
     defexception [:message]
 
     def exception(args) do
-      %__MODULE__{message: "#{args[:module] |> Inspect.inspect(%Inspect.Opts{})} cannot be exhaustively iterated over"}
+      %__MODULE__{
+        message:
+          "#{args[:module] |> Inspect.inspect(%Inspect.Opts{})} cannot be exhaustively iterated over"
+      }
     end
   end
 
-  @callback enumerable?(Mnemonix.store)
-    :: boolean | no_return
+  @callback enumerable?(Mnemonix.store()) :: boolean | no_return
   @doc """
   Returns `true` if the `store` is enumerable.
 
@@ -41,17 +43,15 @@ defmodule Mnemonix.Features.Enumerable do
       iex> Mnemonix.enumerable? store
       false
   """
-  @spec enumerable?(Mnemonix.store)
-    :: boolean | no_return
+  @spec enumerable?(Mnemonix.store()) :: boolean | no_return
   def enumerable?(store) do
     case GenServer.call(store, :enumerable?) do
-      {:ok, enumerable}    -> enumerable
+      {:ok, enumerable} -> enumerable
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback equal?(Mnemonix.store, Mnemonix.store)
-    :: boolean | no_return
+  @callback equal?(Mnemonix.store(), Mnemonix.store()) :: boolean | no_return
   @doc """
   Checks that contents of stores `store1` and `store2` are equal.
 
@@ -74,19 +74,17 @@ defmodule Mnemonix.Features.Enumerable do
 
   Depending on the underlying store types this function may be very inefficient.
   """
-  @spec equal?(Mnemonix.store, Mnemonix.store)
-    :: boolean | no_return
+  @spec equal?(Mnemonix.store(), Mnemonix.store()) :: boolean | no_return
   def equal?(store1, store2) do
-    with  {:ok, result1} when not is_tuple(result1) <- GenServer.call(store1, :to_enumerable),
-          {:ok, result2} when not is_tuple(result2) <- GenServer.call(store2, :to_enumerable) do
+    with {:ok, result1} when not is_tuple(result1) <- GenServer.call(store1, :to_enumerable),
+         {:ok, result2} when not is_tuple(result2) <- GenServer.call(store2, :to_enumerable) do
       result1 === result2
     else
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback keys(Mnemonix.store)
-    :: [Mnemonix.key] | no_return
+  @callback keys(Mnemonix.store()) :: [Mnemonix.key()] | no_return
   @doc """
   Returns all keys in `store`.
 
@@ -106,17 +104,15 @@ defmodule Mnemonix.Features.Enumerable do
 
   Depending on the underlying store this function may be very inefficient.
   """
-  @spec keys(Mnemonix.store)
-    :: [Mnemonix.key] | no_return
+  @spec keys(Mnemonix.store()) :: [Mnemonix.key()] | no_return
   def keys(store) do
     case GenServer.call(store, :keys) do
-      {:ok, keys}          -> keys
+      {:ok, keys} -> keys
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback to_list(Mnemonix.store)
-    :: [{Mnemonix.key, Mnemonix.value}] | no_return
+  @callback to_list(Mnemonix.store()) :: [{Mnemonix.key(), Mnemonix.value()}] | no_return
   @doc """
   Returns all key/value pairs in `store` as a list of two-tuples.
 
@@ -143,17 +139,15 @@ defmodule Mnemonix.Features.Enumerable do
 
   Depending on the underlying store this function may be very inefficient.
   """
-  @spec to_list(Mnemonix.store)
-    :: [{Mnemonix.key, Mnemonix.value}] | no_return
+  @spec to_list(Mnemonix.store()) :: [{Mnemonix.key(), Mnemonix.value()}] | no_return
   def to_list(store) do
     case GenServer.call(store, :to_list) do
-      {:ok, list}          -> list
+      {:ok, list} -> list
       {:raise, type, args} -> raise type, args
     end
   end
 
-  @callback values(Mnemonix.store)
-    :: [Mnemonix.value] | no_return
+  @callback values(Mnemonix.store()) :: [Mnemonix.value()] | no_return
   @doc """
   Returns all values in `store`.
 
@@ -172,13 +166,11 @@ defmodule Mnemonix.Features.Enumerable do
 
   Depending on the underlying store this function may be very inefficient.
   """
-  @spec values(Mnemonix.store)
-    :: [Mnemonix.value] | no_return
+  @spec values(Mnemonix.store()) :: [Mnemonix.value()] | no_return
   def values(store) do
     case GenServer.call(store, :values) do
-      {:ok, values}        -> values
+      {:ok, values} -> values
       {:raise, type, args} -> raise type, args
     end
   end
-
 end

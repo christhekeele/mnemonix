@@ -18,9 +18,9 @@ defmodule Mnemonix.Stores.Null do
   use Store.Behaviour
   use Store.Translator.Raw
 
-####
-# Mnemonix.Store.Behaviours.Core
-##
+  ####
+  # Mnemonix.Store.Behaviours.Core
+  ##
 
   @doc """
   Skips setup since this store does nothing.
@@ -28,56 +28,50 @@ defmodule Mnemonix.Stores.Null do
   Ignores all `opts`.
   """
   @impl Store.Behaviours.Core
-  @spec setup(Store.options)
-    :: {:ok, nil}
+  @spec setup(Store.options()) :: {:ok, nil}
   def setup(_opts) do
     {:ok, nil}
   end
 
-####
-# Mnemonix.Store.Behaviours.Map
-##
+  ####
+  # Mnemonix.Store.Behaviours.Map
+  ##
 
   @impl Store.Behaviours.Map
-  @spec delete(Store.t, Mnemonix.key)
-    :: Store.Server.instruction
+  @spec delete(Store.t(), Mnemonix.key()) :: Store.Server.instruction()
   def delete(store = %Store{}, _key) do
     {:ok, store}
   end
 
   @impl Store.Behaviours.Map
-  @spec fetch(Store.t, Mnemonix.key)
-    :: Store.Server.instruction({:ok, Mnemonix.value} | :error)
+  @spec fetch(Store.t(), Mnemonix.key()) ::
+          Store.Server.instruction({:ok, Mnemonix.value()} | :error)
   def fetch(store = %Store{}, _key) do
     {:ok, store, {:ok, nil}}
   end
 
   @impl Store.Behaviours.Map
-  @spec put(Store.t, Mnemonix.key, Mnemonix.value)
-    :: Store.Server.instruction
+  @spec put(Store.t(), Mnemonix.key(), Mnemonix.value()) :: Store.Server.instruction()
   def put(store = %Store{}, _key, _value) do
     {:ok, store}
   end
 
-####
-# Mnemonix.Store.Behaviours.Enumerable
-##
+  ####
+  # Mnemonix.Store.Behaviours.Enumerable
+  ##
 
   @doc """
   Returns `true`: this store supports the functions in `Mnemonix.Features.Enumerable`.
   """
   @impl Store.Behaviours.Enumerable
-  @spec enumerable?(Store.t)
-    :: Store.Server.instruction(boolean)
+  @spec enumerable?(Store.t()) :: Store.Server.instruction(boolean)
   def enumerable?(store) do
     {:ok, store, true}
   end
 
   @impl Store.Behaviours.Enumerable
-  @spec to_enumerable(Store.t)
-    :: Store.Server.instruction([Mnemonix.pair])
+  @spec to_enumerable(Store.t()) :: Store.Server.instruction([Mnemonix.pair()])
   def to_enumerable(store = %Store{}) do
     {:ok, store, []}
   end
-
 end

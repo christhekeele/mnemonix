@@ -42,42 +42,39 @@ if Code.ensure_loaded?(Plug) do
 
     @sid_bytes 96
 
-    @spec init(Plug.opts)
-      :: GenServer.name | no_return
+    @spec init(Plug.opts()) :: GenServer.name() | no_return
     def init(opts) do
       Keyword.fetch!(opts, :mnemonix)
     end
 
-    @spec get(Plug.Conn.t, Store.cookie, GenServer.name)
-      :: {Store.sid, Store.session}
+    @spec get(Plug.Conn.t(), Store.cookie(), GenServer.name()) :: {Store.sid(), Store.session()}
     def get(conn, cookie, store) do
       with {:ok, {_ts, data}} <- Mnemonix.fetch(store, cookie) do
         {put(conn, cookie, data, store), data}
-      else :error ->
-        {nil, %{}}
+      else
+        :error ->
+          {nil, %{}}
       end
     end
 
-    @spec put(Plug.Conn.t, Store.sid, any, GenServer.name)
-      :: Store.cookie
+    @spec put(Plug.Conn.t(), Store.sid(), any, GenServer.name()) :: Store.cookie()
     def put(conn, sid, data, store)
 
     def put(conn, nil, data, store) do
-      put conn, make_sid(), data, store
+      put(conn, make_sid(), data, store)
     end
 
-    def put(_conn, sid, data, store) when is_map data do
+    def put(_conn, sid, data, store) when is_map(data) do
       with ^store <- Mnemonix.put(store, sid, {timestamp(), data}) do
         sid
       end
     end
 
     def put(conn, sid, data, store) do
-      put conn, sid, Enum.into(data, %{}), store
+      put(conn, sid, Enum.into(data, %{}), store)
     end
 
-    @spec delete(Plug.Conn.t, Store.sid, GenServer.name)
-      :: :ok
+    @spec delete(Plug.Conn.t(), Store.sid(), GenServer.name()) :: :ok
     def delete(conn, sid, store)
 
     def delete(_conn, sid, store) do
@@ -87,12 +84,11 @@ if Code.ensure_loaded?(Plug) do
     end
 
     defp make_sid do
-      @sid_bytes |> :crypto.strong_rand_bytes |> Base.encode64
+      @sid_bytes |> :crypto.strong_rand_bytes() |> Base.encode64()
     end
 
     defp timestamp() do
       :os.timestamp()
     end
-
   end
 end

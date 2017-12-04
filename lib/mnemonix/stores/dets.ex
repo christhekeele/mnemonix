@@ -22,17 +22,20 @@ defmodule Mnemonix.Stores.DETS do
     defexception [:message]
 
     def exception(opts) do
-      %__MODULE__{message: if Keyword.has_key?(opts, :reason) do
-        "ets operation failed for reason: `#{Keyword.get(opts, :reason)}`"
-      else
-        "ets operation failed"
-      end}
+      %__MODULE__{
+        message:
+          if Keyword.has_key?(opts, :reason) do
+            "ets operation failed for reason: `#{Keyword.get(opts, :reason)}`"
+          else
+            "ets operation failed"
+          end
+      }
     end
   end
 
-####
-# Mnemonix.Store.Behaviours.Core
-##
+  ####
+  # Mnemonix.Store.Behaviours.Core
+  ##
 
   @doc """
   Creates a new DETS table to store state using provided `opts`.
@@ -53,8 +56,7 @@ defmodule Mnemonix.Stores.DETS do
   for `type:`, which will always be `:set`.
   """
   @impl Store.Behaviours.Core
-  @spec setup(Store.options)
-    :: {:ok, state :: term} | {:stop, reason :: any}
+  @spec setup(Store.options()) :: {:ok, state :: term} | {:stop, reason :: any}
   def setup(opts) do
     {table, opts} = Keyword.pop(opts, :table)
     table = if table, do: table, else: Module.concat(__MODULE__, Table)
@@ -65,48 +67,44 @@ defmodule Mnemonix.Stores.DETS do
   end
 
   @impl Store.Behaviours.Core
-  @spec teardown(reason, Store.t)
-    :: {:ok, reason} | {:error, reason}
-      when reason: :normal | :shutdown | {:shutdown, term} | term
+  @spec teardown(reason, Store.t()) :: {:ok, reason} | {:error, reason}
+        when reason: :normal | :shutdown | {:shutdown, term} | term
   def teardown(reason, %Store{state: state}) do
     with :ok <- :dets.close(state) do
       {:ok, reason}
     end
   end
 
-####
-# Mnemonix.Store.Behaviours.Map
-##
+  ####
+  # Mnemonix.Store.Behaviours.Map
+  ##
 
   @impl Store.Behaviours.Map
-  @spec delete(Store.t, Mnemonix.key)
-    :: Store.Server.instruction
+  @spec delete(Store.t(), Mnemonix.key()) :: Store.Server.instruction()
   def delete(store = %Store{state: table}, key) do
     case :dets.delete(table, key) do
-      :ok              -> {:ok, store}
+      :ok -> {:ok, store}
       {:error, reason} -> {:raise, store, Exception, reason: reason}
     end
   end
 
   @impl Store.Behaviours.Map
-  @spec fetch(Store.t, Mnemonix.key)
-    :: Store.Server.instruction({:ok, Mnemonix.value} | :error)
+  @spec fetch(Store.t(), Mnemonix.key()) ::
+          Store.Server.instruction({:ok, Mnemonix.value()} | :error)
   def fetch(store = %Store{state: table}, key) do
     case :dets.lookup(table, key) do
       [{^key, value} | []] -> {:ok, store, {:ok, value}}
-      []                   -> {:ok, store, :error}
-      {:error, reason}     -> {:raise, store, Exception, reason: reason}
-    end
-  end
-
-  @impl Store.Behaviours.Map
-  @spec put(Store.t, Mnemonix.key, Mnemonix.value)
-    :: Store.Server.instruction
-  def put(store = %Store{state: table}, key, value) do
-    case :dets.insert(table, {key, value}) do
-      :ok              -> {:ok, store}
+      [] -> {:ok, store, :error}
       {:error, reason} -> {:raise, store, Exception, reason: reason}
     end
   end
 
+  @impl Store.Behaviours.Map
+  @spec put(Store.t(), Mnemonix.key(), Mnemonix.value()) :: Store.Server.instruction()
+  def put(store = %Store{state: table}, key, value) do
+    case :dets.insert(table, {key, value}) do
+      :ok -> {:ok, store}
+      {:error, reason} -> {:raise, store, Exception, reason: reason}
+    end
+  end
 end

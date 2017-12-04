@@ -12,7 +12,14 @@ defmodule Mnemonix.Supervision do
 
   defmacro __using__(opts \\ []) do
     {singleton, opts} = Mnemonix.Singleton.Behaviour.establish_singleton(__CALLER__.module, opts)
-    store = if singleton, do: Mnemonix.Singleton.Behaviour.determine_singleton(__CALLER__.module, Keyword.get(opts, :singleton))
+
+    store =
+      if singleton,
+        do:
+          Mnemonix.Singleton.Behaviour.determine_singleton(
+            __CALLER__.module,
+            Keyword.get(opts, :singleton)
+          )
 
     quote location: :keep do
       alias Mnemonix.Store
@@ -20,10 +27,11 @@ defmodule Mnemonix.Supervision do
       @doc false
       def defaults do
         {default_impl, default_opts} = Mnemonix.Application.specification()
+
         case Keyword.get(unquote(opts), :default, Mnemonix.Application.specification()) do
           impl when is_atom(impl) -> {impl, default_impl}
           opts when is_list(opts) -> {default_opts, opts}
-          {impl, opts}            -> {impl, opts}
+          {impl, opts} -> {impl, opts}
         end
       end
 
@@ -32,11 +40,10 @@ defmodule Mnemonix.Supervision do
 
       The returned `t:GenServer.server/0` reference can be used in the `Mnemonix` API.
       """
-      @spec start_link
-        :: GenServer.on_start
+      @spec start_link :: GenServer.on_start()
       def start_link do
         {implementation, options} = defaults()
-        start_link implementation, options
+        start_link(implementation, options)
       end
 
       @doc """
@@ -49,11 +56,10 @@ defmodule Mnemonix.Supervision do
           iex> Mnemonix.get(store, :foo)
           :bar
       """
-      @spec start_link(Store.Server.options)
-        :: GenServer.on_start
+      @spec start_link(Store.Server.options()) :: GenServer.on_start()
       def start_link(options) when is_list(options) do
         {implementation, default_options} = defaults()
-        start_link implementation, Keyword.merge(default_options, options)
+        start_link(implementation, Keyword.merge(default_options, options))
       end
 
       @doc """
@@ -68,11 +74,10 @@ defmodule Mnemonix.Supervision do
           iex> Mnemonix.get(store, :foo)
           :bar
       """
-      @spec start_link(Store.Behaviour.t)
-        :: GenServer.on_start
+      @spec start_link(Store.Behaviour.t()) :: GenServer.on_start()
       def start_link(implementation) do
         {_implementation, default_options} = defaults()
-        start_link implementation, default_options
+        start_link(implementation, default_options)
       end
 
       @doc """
@@ -87,12 +92,10 @@ defmodule Mnemonix.Supervision do
           iex> Mnemonix.get(NamedStore, :foo)
           :bar
       """
-      @spec start_link(Store.Behaviour.t, Store.Server.options)
-        :: GenServer.on_start
+      @spec start_link(Store.Behaviour.t(), Store.Server.options()) :: GenServer.on_start()
       def start_link(implementation, options) do
         implementation.start_link(Keyword.put_new(options, :name, unquote(store)))
       end
-
     end
   end
 end
