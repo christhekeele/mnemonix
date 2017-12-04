@@ -3,6 +3,7 @@ defmodule Mnemonix.Singleton.Behaviour do
 
   defmacro __using__(opts \\ []) do
     opts = Keyword.put(opts, :source, __CALLER__.module)
+
     quote location: :keep do
       @opts unquote(opts)
       @before_compile unquote(__MODULE__)
@@ -21,13 +22,13 @@ defmodule Mnemonix.Singleton.Behaviour do
 
         unquote_splicing(
           for {:type, type, _module_info} <- types do
-            quote(do: @type unquote(type))
+            quote(do: @type(unquote(type)))
           end
         )
 
         unquote_splicing(
           for {:callback, callback, _module_info} <- callbacks do
-            quote(do: @callback unquote(strip_first_callback_param(callback)))
+            quote(do: @callback(unquote(strip_first_callback_param(callback))))
           end
         )
       end
@@ -36,7 +37,10 @@ defmodule Mnemonix.Singleton.Behaviour do
 
   def establish_singleton(module, opts) do
     singleton = Keyword.get(opts, :singleton, false)
-    singleton = if singleton, do: Mnemonix.Singleton.Behaviour.determine_singleton(module, singleton)
+
+    singleton =
+      if singleton, do: Mnemonix.Singleton.Behaviour.determine_singleton(module, singleton)
+
     opts = if singleton, do: Keyword.put(opts, :singleton, {module, singleton}), else: opts
     {singleton, opts}
   end
@@ -53,8 +57,8 @@ defmodule Mnemonix.Singleton.Behaviour do
   def strip_first_callback_param({:when, _, [node, names]}) do
     {:when, [], [strip_first_callback_param(node), names]}
   end
+
   def strip_first_callback_param({:::, _, [{name, _, args}, return]}) do
     {:::, [], [{name, [], tl(args)}, return]}
   end
-
 end

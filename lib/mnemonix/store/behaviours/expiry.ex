@@ -50,5 +50,4 @@ defmodule Mnemonix.Store.Behaviours.Expiry do
   #        {:ok, store} <- expire(store, key, ttl),
   #   do: {:ok, store}
   # end
-
 end

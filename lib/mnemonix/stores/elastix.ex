@@ -7,7 +7,7 @@ if Code.ensure_loaded?(Elastix) do
     """
 
     alias Mnemonix.Store
-    alias HTTPoison.{Response,Error}
+    alias HTTPoison.{Response, Error}
 
     use Store.Behaviour
     use Store.Translator.Raw
@@ -19,17 +19,15 @@ if Code.ensure_loaded?(Elastix) do
     defmodule Conn do
       @moduledoc false
 
-      defstruct [
-        url: "http://127.0.0.1:9200",
-        index: :mnemonix,
-        type: :item,
-        refresh: true,
-      ]
+      defstruct url: "http://127.0.0.1:9200",
+                index: :mnemonix,
+                type: :item,
+                refresh: true
     end
 
-  ####
-  # Mnemonix.Store.Behaviours.Core
-  ##
+    ####
+    # Mnemonix.Store.Behaviours.Core
+    ##
 
     @doc """
     Connects to ElasticSearch to store data using provided `opts`.
@@ -54,57 +52,66 @@ if Code.ensure_loaded?(Elastix) do
 
     """
     @impl Store.Behaviours.Core
-    @spec setup(Store.options)
-      :: {:ok, state :: term} | {:stop, reason :: any}
+    @spec setup(Store.options()) :: {:ok, state :: term} | {:stop, reason :: any}
     def setup(opts) do
       {:ok, struct(Conn, opts)}
     end
 
-  ####
-  # Mnemonix.Store.Behaviours.Map
-  ##
+    ####
+    # Mnemonix.Store.Behaviours.Map
+    ##
 
     @impl Store.Behaviours.Map
-    @spec delete(Store.t, Mnemonix.key)
-      :: Store.Server.instruction
-    def delete(store = %Store{state: %Conn{url: url, index: index, type: type, refresh: refresh}}, key) do
+    @spec delete(Store.t(), Mnemonix.key()) :: Store.Server.instruction()
+    def delete(
+          store = %Store{state: %Conn{url: url, index: index, type: type, refresh: refresh}},
+          key
+        ) do
       case Elastix.Document.delete(url, index, type, key, %{refresh: refresh}) do
         {:ok, %Response{body: _}} -> {:ok, store}
         {:error, %Error{reason: reason}} -> {:raise, store, Exception, [message: reason]}
       end
-
     end
 
     @impl Store.Behaviours.Map
-    @spec fetch(Store.t, Mnemonix.key)
-      :: Store.Server.instruction({:ok, Mnemonix.value} | :error)
+    @spec fetch(Store.t(), Mnemonix.key()) ::
+            Store.Server.instruction({:ok, Mnemonix.value()} | :error)
     def fetch(store = %Store{state: %Conn{url: url, index: index, type: type}}, key) do
       search = %{query: %{term: %{_id: key}}}
 
       case Elastix.Search.search(url, index, [type], search) do
-        {:ok, %Response{body: body}} -> case get_in(body, ["hits", "hits"])  do
-          [%{"_source" => %{"_value" => value}}] -> {:ok, store, {:ok, value}}
-          [%{"_source" => value}]                -> {:ok, store, {:ok, value}}
-          []                                     -> {:ok, store, :error}
-          nil                                    -> {:ok, store, :error}
-        end
-        {:error, %Error{reason: reason}} -> {:raise, store, Exception, [message: reason]}
-      end
+        {:ok, %Response{body: body}} ->
+          case get_in(body, ["hits", "hits"]) do
+            [%{"_source" => %{"_value" => value}}] -> {:ok, store, {:ok, value}}
+            [%{"_source" => value}] -> {:ok, store, {:ok, value}}
+            [] -> {:ok, store, :error}
+            nil -> {:ok, store, :error}
+          end
 
+        {:error, %Error{reason: reason}} ->
+          {:raise, store, Exception, [message: reason]}
+      end
     end
 
     @impl Store.Behaviours.Map
-    @spec put(Store.t, Mnemonix.key, Mnemonix.value)
-      :: Store.Server.instruction
-    def put(store = %Store{state: %Conn{url: url, index: index, type: type, refresh: refresh}}, key, value) do
-      value = if is_map(value), do: value, else:  %{"_value" => value}
+    @spec put(Store.t(), Mnemonix.key(), Mnemonix.value()) :: Store.Server.instruction()
+    def put(
+          store = %Store{state: %Conn{url: url, index: index, type: type, refresh: refresh}},
+          key,
+          value
+        ) do
+      value = if is_map(value), do: value, else: %{"_value" => value}
 
       case Elastix.Document.index(url, index, type, key, value, %{refresh: refresh}) do
-        {:ok, %Response{status_code: code}} when code in [200, 201] -> {:ok, store}
-        {:ok, %Response{body: body }} -> {:raise, store, Exception, [message: get_in(body, ["error", "reason"]) ]}
-        {:error, %Error{reason: reason}} -> {:raise, store, Exception, [message: reason]}
+        {:ok, %Response{status_code: code}} when code in [200, 201] ->
+          {:ok, store}
+
+        {:ok, %Response{body: body}} ->
+          {:raise, store, Exception, [message: get_in(body, ["error", "reason"])]}
+
+        {:error, %Error{reason: reason}} ->
+          {:raise, store, Exception, [message: reason]}
       end
     end
-
   end
 end

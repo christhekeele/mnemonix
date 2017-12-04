@@ -24,9 +24,9 @@ defmodule Mnemonix.Stores.Map do
   use Store.Behaviour
   use Store.Translator.Raw
 
-####
-# Mnemonix.Store.Behaviours.Core
-##
+  ####
+  # Mnemonix.Store.Behaviours.Core
+  ##
 
   @doc """
   Constructs a map to store data using provided `opts`.
@@ -38,56 +38,50 @@ defmodule Mnemonix.Stores.Map do
     - *Default:* `%{}`
   """
   @impl Store.Behaviours.Core
-  @spec setup(Store.options)
-    :: {:ok, state :: term} | {:stop, reason :: any}
+  @spec setup(Store.options()) :: {:ok, state :: term} | {:stop, reason :: any}
   def setup(_opts) do
     {:ok, %{}}
   end
 
-####
-# Mnemonix.Store.Behaviours.Map
-##
+  ####
+  # Mnemonix.Store.Behaviours.Map
+  ##
 
   @impl Store.Behaviours.Map
-  @spec delete(Store.t, Mnemonix.key)
-    :: Store.Server.instruction
+  @spec delete(Store.t(), Mnemonix.key()) :: Store.Server.instruction()
   def delete(store = %Store{state: map}, key) do
     {:ok, %{store | state: Map.delete(map, key)}}
   end
 
   @impl Store.Behaviours.Map
-  @spec fetch(Store.t, Mnemonix.key)
-    :: Store.Server.instruction({:ok, Mnemonix.value} | :error)
+  @spec fetch(Store.t(), Mnemonix.key()) ::
+          Store.Server.instruction({:ok, Mnemonix.value()} | :error)
   def fetch(store = %Store{state: map}, key) do
     {:ok, store, Map.fetch(map, key)}
   end
 
   @impl Store.Behaviours.Map
-  @spec put(Store.t, Mnemonix.key, Mnemonix.value)
-    :: Store.Server.instruction
+  @spec put(Store.t(), Mnemonix.key(), Mnemonix.value()) :: Store.Server.instruction()
   def put(store = %Store{state: map}, key, value) do
     {:ok, %{store | state: Map.put(map, key, value)}}
   end
 
-####
-# Mnemonix.Store.Behaviours.Enumerable
-##
+  ####
+  # Mnemonix.Store.Behaviours.Enumerable
+  ##
 
   @doc """
   Returns `true`: this store supports the functions in `Mnemonix.Features.Enumerable`.
   """
   @impl Store.Behaviours.Enumerable
-  @spec enumerable?(Mnemonix.Store.t)
-    :: Store.Server.instruction(boolean)
+  @spec enumerable?(Mnemonix.Store.t()) :: Store.Server.instruction(boolean)
   def enumerable?(store) do
     {:ok, store, true}
   end
 
   @impl Store.Behaviours.Enumerable
-  @spec to_enumerable(Mnemonix.Store.t)
-    :: Store.Server.instruction([Mnemonix.pair])
+  @spec to_enumerable(Mnemonix.Store.t()) :: Store.Server.instruction([Mnemonix.pair()])
   def to_enumerable(store = %Store{state: map}) do
     {:ok, store, Map.to_list(map)}
   end
-
 end

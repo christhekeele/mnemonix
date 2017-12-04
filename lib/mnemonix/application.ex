@@ -51,16 +51,16 @@ defmodule Mnemonix.Application do
       config :mnemonix, Bar: {Mnemonix.Stores.ETS, table: Baz}
   """
   @impl Application
-  @spec start(Application.start_type, [Mnemonix.spec])
-    :: {:ok, pid} | {:error, reason :: term}
+  @spec start(Application.start_type(), [Mnemonix.spec()]) ::
+          {:ok, pid} | {:error, reason :: term}
   def start(_type, [default]) do
     :mnemonix
     |> Application.get_env(:stores, [])
     |> Enum.map(fn name ->
-      :mnemonix
-      |> Application.get_env(name, default)
-      |> prepare_child_spec(name)
-    end)
+         :mnemonix
+         |> Application.get_env(name, default)
+         |> prepare_child_spec(name)
+       end)
     |> Supervisor.start_link(strategy: :one_for_one, name: Mnemonix.Supervisor)
   end
 
@@ -74,12 +74,14 @@ defmodule Mnemonix.Application do
   This is the specification used for stores named in `config :mnemonix, :stores`
   without corresponding configuration under `config :mnemonix, <store_name>`.
   """
-  @spec specification :: Mnemonix.spec
-  def specification, do: :mnemonix
-    |> Application.spec
-    |> Keyword.get(:mod)
-    |> elem(1)
-    |> List.first
+  @spec specification :: Mnemonix.spec()
+  def specification,
+    do:
+      :mnemonix
+      |> Application.spec()
+      |> Keyword.get(:mod)
+      |> elem(1)
+      |> List.first()
 
   @doc """
   Convenience function to access the current hex version of the `Mnemonix` application.
@@ -87,5 +89,4 @@ defmodule Mnemonix.Application do
   def version do
     with {:ok, version} = :application.get_key(:mnemonix, :vsn), do: version
   end
-
 end
