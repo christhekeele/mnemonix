@@ -18,7 +18,7 @@ elixir:
   - 1.5.0
 os:
   - linux
-  - osx
+  # - osx
   # - windows
   
 branches:
