@@ -70,7 +70,7 @@ defmodule Mnemonix do
   functions keep parity with the `Map` API, but be warned: they are only implemented for a subset of
   stores, and may be very inefficient. Consult your store's specific documentation for more details.
 
-  These `Map` equivalents will raise `Mnemonix.Features.Enumerable.Error` if your store doesn't
+  These `Map` equivalents will raise `Mnemonix.Features.Enumerable.Exception` if your store doesn't
   support them:
 
   - `Mnemonix.Features.Enumerable.equal?/2`

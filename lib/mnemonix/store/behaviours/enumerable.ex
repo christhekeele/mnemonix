@@ -17,7 +17,7 @@ defmodule Mnemonix.Store.Behaviours.Enumerable do
   @doc """
   Returns `false`: this store does not support the functions in `Mnemonix.Features.Enumerable`.
 
-  Invoking any of those functions on this store will raise a `Mnemonix.Features.Enumerable.Error`.
+  Invoking any of those functions on this store will raise a `Mnemonix.Features.Enumerable.Exception`.
   """
   @spec enumerable?(Store.t()) :: Store.Server.instruction(boolean)
   def enumerable?(store) do
@@ -28,7 +28,7 @@ defmodule Mnemonix.Store.Behaviours.Enumerable do
   @doc false
   @spec to_enumerable(Store.t()) :: Store.Server.instruction([Mnemonix.pair()])
   def to_enumerable(store) do
-    {:raise, store, Mnemonix.Features.Enumerable.Error, [module: store.impl]}
+    {:raise, store, Mnemonix.Features.Enumerable.Exception, [module: store.impl]}
   end
 
   @callback keys(Store.t()) :: Store.Server.instruction([Mnemonix.key()] | {:default, module})
