@@ -121,7 +121,7 @@ defmodule Mnemonix.Behaviour do
       ) do
     params =
       params
-      normalize_params
+      |> normalize_params
       |> Macro.prewalk(fn
            {:=, _, [{name, _, context} = arg1, arg2]} ->
              if is_atom(name) and (is_atom(context) or context == nil) do
