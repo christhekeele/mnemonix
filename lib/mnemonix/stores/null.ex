@@ -39,20 +39,20 @@ defmodule Mnemonix.Stores.Null do
 
   @impl Store.Behaviours.Map
   @spec delete(Store.t(), Mnemonix.key()) :: Store.Server.instruction()
-  def delete(store = %Store{}, _key) do
+  def delete(%Store{} = store, _key) do
     {:ok, store}
   end
 
   @impl Store.Behaviours.Map
   @spec fetch(Store.t(), Mnemonix.key()) ::
           Store.Server.instruction({:ok, Mnemonix.value()} | :error)
-  def fetch(store = %Store{}, _key) do
+  def fetch(%Store{} = store, _key) do
     {:ok, store, {:ok, nil}}
   end
 
   @impl Store.Behaviours.Map
   @spec put(Store.t(), Mnemonix.key(), Mnemonix.value()) :: Store.Server.instruction()
-  def put(store = %Store{}, _key, _value) do
+  def put(%Store{} = store, _key, _value) do
     {:ok, store}
   end
 
@@ -71,7 +71,7 @@ defmodule Mnemonix.Stores.Null do
 
   @impl Store.Behaviours.Enumerable
   @spec to_enumerable(Store.t()) :: Store.Server.instruction([Mnemonix.pair()])
-  def to_enumerable(store = %Store{}) do
+  def to_enumerable(%Store{} = store) do
     {:ok, store, []}
   end
 end

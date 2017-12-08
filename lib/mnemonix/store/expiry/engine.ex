@@ -16,11 +16,11 @@ defmodule Mnemonix.Store.Expiry.Engine do
   #   {:ok, %__MODULE__{default: default_ttl}}
   # end
   #
-  # def expire(store = %Mnemonix.Store{expiry: engine}, key, ttl \\ nil) do
+  # def expire(Mnemonix.Store{expiry: engine} = store, key, ttl \\ nil) do
   #   GenServer.call(engine, {:expire, store, key, ttl})
   # end
   #
-  # def persist(store = %Mnemonix.Store{expiry: engine}, key) do
+  # def persist(%Mnemonix.Store{expiry: engine} = store, key) do
   #   GenServer.call(engine, {:persist, store, key})
   # end
   #

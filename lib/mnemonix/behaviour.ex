@@ -106,19 +106,14 @@ defmodule Mnemonix.Behaviour do
   end
 
   # If we are inlining, we may need any and all functions, private ones included
-  def compose_default(info = %{inline: true}, doc, name, params, guards, body) do
+  def compose_default(%{inline: true} = info, doc, name, params, guards, body) do
     compose_definition(info, doc, name, params, guards, body)
   end
 
   # Otherwise we are only interested in public functions
-  def compose_default(
-        info = %{kind: :def, module: module, singleton: singleton, callback: callback},
-        doc,
-        name,
-        params,
-        guards,
-        _body
-      ) do
+  def compose_default(%{kind: :def} = info, doc, name, params, guards, _body) do
+    %{module: module, singleton: singleton, callback: callback} = info
+
     params =
       params
       |> normalize_params
@@ -197,7 +192,7 @@ defmodule Mnemonix.Behaviour do
     compose_application(source, name, args)
   end
 
-  defp compose_definition(info = %{kind: :def}, doc, name, params, guards, body) do
+  defp compose_definition(%{kind: :def} = info, doc, name, params, guards, body) do
     [
       compose_docs(info, doc),
       compose_function(:def, name, params, guards, body)
@@ -208,7 +203,7 @@ defmodule Mnemonix.Behaviour do
     compose_function(:defp, name, params, guards, body)
   end
 
-  defp compose_docs(info = %{docs: false}, _doc), do: compose_docs(info, false)
+  defp compose_docs(%{docs: false} = info, _doc), do: compose_docs(info, false)
 
   defp compose_docs(_info, {_, doc}) when is_binary(doc) do
     compose_module_attribute(:doc, doc)

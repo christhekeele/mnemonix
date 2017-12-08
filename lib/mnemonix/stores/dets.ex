@@ -81,7 +81,7 @@ defmodule Mnemonix.Stores.DETS do
 
   @impl Store.Behaviours.Map
   @spec delete(Store.t(), Mnemonix.key()) :: Store.Server.instruction()
-  def delete(store = %Store{state: table}, key) do
+  def delete(%Store{state: table} = store, key) do
     case :dets.delete(table, key) do
       :ok -> {:ok, store}
       {:error, reason} -> {:raise, store, Exception, reason: reason}
@@ -91,7 +91,7 @@ defmodule Mnemonix.Stores.DETS do
   @impl Store.Behaviours.Map
   @spec fetch(Store.t(), Mnemonix.key()) ::
           Store.Server.instruction({:ok, Mnemonix.value()} | :error)
-  def fetch(store = %Store{state: table}, key) do
+  def fetch(%Store{state: table} = store, key) do
     case :dets.lookup(table, key) do
       [{^key, value} | []] -> {:ok, store, {:ok, value}}
       [] -> {:ok, store, :error}
@@ -101,7 +101,7 @@ defmodule Mnemonix.Stores.DETS do
 
   @impl Store.Behaviours.Map
   @spec put(Store.t(), Mnemonix.key(), Mnemonix.value()) :: Store.Server.instruction()
-  def put(store = %Store{state: table}, key, value) do
+  def put(%Store{state: table} = store, key, value) do
     case :dets.insert(table, {key, value}) do
       :ok -> {:ok, store}
       {:error, reason} -> {:raise, store, Exception, reason: reason}

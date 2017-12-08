@@ -12,7 +12,7 @@ defmodule Mnemonix.Store.Behaviours.Expiry do
   # @spec setup_expiry(Mnemonix.Store.t)
   #   :: {:ok, Mnemonix.Store.t} | {:error, reason}
   #     when reason: :normal | :shutdown | {:shutdown, term} | term
-  # def setup_expiry(store = %Store{opts: opts}) do
+  # def setup_expiry(%Store{opts: opts} = store) do
   #   with {:ok, engine} <- Expiry.Engine.start_link(opts) do
   #     {:ok, %{store | expiry: engine}}
   #   end

@@ -110,7 +110,7 @@ defmodule Mnemonix.Stores.ETS do
 
   @impl Store.Behaviours.Map
   @spec delete(Store.t(), Mnemonix.key()) :: Store.Server.instruction()
-  def delete(store = %Store{state: table}, key) do
+  def delete(%Store{state: table} = store, key) do
     :ets.delete(table, key)
     {:ok, store}
   end
@@ -118,7 +118,7 @@ defmodule Mnemonix.Stores.ETS do
   @impl Store.Behaviours.Map
   @spec fetch(Store.t(), Mnemonix.key()) ::
           Store.Server.instruction({:ok, Mnemonix.value()} | :error)
-  def fetch(store = %Store{state: table}, key) do
+  def fetch(%Store{state: table} = store, key) do
     case :ets.lookup(table, key) do
       [{^key, value} | []] -> {:ok, store, {:ok, value}}
       [] -> {:ok, store, :error}
@@ -128,7 +128,7 @@ defmodule Mnemonix.Stores.ETS do
 
   @impl Store.Behaviours.Map
   @spec put(Store.t(), Mnemonix.key(), Mnemonix.value()) :: Store.Server.instruction()
-  def put(store = %Store{state: table}, key, value) do
+  def put(%Store{state: table} = store, key, value) do
     :ets.insert(table, {key, value})
     {:ok, store}
   end
@@ -148,7 +148,7 @@ defmodule Mnemonix.Stores.ETS do
 
   @impl Store.Behaviours.Enumerable
   @spec to_enumerable(Store.t()) :: Store.Server.instruction([Mnemonix.pair()])
-  def to_enumerable(store = %Store{state: table}) do
+  def to_enumerable(%Store{state: table} = store) do
     {:ok, store, :ets.tab2list(table)}
   end
 end

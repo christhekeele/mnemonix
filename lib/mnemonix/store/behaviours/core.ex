@@ -47,7 +47,9 @@ defmodule Mnemonix.Store.Behaviours.Core do
   end
 
   @callback setup_initial(Mnemonix.Store.t()) :: {:ok, Mnemonix.store()} | no_return
-  def setup_initial(store = %Mnemonix.Store{impl: impl, opts: opts}) do
+  def setup_initial(%Mnemonix.Store{} = store) do
+    %Mnemonix.Store{impl: impl, opts: opts} = store
+
     {:ok, store} =
       opts
       |> Keyword.get(:initial, %{})

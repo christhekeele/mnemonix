@@ -63,10 +63,9 @@ if Code.ensure_loaded?(Elastix) do
 
     @impl Store.Behaviours.Map
     @spec delete(Store.t(), Mnemonix.key()) :: Store.Server.instruction()
-    def delete(
-          store = %Store{state: %Conn{url: url, index: index, type: type, refresh: refresh}},
-          key
-        ) do
+    def delete(%Store{} = store, key) do
+      %Store{state: %Conn{url: url, index: index, type: type, refresh: refresh}} = store
+
       case Elastix.Document.delete(url, index, type, key, %{refresh: refresh}) do
         {:ok, %Response{body: _}} -> {:ok, store}
         {:error, %Error{reason: reason}} -> {:raise, store, Exception, [message: reason]}
@@ -76,7 +75,8 @@ if Code.ensure_loaded?(Elastix) do
     @impl Store.Behaviours.Map
     @spec fetch(Store.t(), Mnemonix.key()) ::
             Store.Server.instruction({:ok, Mnemonix.value()} | :error)
-    def fetch(store = %Store{state: %Conn{url: url, index: index, type: type}}, key) do
+    def fetch(%Store{} = store, key) do
+      %Store{state: %Conn{url: url, index: index, type: type}} = store
       search = %{query: %{term: %{_id: key}}}
 
       case Elastix.Search.search(url, index, [type], search) do
@@ -95,11 +95,8 @@ if Code.ensure_loaded?(Elastix) do
 
     @impl Store.Behaviours.Map
     @spec put(Store.t(), Mnemonix.key(), Mnemonix.value()) :: Store.Server.instruction()
-    def put(
-          store = %Store{state: %Conn{url: url, index: index, type: type, refresh: refresh}},
-          key,
-          value
-        ) do
+    def put(%Store{} = store, key, value) do
+      %Store{state: %Conn{url: url, index: index, type: type, refresh: refresh}} = store
       value = if is_map(value), do: value, else: %{"_value" => value}
 
       case Elastix.Document.index(url, index, type, key, value, %{refresh: refresh}) do
