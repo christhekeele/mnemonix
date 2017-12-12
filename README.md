@@ -101,7 +101,7 @@ Here are some useful commands if you've just forked the project and want to cont
 - `mix coveralls.html` - Generate test suite coverage report
 - `mix docs` - Generate documentation pages
 - `mix inch` - Evaluate quality of documentation
-- `mix all` - All of the above
+- `mix checks` - Run all of the above checks and analyses
 - `mix clean` - If any of the above stop behaving as expected
 
 For more information on helping the development of Mnemonix,

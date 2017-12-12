@@ -33,6 +33,7 @@ defmodule Mnemonix.Mixfile do
 
   defp tools, do: [
     {:benchfella,  "~> 0.3",  only: [:dev, :test]},
+    {:cortex,      "~> 0.4",  only: [:dev, :test]},
     {:credo,       "~> 0.6",  only: [:dev, :test]},
     {:dialyzex,    "~> 1.0",  only: [:dev, :test]},
     {:excoveralls, "~> 0.6",  only: [:dev, :test]},
@@ -84,7 +85,7 @@ defmodule Mnemonix.Mixfile do
   ]
 
   defp aliases, do: [
-    all: ~w[deps.get coveralls.html dialyzer docs inch],
+    checks: ~w[bench coveralls.html dialyzer docs inch],
   ]
 
   defp coverage, do: [

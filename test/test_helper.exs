@@ -3,10 +3,23 @@ ExUnit.start(timeout: 5000)
 exclusions = []
 
 # Exclude doctests unless told not to.
-exclusions = if System.get_env("DOCTESTS"), do: exclusions, else: [:doctest | exclusions]
+exclusions = if System.get_env("DOCTESTS") do
+  exclusions
+else
+  Mix.shell.info "Skipping doctests."
+  Mix.shell.info "Specify `DOCTESTS=true` to enable them."
+  [:doctest | exclusions]
+end
 
 # Determine if we should raise if we can't run a portion of the suite.
-mandatory = System.get_env("ALL_BACKENDS")
+mandatory = (System.get_env("ALL_BACKENDS") == "true")
+if mandatory do
+  Mix.shell.info "Running in mandatory backend mode. Suite will fail if a test backend is unavailable."
+  Mix.shell.info "Specify `ALL_BACKENDS=false` to disable this and only run tests for available backends."
+else
+  Mix.shell.info "Running in permissive backend mode. Suite will skip tests against unavailable backends."
+  Mix.shell.info "Specify `ALL_BACKENDS=true` to fail the suite if one is unavailable instead."
+end
 
 # Exclude filesystem-dependent tests if the file system is not writable.
 filesystem_dir = String.to_charlist(System.get_env("FILESYSTEM_TEST_DIR") || System.tmp_dir())

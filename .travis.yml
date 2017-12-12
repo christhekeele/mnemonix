@@ -33,6 +33,7 @@ env:
     - DOCTESTS=true
     - ALL_BACKENDS=true
 install:
+  - sudo apt-get -y install inotify-tools # for cortex
   - mix local.rebar --force
   - mix local.hex --force
   - mix deps.get
