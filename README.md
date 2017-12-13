@@ -66,25 +66,20 @@ Available features are:
 - `Mnemonix.Features.Bump` - Increment/decrement integer values
 - `Mnemonix.Features.Expiry` - Set entries to remove themselves from the store with a ttl
 - `Mnemonix.Features.Enumerable` - Iterate over all key/value pairs in supported stores
-- `Mnemonix.Features.Supervision` - Handles `start_link` for custom stores so they fit in with built-in tools
 
 ## Installation
 
-- Add `Mnemonix` to your project's dependencies in its `mix.exs`:
+Add `Mnemonix` to your project's dependencies in its `mix.exs`:
 
-  ```elixir
-  def deps do
-    [{:mnemonix, "~> 0.9.0"}]
-  end
-  ```
-
-- Ensure `Mnemonix` is started before your application:
-
-  ```elixir
-  def application do
-    [applications: [:mnemonix]]
-  end
-  ```
+```elixir
+def deps do
+  [
+    # ...
+    {:mnemonix, "~> 0.10.0"},
+    # ...
+  ]
+end
+```
 
 ## Contributing
 

@@ -661,9 +661,9 @@ defmodule Mnemonix.Store.Server do
 
   # Core Enumerable behaviours
 
-  @spec handle_call(:enumerable?, GenServer.from(), Store.t()) ::
+  @spec handle_call({:enumerable?}, GenServer.from(), Store.t()) ::
           {:reply, reply(boolean), Store.t()}
-  def handle_call(:enumerable?, _, %Store{impl: impl} = store) do
+  def handle_call({:enumerable?}, _, %Store{impl: impl} = store) do
     case impl.enumerable?(store) do
       {:ok, store, enumerability} ->
         {:reply, {:ok, enumerability}, store}
@@ -676,9 +676,9 @@ defmodule Mnemonix.Store.Server do
     end
   end
 
-  @spec handle_call(:to_enumerable, GenServer.from(), Store.t()) ::
+  @spec handle_call({:to_enumerable}, GenServer.from(), Store.t()) ::
           {:reply, reply([Mnemonix.pair()]), Store.t()}
-  def handle_call(:to_enumerable, _, %Store{impl: impl} = store) do
+  def handle_call({:to_enumerable}, _, %Store{impl: impl} = store) do
     case impl.to_enumerable(store) do
       {:ok, store, pairs} when is_list(pairs) ->
         {:reply, {:ok, deserialize_pairs(store, pairs)}, store}
@@ -693,9 +693,9 @@ defmodule Mnemonix.Store.Server do
 
   # Derived Enumerable behaviours
 
-  @spec handle_call(:keys, GenServer.from(), Store.t()) ::
+  @spec handle_call({:keys}, GenServer.from(), Store.t()) ::
           {:reply, reply([Mnemonix.key()]), Store.t()}
-  def handle_call(:keys, _, %Store{impl: impl} = store) do
+  def handle_call({:keys}, _, %Store{impl: impl} = store) do
     case impl.keys(store) do
       {:ok, store, {:default, ^impl}} ->
         case impl.to_enumerable(store) do
@@ -724,9 +724,9 @@ defmodule Mnemonix.Store.Server do
     end
   end
 
-  @spec handle_call(:to_list, GenServer.from(), Store.t()) ::
+  @spec handle_call({:to_list}, GenServer.from(), Store.t()) ::
           {:reply, reply([Mnemonix.pair()]), Store.t()}
-  def handle_call(:to_list, _, %Store{impl: impl} = store) do
+  def handle_call({:to_list}, _, %Store{impl: impl} = store) do
     case impl.to_list(store) do
       {:ok, store, {:default, ^impl}} ->
         case impl.to_enumerable(store) do
@@ -751,9 +751,9 @@ defmodule Mnemonix.Store.Server do
     end
   end
 
-  @spec handle_call(:values, GenServer.from(), Store.t()) ::
+  @spec handle_call({:values}, GenServer.from(), Store.t()) ::
           {:reply, reply([Mnemonix.value()]), Store.t()}
-  def handle_call(:values, _, %Store{impl: impl} = store) do
+  def handle_call({:values}, _, %Store{impl: impl} = store) do
     case impl.values(store) do
       {:ok, store, {:default, ^impl}} ->
         case impl.to_enumerable(store) do

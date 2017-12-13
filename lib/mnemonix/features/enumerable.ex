@@ -45,7 +45,7 @@ defmodule Mnemonix.Features.Enumerable do
   """
   @spec enumerable?(Mnemonix.store()) :: boolean | no_return
   def enumerable?(store) do
-    case GenServer.call(store, :enumerable?) do
+    case GenServer.call(store, {:enumerable?}) do
       {:ok, enumerable} -> enumerable
       {:raise, type, args} -> raise type, args
     end
@@ -76,8 +76,8 @@ defmodule Mnemonix.Features.Enumerable do
   """
   @spec equal?(Mnemonix.store(), Mnemonix.store()) :: boolean | no_return
   def equal?(store1, store2) do
-    with {:ok, result1} when not is_tuple(result1) <- GenServer.call(store1, :to_enumerable),
-         {:ok, result2} when not is_tuple(result2) <- GenServer.call(store2, :to_enumerable) do
+    with {:ok, result1} when not is_tuple(result1) <- GenServer.call(store1, {:to_enumerable}),
+         {:ok, result2} when not is_tuple(result2) <- GenServer.call(store2, {:to_enumerable}) do
       result1 === result2
     else
       {:raise, type, args} -> raise type, args
@@ -106,7 +106,7 @@ defmodule Mnemonix.Features.Enumerable do
   """
   @spec keys(Mnemonix.store()) :: [Mnemonix.key()] | no_return
   def keys(store) do
-    case GenServer.call(store, :keys) do
+    case GenServer.call(store, {:keys}) do
       {:ok, keys} -> keys
       {:raise, type, args} -> raise type, args
     end
@@ -141,7 +141,7 @@ defmodule Mnemonix.Features.Enumerable do
   """
   @spec to_list(Mnemonix.store()) :: [{Mnemonix.key(), Mnemonix.value()}] | no_return
   def to_list(store) do
-    case GenServer.call(store, :to_list) do
+    case GenServer.call(store, {:to_list}) do
       {:ok, list} -> list
       {:raise, type, args} -> raise type, args
     end
@@ -168,7 +168,7 @@ defmodule Mnemonix.Features.Enumerable do
   """
   @spec values(Mnemonix.store()) :: [Mnemonix.value()] | no_return
   def values(store) do
-    case GenServer.call(store, :values) do
+    case GenServer.call(store, {:values}) do
       {:ok, values} -> values
       {:raise, type, args} -> raise type, args
     end

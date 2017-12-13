@@ -6,6 +6,7 @@ There are several things you can do to help out:
 
 - [Report bugs](#reporting-bugs)
 - [Submit your usecase](#creating-guides)
+- [Validate existing guides](#validating-guides)
 - [Improve documentation](#improving-documentation)
 - [Add tests](#adding-tests)
 - [Participate on GitHub](#triaging-contributions)
@@ -31,9 +32,16 @@ Please follow the issue template if you can't find an existing discussion about 
 Creating guides
 ---------------
 
+[new-guide-template]: https://github.com/christhekeele/mnemonix/wiki/_new?wiki%5Bname%5D=Your%20Guide%20Name&wiki%5Bbody%5D=Don%27t%20forget%20to%20update%20the%20wiki%20%5Bhomepage%5D%28https%3A%2F%2Fgithub.com%2Fchristhekeele%2Fmnemonix%2Fwiki%2FHome%2F_edit%29%20and%20%5Bsidebar%5D%28https%3A%2F%2Fgithub.com%2Fchristhekeele%2Fmnemonix%2Fwiki%2F_Sidebar%2F_edit%29%20after%20you%20publish%20your%20guide%21%0D%0A%0D%0A
+
 We use our [GitHub wiki](https://github.com/christhekeele/mnemonix/wiki) to document various ways people are using Mnemonix.
 
-Anyone can edit it, so if you don't see a guide for your use-case, or you can build upon instructions for an existing one, [go nuts](https://github.com/christhekeele/mnemonix/wiki/_new?wiki%5Bname%5D=Howto%3A)!
+Anyone can edit it, so if you don't see a guide for your use-case, or you can build upon instructions for an existing one, go nuts! Please be thoughtful when editing content contributed by others, and look through [existing guides](https://github.com/christhekeele/mnemonix/wiki#using-mnemonix) before [creating your own][new-guide-template] to make sure your topic has not already been covered.
+
+Validating guides
+-----------------
+
+The [Mnemonix wiki](https://github.com/christhekeele/mnemonix/wiki) to document various ways people are using Mnemonix.
 
 Improving documentation
 -----------------------
