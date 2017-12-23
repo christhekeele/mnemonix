@@ -1,4 +1,6 @@
 defmodule Mnemonix.Features.Expiry do
+  @name Inspect.inspect(__MODULE__, %Inspect.Opts{})
+
   @moduledoc """
   Functions to manage the time-to-live of entries within a store.
 
@@ -26,14 +28,14 @@ defmodule Mnemonix.Features.Expiry do
   # ## Examples
   #
   #     iex> store = Mnemonix.new(%{a: 1})
-  #     iex> Mnemonix.expire(store, :a, 1)
+  #     iex> #{@name}.expire(store, :a, 1)
   #     iex> :timer.sleep(200)
   #     iex> Mnemonix.get(store, :a)
   #     nil
   #
   #     iex> store = Mnemonix.new(%{a: 1})
-  #     iex> Mnemonix.expire(store, :a, 24 * 60 * 60 * 1)
-  #     iex> Mnemonix.expire(store, :a, 1)
+  #     iex> #{@name}.expire(store, :a, 24 * 60 * 60 * 1)
+  #     iex> #{@name}.expire(store, :a, 1)
   #     iex> :timer.sleep(200)
   #     iex> Mnemonix.get(store, :a)
   #     nil
@@ -57,14 +59,14 @@ defmodule Mnemonix.Features.Expiry do
   # ## Examples
   #
   #     iex> store = Mnemonix.new(%{a: 1})
-  #     iex> Mnemonix.expire(store, :a, 1)
+  #     iex> #{@name}.expire(store, :a, 1)
   #     iex> :timer.sleep(200)
-  #     iex> Mnemonix.get(store, :a)
+  #     iex> #{@name}.get(store, :a)
   #     nil
   #
   #     iex> store = Mnemonix.new(%{a: 1})
-  #     iex> Mnemonix.expire(store, :a, 24 * 60 * 60 * 1)
-  #     iex> Mnemonix.expire(store, :a, 1)
+  #     iex> #{@name}.expire(store, :a, 24 * 60 * 60 * 1)
+  #     iex> #{@name}.expire(store, :a, 1)
   #     iex> :timer.sleep(200)
   #     iex> Mnemonix.get(store, :a)
   #     nil
@@ -89,7 +91,7 @@ defmodule Mnemonix.Features.Expiry do
   #
   #     iex> store = Mnemonix.new(%{a: 1})
   #     iex> Mnemonix.expire(store, :a, 200)
-  #     iex> Mnemonix.persist(store, :a)
+  #     iex> #{@name}.persist(store, :a)
   #     iex> :timer.sleep(200)
   #     iex> Mnemonix.get(store, :a)
   #     1
@@ -115,7 +117,7 @@ defmodule Mnemonix.Features.Expiry do
   # ## Examples
   #
   #     iex> store = Mnemonix.new
-  #     iex> Mnemonix.put_and_expire(store, :a, "bar", 1)
+  #     iex> #{@name}.put_and_expire(store, :a, "bar", 1)
   #     iex> Mnemonix.get(store, :a)
   #     "bar"
   #     iex> :timer.sleep(200)
@@ -138,7 +140,7 @@ defmodule Mnemonix.Features.Expiry do
   # ## Examples
   #
   #     iex> store = Mnemonix.new
-  #     iex> Mnemonix.put_and_expire(store, :a, "bar", 1)
+  #     iex> #{@name}.put_and_expire(store, :a, "bar", 1)
   #     iex> Mnemonix.get(store, :a)
   #     "bar"
   #     iex> :timer.sleep(200)

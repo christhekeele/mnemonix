@@ -1,4 +1,6 @@
 defmodule Mnemonix.Stores.DETS do
+  @name Inspect.inspect(__MODULE__, %Inspect.Opts{})
+
   @moduledoc """
   A `Mnemonix.Store` that uses a DETS table to store state.
 
@@ -46,7 +48,7 @@ defmodule Mnemonix.Stores.DETS do
 
   - `table:` Name of the table to connect to.
 
-    - *Default:* `#{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}.Table`
+    - *Default:* `#{@name}.Table`
 
   - `initial:` A map of key/value pairs to ensure are set on the ETS table at boot.
 

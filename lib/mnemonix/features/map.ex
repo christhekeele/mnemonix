@@ -1,4 +1,6 @@
 defmodule Mnemonix.Features.Map do
+  @name Inspect.inspect(__MODULE__, %Inspect.Opts{})
+
   @moduledoc """
   Functions to operate on key/value pairs within a store.
 
@@ -20,7 +22,7 @@ defmodule Mnemonix.Features.Map do
       iex> store = Mnemonix.new(%{a: 1})
       iex> Mnemonix.get(store, :a)
       1
-      iex> Mnemonix.delete(store, :a)
+      iex> #{@name}.delete(store, :a)
       iex> Mnemonix.get(store, :a)
       nil
   """
@@ -42,9 +44,9 @@ defmodule Mnemonix.Features.Map do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> Mnemonix.fetch(store, :a)
+      iex> #{@name}.fetch(store, :a)
       {:ok, 1}
-      iex> Mnemonix.fetch(store, :b)
+      iex> #{@name}.fetch(store, :b)
       :error
   """
   @spec fetch(Mnemonix.store(), Mnemonix.key()) :: {:ok, Mnemonix.value()} | :error | no_return
@@ -63,10 +65,10 @@ defmodule Mnemonix.Features.Map do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> Mnemonix.Features.Map.get(store, :b)
+      iex> Mnemonix.get(store, :b)
       nil
-      iex> Mnemonix.Features.Map.put(store, :b, 2)
-      iex> Mnemonix.Features.Map.get(store, :b)
+      iex> #{@name}.put(store, :b, 2)
+      iex> Mnemonix.get(store, :b)
       2
   """
   @spec put(Mnemonix.store(), Mnemonix.key(), Mnemonix.value()) :: Mnemonix.store() | no_return
@@ -85,7 +87,8 @@ defmodule Mnemonix.Features.Map do
 
   ## Examples
 
-      iex> store = Mnemonix.drop Mnemonix.new(%{a: 1, b: 2, d: 4}), [:a, :b, :c]
+      iex> store = Mnemonix.new(%{a: 1, b: 2, d: 4})
+      iex> #{@name}.drop(store, [:a, :b, :c])
       iex> Mnemonix.get store, :a
       nil
       iex> Mnemonix.get store, :d
@@ -110,9 +113,9 @@ defmodule Mnemonix.Features.Map do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> Mnemonix.fetch!(store, :a)
+      iex> #{@name}.fetch!(store, :a)
       1
-      iex> Mnemonix.fetch!(store, :b)
+      iex> #{@name}.fetch!(store, :b)
       ** (KeyError) key :b not found in: Mnemonix.Stores.Map
   """
   @spec fetch!(Mnemonix.store(), Mnemonix.key()) :: {:ok, Mnemonix.value()} | :error | no_return
@@ -132,9 +135,9 @@ defmodule Mnemonix.Features.Map do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> Mnemonix.get(store, :a)
+      iex> #{@name}.get(store, :a)
       1
-      iex> Mnemonix.get(store, :b)
+      iex> #{@name}.get(store, :b)
       nil
   """
   @spec get(Mnemonix.store(), Mnemonix.key()) :: Mnemonix.value() | no_return
@@ -155,9 +158,9 @@ defmodule Mnemonix.Features.Map do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> Mnemonix.get(store, :a, 2)
+      iex> #{@name}.get(store, :a, 2)
       1
-      iex> Mnemonix.get(store, :b, 2)
+      iex> #{@name}.get(store, :b, 2)
       2
   """
   @spec get(Mnemonix.store(), Mnemonix.key(), Mnemonix.value()) :: Mnemonix.value() | no_return
@@ -190,7 +193,7 @@ defmodule Mnemonix.Features.Map do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> {value, ^store} = Mnemonix.get_and_update(store, :a, fn current ->
+      iex> {value, ^store} = #{@name}.get_and_update(store, :a, fn current ->
       ...>   {current, "new value!"}
       ...> end)
       iex> value
@@ -199,7 +202,7 @@ defmodule Mnemonix.Features.Map do
       "new value!"
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> {value, ^store} = Mnemonix.get_and_update(store, :b, fn current ->
+      iex> {value, ^store} = #{@name}.get_and_update(store, :b, fn current ->
       ...>   {current, "new value!"}
       ...> end)
       iex> value
@@ -208,14 +211,14 @@ defmodule Mnemonix.Features.Map do
       "new value!"
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> {value, ^store} = Mnemonix.get_and_update(store, :a, fn _ -> :pop end)
+      iex> {value, ^store} = #{@name}.get_and_update(store, :a, fn _ -> :pop end)
       iex> value
       1
       iex> Mnemonix.get(store, :a)
       nil
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> {value, ^store} = Mnemonix.get_and_update(store, :b, fn _ -> :pop end)
+      iex> {value, ^store} = #{@name}.get_and_update(store, :b, fn _ -> :pop end)
       iex> value
       nil
       iex> Mnemonix.get(store, :b)
@@ -254,7 +257,7 @@ defmodule Mnemonix.Features.Map do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> {value, ^store} = Mnemonix.get_and_update!(store, :a, fn current ->
+      iex> {value, ^store} = #{@name}.get_and_update!(store, :a, fn current ->
       ...>   {current, "new value!"}
       ...> end)
       iex> value
@@ -263,20 +266,20 @@ defmodule Mnemonix.Features.Map do
       "new value!"
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> {_value, ^store} = Mnemonix.get_and_update!(store, :b, fn current ->
+      iex> {_value, ^store} = #{@name}.get_and_update!(store, :b, fn current ->
       ...>   {current, "new value!"}
       ...> end)
       ** (KeyError) key :b not found in: Mnemonix.Stores.Map
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> {value, ^store} = Mnemonix.get_and_update!(store, :a, fn _ -> :pop end)
+      iex> {value, ^store} = #{@name}.get_and_update!(store, :a, fn _ -> :pop end)
       iex> value
       1
       iex> Mnemonix.get(store, :a)
       nil
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> {_value, ^store} = Mnemonix.get_and_update!(store, :b, fn _ -> :pop end)
+      iex> {_value, ^store} = #{@name}.get_and_update!(store, :b, fn _ -> :pop end)
       ** (KeyError) key :b not found in: Mnemonix.Stores.Map
   """
   @spec get_and_update!(
@@ -309,9 +312,9 @@ defmodule Mnemonix.Features.Map do
       ...>   # some expensive operation here
       ...>   13
       ...> end
-      iex> Mnemonix.get_lazy(store, :a, fun)
+      iex> #{@name}.get_lazy(store, :a, fun)
       1
-      iex> Mnemonix.get_lazy(store, :b, fun)
+      iex> #{@name}.get_lazy(store, :b, fun)
       13
   """
   @spec get_lazy(Mnemonix.store(), Mnemonix.key(), (() -> Mnemonix.value())) ::
@@ -330,9 +333,9 @@ defmodule Mnemonix.Features.Map do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> Mnemonix.has_key?(store, :a)
+      iex> #{@name}.has_key?(store, :a)
       true
-      iex> Mnemonix.has_key?(store, :b)
+      iex> #{@name}.has_key?(store, :b)
       false
   """
   @spec has_key?(Mnemonix.store(), Mnemonix.key()) :: boolean
@@ -352,12 +355,12 @@ defmodule Mnemonix.Features.Map do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> {value, ^store} = Mnemonix.pop(store, :a)
+      iex> {value, ^store} = #{@name}.pop(store, :a)
       iex> value
       1
       iex> Mnemonix.get(store, :a)
       nil
-      iex> {value, ^store} = Mnemonix.pop(store, :b)
+      iex> {value, ^store} = #{@name}.pop(store, :b)
       iex> value
       nil
   """
@@ -383,7 +386,7 @@ defmodule Mnemonix.Features.Map do
       iex> {value, ^store} = Mnemonix.pop(store, :a)
       iex> value
       nil
-      iex> {value, ^store} = Mnemonix.pop(store, :b, 2)
+      iex> {value, ^store} = #{@name}.pop(store, :b, 2)
       iex> value
       2
   """
@@ -411,10 +414,10 @@ defmodule Mnemonix.Features.Map do
       ...>   # some expensive operation here
       ...>   13
       ...> end
-      iex> {value, ^store} = Mnemonix.pop_lazy(store, :a, fun)
+      iex> {value, ^store} = #{@name}.pop_lazy(store, :a, fun)
       iex> value
       1
-      iex> {value, ^store} = Mnemonix.pop_lazy(store, :b, fun)
+      iex> {value, ^store} = #{@name}.pop_lazy(store, :b, fun)
       iex> value
       13
   """
@@ -434,10 +437,10 @@ defmodule Mnemonix.Features.Map do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> Mnemonix.put_new(store, :b, 2)
+      iex> #{@name}.put_new(store, :b, 2)
       iex> Mnemonix.get(store, :b)
       2
-      iex> Mnemonix.put_new(store, :b, 3)
+      iex> #{@name}.put_new(store, :b, 3)
       iex> Mnemonix.get(store, :b)
       2
   """
@@ -463,10 +466,10 @@ defmodule Mnemonix.Features.Map do
       ...>   # some expensive operation here
       ...>   13
       ...> end
-      iex> Mnemonix.put_new_lazy(store, :b, fun)
+      iex> #{@name}.put_new_lazy(store, :b, fun)
       iex> Mnemonix.get(store, :b)
       13
-      iex> Mnemonix.put_new_lazy(store, :a, fun)
+      iex> #{@name}.put_new_lazy(store, :a, fun)
       iex> Mnemonix.get(store, :a)
       1
   """
@@ -488,10 +491,10 @@ defmodule Mnemonix.Features.Map do
 
   ## Examples
      iex> store = Mnemonix.new(%{a: 1})
-     iex> Mnemonix.replace(store, :a, 3)
+     iex> #{@name}.replace(store, :a, 3)
      iex> Mnemonix.get(store, :a)
      3
-     iex> Mnemonix.replace(store, :b, 2)
+     iex> #{@name}.replace(store, :b, 2)
      iex> Mnemonix.get(store, :b)
      nil
 
@@ -514,10 +517,10 @@ defmodule Mnemonix.Features.Map do
 
   ## Examples
      iex> store = Mnemonix.new(%{a: 1})
-     iex> Mnemonix.replace!(store, :a, 3)
+     iex> #{@name}.replace!(store, :a, 3)
      iex> Mnemonix.get(store, :a)
      3
-     iex> Mnemonix.replace!(store, :b, 2)
+     iex> #{@name}.replace!(store, :b, 2)
      ** (KeyError) key :b not found in: Mnemonix.Stores.Map
 
   """
@@ -541,7 +544,8 @@ defmodule Mnemonix.Features.Map do
 
   ## Examples
 
-      iex> {removed, store} = Mnemonix.split Mnemonix.new(%{a: 1, b: 2, d: 4}), [:a, :b, :c]
+      iex> store = Mnemonix.new(%{a: 1, b: 2, d: 4})
+      iex> {removed, ^store} = #{@name}.split(store, [:a, :b, :c])
       iex> removed
       %{a: 1, b: 2}
       iex> Mnemonix.get(store, :a)
@@ -551,7 +555,8 @@ defmodule Mnemonix.Features.Map do
       iex> Mnemonix.get(store, :d)
       4
 
-      iex> {removed, _store} = Mnemonix.split Mnemonix.new, [:a, :b, :c]
+      iex> store = Mnemonix.new
+      iex> {removed, _store} = #{@name}.split(store, [:a, :b, :c])
       iex> removed
       %{}
 
@@ -574,10 +579,12 @@ defmodule Mnemonix.Features.Map do
 
   ## Examples
 
-      iex> Mnemonix.take Mnemonix.new(%{a: 1, b: 2, d: 4}), [:a, :b, :c]
+      iex> store = Mnemonix.new(%{a: 1, b: 2, d: 4})
+      iex> #{@name}.take(store, [:a, :b, :c])
       %{a: 1, b: 2}
 
-      iex> Mnemonix.take Mnemonix.new, [:a, :b, :c]
+      iex> store = Mnemonix.new
+      iex> #{@name}.take(store, [:a, :b, :c])
       %{}
 
   """
@@ -604,10 +611,10 @@ defmodule Mnemonix.Features.Map do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> Mnemonix.update(store, :a, 13, &(&1 * 2))
+      iex> #{@name}.update(store, :a, 13, &(&1 * 2))
       iex> Mnemonix.get(store, :a)
       2
-      iex> Mnemonix.update(store, :b, 13, &(&1 * 2))
+      iex> #{@name}.update(store, :b, 13, &(&1 * 2))
       iex> Mnemonix.get(store, :b)
       13
   """
@@ -634,10 +641,10 @@ defmodule Mnemonix.Features.Map do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> Mnemonix.update!(store, :a, &(&1 * 2))
+      iex> #{@name}.update!(store, :a, &(&1 * 2))
       iex> Mnemonix.get(store, :a)
       2
-      iex> Mnemonix.update!(store, :b, &(&1 * 2))
+      iex> #{@name}.update!(store, :b, &(&1 * 2))
       ** (KeyError) key :b not found in: Mnemonix.Stores.Map
   """
   @spec update!(Mnemonix.store(), Mnemonix.key(), (Mnemonix.value() -> Mnemonix.value())) ::

@@ -1,4 +1,6 @@
 defmodule Mnemonix.Stores.ETS do
+  @name Inspect.inspect(__MODULE__, %Inspect.Opts{})
+
   @moduledoc """
   A `Mnemonix.Store` that uses an ETS table to store state.
 
@@ -44,7 +46,7 @@ defmodule Mnemonix.Stores.ETS do
 
   - `table`: Name of the table to create.
 
-    - *Default:* `#{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}.Table`
+    - *Default:* `#{@name}.Table`
 
   - `named`: ETS named table option
 

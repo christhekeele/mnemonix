@@ -1,4 +1,6 @@
 defmodule Mnemonix.Features.Bump do
+  @name Inspect.inspect(__MODULE__, %Inspect.Opts{})
+
   @moduledoc """
   Functions to increment/decrement integer values within a store.
 
@@ -38,21 +40,21 @@ defmodule Mnemonix.Features.Bump do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> Mnemonix.Features.Bump.bump(store, :a, 1)
+      iex> #{@name}.bump(store, :a, 1)
       2
 
       iex> store = Mnemonix.new
-      iex> Mnemonix.Features.Bump.bump(store, :b, 2)
+      iex> #{@name}.bump(store, :b, 2)
       2
 
       iex> store = Mnemonix.new(%{c: "foo"})
-      iex> Mnemonix.Features.Bump.bump(store, :c, 3)
+      iex> #{@name}.bump(store, :c, 3)
       {:error, :no_integer}
       iex> Mnemonix.get(store, :c)
       "foo"
 
       iex> store = Mnemonix.new
-      iex> Mnemonix.Features.Bump.bump(store, :c, "foo")
+      iex> #{@name}.bump(store, :c, "foo")
       {:error, :no_integer}
       iex> Mnemonix.get(store, :d)
       nil
@@ -79,21 +81,21 @@ defmodule Mnemonix.Features.Bump do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> Mnemonix.Features.Bump.bump!(store, :a, 2)
+      iex> #{@name}.bump!(store, :a, 2)
       iex> Mnemonix.get(store, :a)
       3
 
       iex> store = Mnemonix.new
-      iex> Mnemonix.Features.Bump.bump!(store, :b, 2)
+      iex> #{@name}.bump!(store, :b, 2)
       iex> Mnemonix.get(store, :b)
       2
 
       iex> store = Mnemonix.new(%{c: "foo"})
-      iex> Mnemonix.Features.Bump.bump!(store, :c, 2)
+      iex> #{@name}.bump!(store, :c, 2)
       ** (ArithmeticError) bad argument in arithmetic expression
 
       iex> store = Mnemonix.new
-      iex> Mnemonix.Features.Bump.bump!(store, :d, "foo")
+      iex> #{@name}.bump!(store, :d, "foo")
       ** (ArithmeticError) bad argument in arithmetic expression
   """
   @spec bump!(Mnemonix.store(), Mnemonix.key(), amount) :: :ok | no_return
@@ -117,15 +119,15 @@ defmodule Mnemonix.Features.Bump do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> Mnemonix.Features.Bump.increment(store, :a)
+      iex> #{@name}.increment(store, :a)
       2
 
       iex> store = Mnemonix.new
-      iex> Mnemonix.Features.Bump.increment(store, :b)
+      iex> #{@name}.increment(store, :b)
       1
 
       iex> store = Mnemonix.new(%{c: "foo"})
-      iex> Mnemonix.Features.Bump.increment(store, :c)
+      iex> #{@name}.increment(store, :c)
       {:error, :no_integer}
       iex> Mnemonix.get(store, :c)
       "foo"
@@ -153,21 +155,21 @@ defmodule Mnemonix.Features.Bump do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> Mnemonix.Features.Bump.increment(store, :a, 2)
+      iex> #{@name}.increment(store, :a, 2)
       3
 
       iex> store = Mnemonix.new
-      iex> Mnemonix.Features.Bump.increment(store, :b, 2)
+      iex> #{@name}.increment(store, :b, 2)
       2
 
       iex> store = Mnemonix.new(%{c: "foo"})
-      iex> Mnemonix.Features.Bump.increment(store, :c, 2)
+      iex> #{@name}.increment(store, :c, 2)
       {:error, :no_integer}
       iex> Mnemonix.get(store, :c)
       "foo"
 
       iex> store = Mnemonix.new
-      iex> Mnemonix.Features.Bump.increment(store, :d, "foo")
+      iex> #{@name}.increment(store, :d, "foo")
       {:error, :no_integer}
       iex> Mnemonix.get(store, :d)
       nil
@@ -195,15 +197,15 @@ defmodule Mnemonix.Features.Bump do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> Mnemonix.Features.Bump.decrement(store, :a)
+      iex> #{@name}.decrement(store, :a)
       0
 
       iex> store = Mnemonix.new
-      iex> Mnemonix.Features.Bump.decrement(store, :b)
+      iex> #{@name}.decrement(store, :b)
       -1
 
       iex> store = Mnemonix.new(%{c: "foo"})
-      iex> Mnemonix.Features.Bump.decrement(store, :c)
+      iex> #{@name}.decrement(store, :c)
       {:error, :no_integer}
       iex> Mnemonix.get(store, :c)
       "foo"
@@ -231,21 +233,21 @@ defmodule Mnemonix.Features.Bump do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 2})
-      iex> Mnemonix.Features.Bump.decrement(store, :a, 2)
+      iex> #{@name}.decrement(store, :a, 2)
       0
 
       iex> store = Mnemonix.new
-      iex> Mnemonix.Features.Bump.decrement(store, :b, 2)
+      iex> #{@name}.decrement(store, :b, 2)
       -2
 
       iex> store = Mnemonix.new(%{c: "foo"})
-      iex> Mnemonix.Features.Bump.decrement(store, :c, 2)
+      iex> #{@name}.decrement(store, :c, 2)
       {:error, :no_integer}
       iex> Mnemonix.get(store, :c)
       "foo"
 
       iex> store = Mnemonix.new
-      iex> Mnemonix.Features.Bump.decrement(store, :d, "foo")
+      iex> #{@name}.decrement(store, :d, "foo")
       {:error, :no_integer}
       iex> Mnemonix.get(store, :d)
       nil

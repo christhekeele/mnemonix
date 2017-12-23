@@ -1,4 +1,6 @@
 defmodule Mnemonix.Stores.Mnesia do
+  @name Inspect.inspect(__MODULE__, %Inspect.Opts{})
+
   @moduledoc """
   A `Mnemonix.Store` that uses a Mnesia table to store state.
 
@@ -38,7 +40,7 @@ defmodule Mnemonix.Stores.Mnesia do
 
   - `table:` Name of the table to use, will be created if it doesn't exist.
 
-    - *Default:* `#{__MODULE__ |> Inspect.inspect(%Inspect.Opts{})}.Table`
+    - *Default:* `#{@name}.Table`
 
   - `transactional`: Whether or not to perform transactional reads or writes.
 
