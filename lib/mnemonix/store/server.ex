@@ -528,7 +528,7 @@ defmodule Mnemonix.Store.Server do
           {:reply, reply, Store.t()}
   def handle_call({:bump!, key, amount}, _, %Store{impl: impl} = store) do
     case impl.bump!(store, serialize_key(store, key), amount) do
-      {:ok, store} ->
+      {:ok, store, :ok} ->
         {:reply, :ok, store}
 
       {:warn, store, message} ->
@@ -543,8 +543,8 @@ defmodule Mnemonix.Store.Server do
           {:reply, reply, Store.t()}
   def handle_call({:increment, key}, _, %Store{impl: impl} = store) do
     case impl.increment(store, serialize_key(store, key)) do
-      {:ok, store} ->
-        {:reply, :ok, store}
+      {:ok, store, result} ->
+        {:reply, result, store}
 
       {:warn, store, message} ->
         {:reply, {:warn, message}, store}
@@ -558,8 +558,8 @@ defmodule Mnemonix.Store.Server do
           {:reply, reply, Store.t()}
   def handle_call({:increment, key, amount}, _, %Store{impl: impl} = store) do
     case impl.increment(store, serialize_key(store, key), amount) do
-      {:ok, store} ->
-        {:reply, :ok, store}
+      {:ok, store, result} ->
+        {:reply, result, store}
 
       {:warn, store, message} ->
         {:reply, {:warn, message}, store}
@@ -573,8 +573,8 @@ defmodule Mnemonix.Store.Server do
           {:reply, reply, Store.t()}
   def handle_call({:decrement, key}, _, %Store{impl: impl} = store) do
     case impl.decrement(store, serialize_key(store, key)) do
-      {:ok, store} ->
-        {:reply, :ok, store}
+      {:ok, store, result} ->
+        {:reply, result, store}
 
       {:warn, store, message} ->
         {:reply, {:warn, message}, store}
@@ -588,8 +588,8 @@ defmodule Mnemonix.Store.Server do
           {:reply, reply, Store.t()}
   def handle_call({:decrement, key, amount}, _, %Store{impl: impl} = store) do
     case impl.decrement(store, serialize_key(store, key), amount) do
-      {:ok, store} ->
-        {:reply, :ok, store}
+      {:ok, store, result} ->
+        {:reply, result, store}
 
       {:warn, store, message} ->
         {:reply, {:warn, message}, store}

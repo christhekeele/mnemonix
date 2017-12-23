@@ -16,13 +16,7 @@ defmodule Mnemonix.Store.Behaviours.Bump do
   @spec bump(Store.t(), Mnemonix.key(), Bump.amount()) :: Store.Server.instruction(Bump.result())
   def bump(store, key, amount) do
     with {:ok, store, result} <- do_bump(store, :increment, key, amount) do
-      case result do
-        :ok ->
-          {:ok, store}
-
-        {:error, no_integer} ->
-          {:ok, store, {:error, no_integer}}
-      end
+      {:ok, store, result}
     end
   end
 
@@ -32,13 +26,11 @@ defmodule Mnemonix.Store.Behaviours.Bump do
   def bump!(store, key, amount) do
     with {:ok, store, result} <- do_bump(store, :increment, key, amount) do
       case result do
-        :ok ->
-          {:ok, store}
+        {:ok, _value} ->
+          {:ok, store, :ok}
 
-        {:error, no_integer} ->
-          {:raise, store, ArithmeticError, [
-            message: msg_for(no_integer, store.impl.deserialize_key(store, key))
-          ]}
+        {:error, :no_integer} ->
+          {:raise, store, ArithmeticError, [message: "bad argument in arithmetic expression"]}
       end
     end
   end
@@ -52,8 +44,8 @@ defmodule Mnemonix.Store.Behaviours.Bump do
   @doc false
   @spec increment(Store.t(), Mnemonix.key(), amount :: term) :: Store.Server.instruction()
   def increment(store, key, amount) do
-    with {:ok, store} <- do_bump(store, :increment, key, amount) do
-      {:ok, store}
+    with {:ok, store, result} <- do_bump(store, :increment, key, amount) do
+      {:ok, store, result}
     end
   end
 
@@ -66,49 +58,47 @@ defmodule Mnemonix.Store.Behaviours.Bump do
   @doc false
   @spec decrement(Store.t(), Mnemonix.key(), amount :: term) :: Store.Server.instruction()
   def decrement(store, key, amount) do
-    with {:ok, store} <- do_bump(store, :decrement, key, amount) do
-      {:ok, store}
+    with {:ok, store, result} <- do_bump(store, :decrement, key, amount) do
+      {:ok, store, result}
     end
   end
 
-  @doc false
-  def msg_for(:amount, _key), do: "value provided to operation is not an integer"
+  defp do_bump(store, operation, key, amount) do
+    if is_integer(amount) do
+      with {:ok, store, current} <- store.impl.fetch(store, key) do
+        case current do
+          :error ->
+            with {:ok, store} <- store.impl.put(store, key, store.impl.serialize_value(store, 0)) do
+              do_bump(store, operation, key, amount)
+            end
 
-  def msg_for(:value, key),
-    do: "value at key #{key |> Inspect.inspect(%Inspect.Opts{})} is not an integer"
+          {:ok, value} ->
+            case do_bump_calculation(operation, store.impl.deserialize_value(store, value), amount) do
+              {:ok, value} ->
+                with {:ok, store} <-
+                       store.impl.put(store, key, store.impl.serialize_value(store, value)) do
+                  {:ok, store, {:ok, value}}
+                end
 
-  @doc false
-  def do_bump(store, operation, key, amount) do
-    with {:ok, store, current} <- store.impl.fetch(store, key) do
-      case current do
-        :error ->
-          with {:ok, store} <- store.impl.put(store, key, store.impl.serialize_value(store, 0)) do
-            do_bump(store, operation, key, amount)
-          end
-
-        {:ok, value} ->
-          case do_bump_calculation(operation, store.impl.deserialize_value(store, value), amount) do
-            {:ok, result} ->
-              with {:ok, store} <-
-                     store.impl.put(store, key, store.impl.serialize_value(store, result)) do
-                {:ok, store}
-              end
-
-            {:error, no_integer} ->
-              {:ok, store, {:error, no_integer}}
-          end
+              {:error, :no_integer} ->
+                {:ok, store, {:error, :no_integer}}
+            end
+        end
       end
+    else
+      {:ok, store, {:error, :no_integer}}
     end
   end
 
-  @doc false
+  defp do_bump_calculation(operation, value, amount) do
+    if is_integer(value) and is_integer(amount) do
+      case operation do
+        :increment -> {:ok, value + amount}
+        :decrement -> {:ok, value - amount}
+      end
+    else
+      {:error, :no_integer}
+    end
+  end
 
-  def do_bump_calculation(_operation, _value, amount) when not is_integer(amount),
-    do: {:error, :amount}
-
-  def do_bump_calculation(_operation, value, _amount) when not is_integer(value),
-    do: {:error, :value}
-
-  def do_bump_calculation(:increment, value, amount), do: {:ok, value + amount}
-  def do_bump_calculation(:decrement, value, amount), do: {:ok, value - amount}
 end

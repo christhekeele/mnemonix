@@ -63,10 +63,10 @@ defmodule Mnemonix.Features.Map do
   ## Examples
 
       iex> store = Mnemonix.new(%{a: 1})
-      iex> Mnemonix.get(store, :b)
+      iex> Mnemonix.Features.Map.get(store, :b)
       nil
-      iex> Mnemonix.put(store, :b, 2)
-      iex> Mnemonix.get(store, :b)
+      iex> Mnemonix.Features.Map.put(store, :b, 2)
+      iex> Mnemonix.Features.Map.get(store, :b)
       2
   """
   @spec put(Mnemonix.store(), Mnemonix.key(), Mnemonix.value()) :: Mnemonix.store() | no_return

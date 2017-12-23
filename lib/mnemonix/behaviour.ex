@@ -1,11 +1,5 @@
 defmodule Mnemonix.Behaviour do
-  @moduledoc """
-             Creates a behaviour that carries its own default implementation.
-
-             When used, all functions defined on itself are given to the using module.
-
-             Opts info.
-             """ && false
+  @moduledoc false
 
   def __on_definition__(env, kind, name, params, guards, body) do
     doc = Module.get_attribute(env.module, :doc)
@@ -72,8 +66,9 @@ defmodule Mnemonix.Behaviour do
           Mnemonix.Singleton.Behaviour.establish_singleton(__CALLER__.module, opts)
 
         defaults =
-          for {doc, kind, name, params, guards, body} when kind in ~w[def defp]a <-
-                source.__functions__ do
+          for {_, kind, _, _, _, _} = function when kind in ~w[def defp]a <- source.__functions__ do
+            {doc, kind, name, params, guards, body} = function
+
             if String.starts_with?(Atom.to_string(name), "__") do
               nil
             else
@@ -89,14 +84,24 @@ defmodule Mnemonix.Behaviour do
                 singleton: singleton
               }
 
+              doc = case doc do
+                {line, content} when is_binary(content) ->
+                  target_name = Inspect.inspect(__CALLER__.module, %Inspect.Opts{})
+                  source_name = Inspect.inspect(source, %Inspect.Opts{})
+                  source_regex = ~r{#{source_name}(?!\.[A-Z])} # ie. except references to namespaced modules
+                  new_content = String.replace(content, source_regex, target_name)
+                  {line, new_content}
+                _ -> doc
+              end
+
               Mnemonix.Behaviour.compose_default(info, doc, name, params, guards, body)
             end
           end
 
         [
-          quote(do: @behaviour(unquote(__MODULE__))),
+          quote(location: :keep, do: @behaviour(unquote(__MODULE__))),
           defaults,
-          quote(do: defoverridable(unquote(__MODULE__))),
+          quote(location: :keep, do: defoverridable(unquote(__MODULE__))),
           unquote(code)
         ]
         |> List.flatten()

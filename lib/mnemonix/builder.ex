@@ -86,13 +86,12 @@ defmodule Mnemonix.Builder do
   defmacro __using__(opts) do
     {singleton, opts} = Mnemonix.Singleton.Behaviour.establish_singleton(__CALLER__.module, opts)
 
-    store =
-      if singleton,
-        do:
-          Mnemonix.Singleton.Behaviour.determine_singleton(
-            __CALLER__.module,
-            Keyword.get(opts, :singleton)
-          )
+    store = if singleton do
+      Mnemonix.Singleton.Behaviour.determine_singleton(
+        __CALLER__.module,
+        Keyword.get(opts, :singleton)
+      )
+    end
 
     if singleton do
       quote location: :keep do

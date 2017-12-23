@@ -22,13 +22,13 @@ defmodule Mnemonix.Singleton.Behaviour do
 
         unquote_splicing(
           for {:type, type, _module_info} <- types do
-            quote(do: @type(unquote(type)))
+            quote(location: :keep, do: @type(unquote(type)))
           end
         )
 
         unquote_splicing(
           for {:callback, callback, _module_info} <- callbacks do
-            quote(do: @callback(unquote(strip_first_callback_param(callback))))
+            quote(location: :keep, do: @callback(unquote(strip_first_callback_param(callback))))
           end
         )
       end
