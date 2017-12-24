@@ -105,7 +105,7 @@ defmodule Mnemonix.Behaviour do
           unquote(code)
         ]
         |> List.flatten()
-        |> Enum.filter(& &1)
+        |> Enum.filter(&(&1))
       end
     end
   end

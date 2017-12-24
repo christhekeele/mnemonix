@@ -1,6 +1,19 @@
-language: elixir
+# TESTS
+script: mix coveralls.travis
+stages:
+  - name: checks
+  - name: test
+jobs:
+  include:
+    - stage: checks
+    - script: mix credo list
+    - script: travis_wait mix dialyzer --check=false
+    - script: mix inch.report
+    
+    - stage: test
 
 # MATRIX
+language: elixir
 otp_release:
   - 20.1
   - 20.0
@@ -20,13 +33,12 @@ os:
   - linux
   # - osx
   # - windows
-  
 branches:
   only:
     - master
     - development
 
-# TESTS
+# SETUP
 env:
   global:
     - MIX_ENV=test
@@ -37,28 +49,12 @@ install:
   - mix local.rebar --force
   - mix local.hex --force
   - mix deps.get
-script: mix coveralls
-
-# VARIANTS
-stages:
-  - name: checks
-  - name: test
-jobs:
-  include:
-    - stage: checks
-    - script: mix credo list
-    - script: travis_wait mix dialyzer --check=false
-    - script: mix inch.report
-    
-    - stage: test
-
-# DEPENDENCIES
 services:
   - redis-server
   - memcached
   - elasticsearch
 
-# OPTIMIZATIONS
+# CACHING
 cache:
   directories:
     - deps
