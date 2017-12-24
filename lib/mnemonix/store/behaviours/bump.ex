@@ -16,7 +16,13 @@ defmodule Mnemonix.Store.Behaviours.Bump do
   @spec bump(Store.t(), Mnemonix.key(), Bump.amount()) :: Store.Server.instruction(Bump.result())
   def bump(store, key, amount) do
     with {:ok, store, result} <- do_bump(store, :increment, key, amount) do
-      {:ok, store, result}
+      case result do
+        {:ok, value} ->
+          {:ok, store, {:ok, value}}
+
+        {:error, :no_integer} ->
+          {:ok, store, {:ok, {:error, :no_integer}}}
+      end
     end
   end
 
@@ -45,7 +51,13 @@ defmodule Mnemonix.Store.Behaviours.Bump do
   @spec increment(Store.t(), Mnemonix.key(), amount :: term) :: Store.Server.instruction()
   def increment(store, key, amount) do
     with {:ok, store, result} <- do_bump(store, :increment, key, amount) do
-      {:ok, store, result}
+      case result do
+        {:ok, value} ->
+          {:ok, store, {:ok, value}}
+
+        {:error, :no_integer} ->
+          {:ok, store, {:ok, {:error, :no_integer}}}
+      end
     end
   end
 
@@ -59,7 +71,13 @@ defmodule Mnemonix.Store.Behaviours.Bump do
   @spec decrement(Store.t(), Mnemonix.key(), amount :: term) :: Store.Server.instruction()
   def decrement(store, key, amount) do
     with {:ok, store, result} <- do_bump(store, :decrement, key, amount) do
-      {:ok, store, result}
+      case result do
+        {:ok, value} ->
+          {:ok, store, {:ok, value}}
+
+        {:error, :no_integer} ->
+          {:ok, store, {:ok, {:error, :no_integer}}}
+      end
     end
   end
 

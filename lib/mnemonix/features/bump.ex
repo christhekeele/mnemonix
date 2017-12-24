@@ -63,7 +63,6 @@ defmodule Mnemonix.Features.Bump do
   def bump(store, key, amount) do
     case GenServer.call(store, {:bump, key, amount}) do
       {:ok, value} -> value
-      {:error, :no_integer} -> {:error, :no_integer}
       {:raise, type, args} -> raise type, args
     end
   end
@@ -136,7 +135,6 @@ defmodule Mnemonix.Features.Bump do
   def increment(store, key) do
     case GenServer.call(store, {:increment, key}) do
       {:ok, value} -> value
-      {:error, :no_integer} -> {:error, :no_integer}
       {:raise, type, args} -> raise type, args
     end
   end
@@ -179,7 +177,6 @@ defmodule Mnemonix.Features.Bump do
   def increment(store, key, amount) do
     case GenServer.call(store, {:increment, key, amount}) do
       {:ok, value} -> value
-      {:error, :no_integer} -> {:error, :no_integer}
       {:raise, type, args} -> raise type, args
     end
   end
@@ -214,7 +211,6 @@ defmodule Mnemonix.Features.Bump do
   def decrement(store, key) do
     case GenServer.call(store, {:decrement, key}) do
       {:ok, value} -> value
-      {:error, :no_integer} -> {:error, :no_integer}
       {:raise, type, args} -> raise type, args
     end
   end
@@ -257,7 +253,6 @@ defmodule Mnemonix.Features.Bump do
   def decrement(store, key, amount) do
     case GenServer.call(store, {:decrement, key, amount}) do
       {:ok, value} -> value
-      {:error, :no_integer} -> {:error, :no_integer}
       {:raise, type, args} -> raise type, args
     end
   end
