@@ -115,6 +115,14 @@ defmodule Mnemonix.Mixfile do
       {:_, :_},
       {:guard_fail, [:or, '(\'false\',\'false\')']}
     },
+    {:warn_not_called,
+      {:_, :_},
+      {:unused_fun, [:any_impl_for, 0]}
+    },
+    {:warn_not_called,
+      {:_, :_},
+      {:unused_fun, [:impl_for?, 1]}
+    },
   ]
 
 end
