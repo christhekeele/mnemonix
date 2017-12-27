@@ -24,13 +24,14 @@ Mnemonix
 
 `Mnemonix` aims to help you:
 
-  - Get running with key/values stores with minimal ceremony
+  - Get running with key/value stores with minimal ceremony
   - Experiment with different key/value store backends for your application
   - Allow end-users of your library liberty to choose their preferred backend
+  - Enable composing access to different key/value stores with different read/write strategies
 
 It encodes the behaviour, lifecycle, and feature set of a key/value store behind a common `GenServer` interface, normalizes different store APIs to conform to that interface, polyfills stores lacking features, and exposes access to them through a familiar `Map` API.
 
-[Learn more about starting a store and manipulating it with the `Mnemonix` API in the documentation.](https://hexdocs.pm/mnemonix/index.html)
+Learn more about starting a store and manipulating it with the `Mnemonix` API [in the documentation](https://hexdocs.pm/mnemonix/index.html).
 
 ##### Pronunciation: **`/nɛˈmɑːnɪks/`** – *`noo-MAHN-icks`*
 
@@ -58,7 +59,7 @@ It encodes the behaviour, lifecycle, and feature set of a key/value store behind
 
 ## Features
 
-Obviously, `Mnemonix` gives you `Map`-style functions to manipulate various key/value stores. However, `Mnemonix` also offers extra features beyond simple Map functions. Stores that don't natively support these features have the capability added through an Elixir polyfill, guaranteeing you can use and switch stores without worrying about what features they support under the hood.
+Naturally, `Mnemonix` gives you `Map`-style functions to manipulate various key/value stores. However, `Mnemonix` also offers extra features beyond simple Map functions. Stores that don't natively support these features have the capability added through an Elixir polyfill, guaranteeing you can use and switch stores without worrying about what features they support under the hood.
 
 Available features are:
 

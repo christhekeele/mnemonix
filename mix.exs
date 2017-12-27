@@ -65,6 +65,7 @@ defmodule Mnemonix.Mixfile do
       Integrations: [Plug.Session.MNEMONIX],
       # Supervision: [Mnemonix.Application, Mnemonix.Supervisor],
       Stores: ~r<Mnemonix.Stores>,
+      MetaStores: ~r<Mnemonix.Meta.Stores>,
     ]
   ]
 
