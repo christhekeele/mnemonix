@@ -1,53 +1,63 @@
 defmodule Mnemonix.Store.Behaviours.Expiry do
   @moduledoc false
 
-  # alias Mnemonix.Store.Expiry #TODO
-  #
-  # use Mnemonix.Behaviour
-  #
-  # @callback setup_expiry(Mnemonix.Store.t)
-  #   :: {:ok, Mnemonix.Store.t} | {:error, reason}
-  #     when reason: :normal | :shutdown | {:shutdown, term} | term
-  # @doc false
-  # @spec setup_expiry(Mnemonix.Store.t)
-  #   :: {:ok, Mnemonix.Store.t} | {:error, reason}
-  #     when reason: :normal | :shutdown | {:shutdown, term} | term
-  # def setup_expiry(%Store{opts: opts} = store) do
-  #   with {:ok, engine} <- Expiry.Engine.start_link(opts) do
-  #     {:ok, %{store | expiry: engine}}
-  #   end
-  # end
-  #
-  # @callback expire(Mnemonix.Store.t, Mnemonix.key, Mnemonix.Features.Bump.ttl)
-  #   :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Server.exception
-  # @doc false
-  # @spec expire(Mnemonix.Store.t, Mnemonix.key, Mnemonix.Features.Bump.ttl)
-  #   :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Server.exception
-  # def expire(store, key, ttl) do
-  #   with :ok <- Expiry.Engine.expire(store, key, ttl) do
-  #     {:ok, store}
-  #   end
-  # end
-  #
-  # @callback persist(Mnemonix.Store.t, Mnemonix.key)
-  #   :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Server.exception
-  # @doc false
-  # @spec persist(Mnemonix.Store.t, Mnemonix.key)
-  #   :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Server.exception
-  # def persist(store, key) do
-  #   with :ok <- Expiry.Engine.persist(store, key) do
-  #     {:ok, store}
-  #   end
-  # end
-  #
-  # @callback put_and_expire(Mnemonix.Store.t, Mnemonix.key, Mnemonix.value, Mnemonix.Features.Bump.ttl)
-  #   :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Server.exception
-  # @doc false
-  # @spec put_and_expire(Mnemonix.Store.t, Mnemonix.key, Mnemonix.value, Mnemonix.Features.Bump.ttl)
-  #   :: {:ok, Mnemonix.Store.t} | Mnemonix.Store.Server.exception
-  # def put_and_expire(store, key, value, ttl) do
-  #   with {:ok, store} <- store.impl.put(store, key, value),
-  #        {:ok, store} <- expire(store, key, ttl),
-  #   do: {:ok, store}
-  # end
+  alias Mnemonix.Store
+  alias Mnemonix.Features.Expiry
+
+  use Mnemonix.Behaviour
+
+  @callback setup_expiry(Store.t()) ::
+              {:ok, Store.t()} | :ignore | {:stop, reason :: term}
+  @doc false
+  @spec setup_expiry(Store.t()) ::
+              {:ok, Store.t()} | :ignore | {:stop, reason :: term}
+  def setup_expiry(%Store{} = store) do
+    {:ok, %Store{store | expiry: :ets.new(Module.concat(__MODULE__, Table), [:private])}}
+  end
+
+  @callback expire(Store.t, Mnemonix.key, Expiry.ttl)
+    :: {:ok, Store.t} | Store.Server.exception
+  @doc false
+  @spec expire(Store.t, Mnemonix.key, Expiry.ttl)
+    :: {:ok, Store.t} | Store.Server.exception
+  def expire(%Store{} = store, key, ttl) do
+    with :ok <- abort(store, key),
+         :ok <- schedule(store, key, ttl),
+    do: {:ok, store}
+  end
+
+  @callback persist(Store.t, Mnemonix.key)
+    :: {:ok, Store.t} | Store.Server.exception
+  @doc false
+  @spec persist(Store.t, Mnemonix.key)
+    :: {:ok, Store.t} | Store.Server.exception
+  def persist(%Store{} = store, key) do
+    with :ok <- abort(store, key) do
+      {:ok, store}
+    end
+  end
+
+  @callback put_and_expire(Store.t, Mnemonix.key, Mnemonix.value, Expiry.ttl)
+    :: {:ok, Store.t} | Store.Server.exception
+  @doc false
+  @spec put_and_expire(Store.t, Mnemonix.key, Mnemonix.value, Expiry.ttl)
+    :: {:ok, Store.t} | Store.Server.exception
+  def put_and_expire(%Store{impl: impl} = store, key, value, ttl) do
+    with {:ok, store} <- impl.put(store, key, value),
+         :ok <- schedule(store, key, ttl),
+    do: {:ok, store}
+  end
+
+  defp abort(%Store{expiry: expiry}, key) do
+    case :ets.take(expiry, key) do
+      [{^key, timer}] -> Process.cancel_timer(timer, info: false)
+      _ -> :ok
+    end
+  end
+
+  defp schedule(%Store{expiry: expiry}, key, ttl) do
+    with true <- :ets.insert(expiry, {key, Process.send_after(self(), {:expire, key}, ttl)}) do
+      :ok
+    end
+  end
 end

@@ -11,7 +11,7 @@ defmodule Mnemonix.Store do
           impl: Mnemonix.Store.Behaviour.t(),
           opts: options,
           state: state :: term,
-          expiry: :native | pid
+          expiry: :ets.tab() | :native,
         }
   @enforce_keys [:impl, :opts, :state]
   defstruct [:impl, :opts, :state, expiry: :native]

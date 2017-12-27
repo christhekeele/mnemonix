@@ -38,7 +38,7 @@ defmodule Mnemonix.Stores.Map do
     - *Default:* `%{}`
   """
   @impl Store.Behaviours.Core
-  @spec setup(Store.options()) :: {:ok, state :: term} | {:stop, reason :: any}
+  @spec setup(Store.options()) :: {:ok, state :: term} | :ignore | {:stop, reason :: term}
   def setup(_opts) do
     {:ok, %{}}
   end

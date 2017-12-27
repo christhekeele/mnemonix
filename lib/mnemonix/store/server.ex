@@ -71,15 +71,18 @@ defmodule Mnemonix.Store.Server do
   @doc """
   Prepares the underlying store `impl` for usage with supplied `options`.
 
-  Invokes the `c:Mnemonix.Core.Behaviour.setup/1` and `c:Mnemonix.Expiry.Behaviour.setup_expiry/1`
-  callbacks.
+  Invokes the following callbacks:
+
+  - `c:Mnemonix.Core.Behaviour.setup/1`
+  - `c:Mnemonix.Expiry.Behaviour.setup_expiry/1`
+  - `c:Mnemonix.Core.Behaviour.setup_initial/1`
   """
   @spec init({Store.Behaviour.t(), Store.options()}) ::
           {:ok, Store.t()} | :ignore | {:stop, reason :: term}
   def init({impl, config}) do
     with {:ok, state} <- impl.setup(config),
-         store <- Store.new(impl, config, state),
-         # {:ok, store} <- impl.setup_expiry(store), #TODO
+         store = Store.new(impl, config, state),
+         {:ok, store} <- impl.setup_expiry(store),
          {:ok, store} <- impl.setup_initial(store),
          do: {:ok, store}
   end
@@ -95,6 +98,29 @@ defmodule Mnemonix.Store.Server do
     with {:ok, reason} <- impl.teardown(reason, store) do
       reason
     end
+  end
+
+  @doc false
+  @spec handle_info(msg :: :timeout | term, state :: term) ::
+    {:noreply, new_state} |
+    {:noreply, new_state, timeout | :hibernate} |
+    {:stop, reason :: term, new_state} when new_state: term
+
+  def handle_info({:expire, key}, %Store{impl: impl} = store) do
+    case impl.delete(store, key) do
+      {:ok, store} ->
+        {:noreply, store}
+
+      {:warn, store, _message} ->
+        {:noreply, store}
+
+      {:raise, store, _type, _args} ->
+        {:noreply, store}
+    end
+  end
+
+  def handle_info(_, %Store{} = store) do
+    {:noreply, store}
   end
 
   @doc """

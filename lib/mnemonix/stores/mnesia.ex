@@ -56,7 +56,7 @@ defmodule Mnemonix.Stores.Mnesia do
   for `type:`, which will always be `:set`.
   """
   @impl Store.Behaviours.Core
-  @spec setup(Store.options()) :: {:ok, state :: term} | {:stop, reason :: any}
+  @spec setup(Store.options()) :: {:ok, state :: term} | :ignore | {:stop, reason :: term}
   def setup(opts) do
     {table, opts} = Keyword.get_and_update(opts, :table, fn _ -> :pop end)
     table = if table, do: table, else: Module.concat(__MODULE__, Table)

@@ -58,7 +58,7 @@ defmodule Mnemonix.Stores.DETS do
   for `type:`, which will always be `:set`.
   """
   @impl Store.Behaviours.Core
-  @spec setup(Store.options()) :: {:ok, state :: term} | {:stop, reason :: any}
+  @spec setup(Store.options()) :: {:ok, state :: term} | :ignore | {:stop, reason :: term}
   def setup(opts) do
     {table, opts} = Keyword.pop(opts, :table)
     table = if table, do: table, else: Module.concat(__MODULE__, Table)

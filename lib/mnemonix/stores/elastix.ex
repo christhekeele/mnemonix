@@ -52,7 +52,7 @@ if Code.ensure_loaded?(Elastix) do
 
     """
     @impl Store.Behaviours.Core
-    @spec setup(Store.options()) :: {:ok, state :: term} | {:stop, reason :: any}
+    @spec setup(Store.options()) :: {:ok, state :: term} | :ignore | {:stop, reason :: term}
     def setup(opts) do
       {:ok, struct(Conn, opts)}
     end

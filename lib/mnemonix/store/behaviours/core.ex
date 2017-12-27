@@ -15,15 +15,7 @@ defmodule Mnemonix.Store.Behaviours.Core do
     end
   end
 
-  @callback setup(Mnemonix.Store.options()) ::
-              {:ok, state :: term} | :ignore | {:stop, reason :: term}
-  # @doc false
-  # @spec setup(Mnemonix.Store.options)
-  #   :: {:ok, state :: term} | :ignore | {:stop, reason :: term}
-  # def setup(options), do: {:ok, options}
-
-  @callback start_link() :: {:ok, Mnemonix.store()} | no_return
-  @callback start_link(options :: Keyword.t()) :: {:ok, Mnemonix.store()} | no_return
+  alias Mnemonix.Store
 
   @callback child_spec() :: Supervisor.child_spec()
   @doc false
@@ -39,34 +31,45 @@ defmodule Mnemonix.Store.Behaviours.Core do
 
     %{
       id: make_ref(),
-      start: {Mnemonix.Store.Server, :start_link, [__MODULE__, options]},
+      start: {Store.Server, :start_link, [__MODULE__, options]},
       restart: restart,
       shutdown: shutdown,
-      type: :worker
+      type: :worker,
     }
   end
 
-  @callback setup_initial(Mnemonix.Store.t()) :: {:ok, Mnemonix.store()} | no_return
-  def setup_initial(%Mnemonix.Store{} = store) do
-    %Mnemonix.Store{impl: impl, opts: opts} = store
+  @callback start_link() :: {:ok, Mnemonix.store()} | no_return
+  @callback start_link(options :: Keyword.t()) :: {:ok, Mnemonix.store()} | no_return
 
-    {:ok, store} =
-      opts
-      |> Keyword.get(:initial, %{})
-      |> Enum.map(fn {key, value} ->
-           {impl.serialize_key(store, key), impl.serialize_value(store, value)}
-         end)
-      |> Enum.reduce({:ok, store}, fn {key, value}, {:ok, store} ->
-           impl.put(store, key, value)
-         end)
+  @callback setup(Store.options()) ::
+              {:ok, state :: term} | :ignore | {:stop, reason :: term}
+  # @doc false
+  # @spec setup(Store.options) ::
+  #         {:ok, Store.t()} | :ignore | {:stop, reason :: term}
+  # def setup(options), do: {:ok, Mnemonix.Store}
 
-    {:ok, store}
+  @callback setup_initial(Store.t()) ::
+              {:ok, Store.t()} | :ignore | {:stop, reason :: term}
+  @doc false
+  @spec setup_initial(Store.t()) ::
+              {:ok, Store.t()} | :ignore | {:stop, reason :: term}
+  def setup_initial(%Store{} = store) do
+    %Store{impl: impl, opts: opts} = store
+
+    opts
+    |> Keyword.get(:initial, %{})
+    |> Enum.map(fn {key, value} ->
+         {impl.serialize_key(store, key), impl.serialize_value(store, value)}
+       end)
+    |> Enum.reduce({:ok, store}, fn {key, value}, {:ok, store} ->
+         impl.put(store, key, value)
+       end)
   end
 
-  @callback teardown(reason, Mnemonix.Store.t()) :: {:ok, reason} | {:error, reason}
+  @callback teardown(reason, Store.t()) :: {:ok, reason} | {:error, reason}
             when reason: :normal | :shutdown | {:shutdown, term} | term
   @doc false
-  @spec teardown(reason, Mnemonix.Store.t()) :: {:ok, reason} | {:error, reason}
+  @spec teardown(reason, Store.t()) :: {:ok, reason} | {:error, reason}
         when reason: :normal | :shutdown | {:shutdown, term} | term
   def teardown(reason, _store) do
     {:ok, reason}

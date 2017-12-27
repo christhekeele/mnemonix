@@ -16,7 +16,7 @@ defmodule Mnemonix.Store.Behaviour do
       use Mnemonix.Store.Behaviours.Core, unquote(opts)
       use Mnemonix.Store.Behaviours.Map, unquote(opts)
       use Mnemonix.Store.Behaviours.Bump, unquote(opts)
-      # use Mnemonix.Store.Behaviours.Expiry, unquote(opts) #TODO
+      use Mnemonix.Store.Behaviours.Expiry, unquote(opts)
       use Mnemonix.Store.Behaviours.Enumerable, unquote(opts)
     end
   end

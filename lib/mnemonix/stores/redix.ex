@@ -44,7 +44,7 @@ if Code.ensure_loaded?(Redix) do
     All other options are passed verbatim to `Redix.start_link/2`.
     """
     @impl Store.Behaviours.Core
-    @spec setup(Store.options()) :: {:ok, state :: term} | {:stop, reason :: any}
+    @spec setup(Store.options()) :: {:ok, state :: term} | :ignore | {:stop, reason :: term}
     def setup(opts) do
       {conn, options} = Keyword.get_and_update(opts, :conn, fn _ -> :pop end)
 

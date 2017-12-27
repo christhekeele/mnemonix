@@ -37,7 +37,7 @@ if Code.ensure_loaded?(Memcache) do
     All other options are passed verbatim to `Memcache.start_link/1`.
     """
     @impl Store.Behaviours.Core
-    @spec setup(Store.options()) :: {:ok, state :: term} | {:stop, reason :: any}
+    @spec setup(Store.options()) :: {:ok, state :: term} | :ignore | {:stop, reason :: term}
     def setup(opts) do
       options =
         opts

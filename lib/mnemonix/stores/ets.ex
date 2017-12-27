@@ -72,12 +72,12 @@ defmodule Mnemonix.Stores.ETS do
 
     - *Default:* `false`
 
-  - `initial`: A map of key/value pairs to ensure are set on the DETS table at boot.
+  - `initial`: A map of key/value pairs to ensure are set on the ETS table at boot.
 
     - *Default:* `%{}`
   """
   @impl Store.Behaviours.Core
-  @spec setup(Store.options()) :: {:ok, state :: term} | {:stop, reason :: any}
+  @spec setup(Store.options()) :: {:ok, state :: term} | :ignore | {:stop, reason :: term}
   def setup(opts) do
     table = Keyword.get(opts, :table) || Module.concat(__MODULE__, Table)
     privacy = Keyword.get(opts, :privacy) || :private

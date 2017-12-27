@@ -54,6 +54,57 @@ defmodule Mnemonix.Application do
   @spec start(Application.start_type(), [Mnemonix.spec()]) ::
           {:ok, pid} | {:error, reason :: term}
   def start(_type, [default]) do
+    default
+    |> tree
+    |> Supervisor.start_link(name: Mnemonix.Supervisor, strategy: :rest_for_one)
+  end
+
+  @spec tree() :: [:supervisor.child_spec()]
+  def tree, do: specification() |> tree
+
+  @spec tree(Mnemonix.spec()) :: [:supervisor.child_spec()]
+  def tree(default), do: [
+    # prepare_supervisor_spec(
+    #   Mnemonix.Application.Supervisor,
+    #   [
+    #     prepare_supervisor_spec(
+    #       Mnemonix.Store.Expiry.Supervisor,
+    #       [Mnemonix.Store.Expiry.Engine],
+    #       strategy: :simple_one_for_one,
+    #     )
+    #   ],
+    #   strategy: :one_for_one,
+    # ),
+    prepare_supervisor_spec(
+      Mnemonix.Store.Supervisor,
+      managed_stores(default),
+      strategy: :one_for_one,
+    ),
+  ]
+
+  defp prepare_supervisor_spec(module, children, opts) do
+    %{
+      id: module,
+      start: {Supervisor, :start_link, [children, Keyword.put(opts, :name, module)]},
+      restart: :permanent,
+      type: :supervisor,
+    }
+  end
+
+  @doc """
+  Convenience function to preview the stores that `Mnemonix.Application` will manage for you.
+  """
+  @spec managed_stores :: [Supervisor.child_spec()]
+  def managed_stores, do: specification() |> managed_stores
+
+  @doc """
+  Convenience function to see the configuration of the stores that `Mnemonix.Application` manages for you.
+
+  Provide a store specification to compare the generated configuration against
+  the `default` `specification/0` that Mnemonix uses by default.
+  """
+  @spec managed_stores(Mnemonix.spec()) :: [Supervisor.child_spec()]
+  def managed_stores(default) do
     :mnemonix
     |> Application.get_env(:stores, [])
     |> Enum.map(fn name ->
@@ -61,7 +112,6 @@ defmodule Mnemonix.Application do
          |> Application.get_env(name, default)
          |> prepare_child_spec(name)
        end)
-    |> Supervisor.start_link(strategy: :one_for_one, name: Mnemonix.Supervisor)
   end
 
   defp prepare_child_spec({impl, opts}, name) do
@@ -75,13 +125,13 @@ defmodule Mnemonix.Application do
   without corresponding configuration under `config :mnemonix, <store_name>`.
   """
   @spec specification :: Mnemonix.spec()
-  def specification,
-    do:
-      :mnemonix
-      |> Application.spec()
-      |> Keyword.get(:mod)
-      |> elem(1)
-      |> List.first()
+  def specification do
+    :mnemonix
+    |> Application.spec()
+    |> Keyword.get(:mod)
+    |> elem(1)
+    |> List.first()
+  end
 
   @doc """
   Convenience function to access the current hex version of the `Mnemonix` application.
