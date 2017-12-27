@@ -74,7 +74,8 @@ defmodule Mnemonix.Features.Expiry do
     :: Mnemonix.store | no_return
   def expire(store, key, ttl) do
     case GenServer.call(store, {:expire, key, ttl}) do
-      :ok                  -> store
+      :ok -> store
+      {:warn, message} -> with :ok <- IO.warn(message), do: store
       {:raise, type, args} -> raise type, args
     end
   end
@@ -99,7 +100,8 @@ defmodule Mnemonix.Features.Expiry do
     :: Mnemonix.store | no_return
   def persist(store, key) do
     case GenServer.call(store, {:persist, key}) do
-      :ok                  -> store
+      :ok -> store
+      {:warn, message} -> with :ok <- IO.warn(message), do: store
       {:raise, type, args} -> raise type, args
     end
   end
@@ -150,7 +152,8 @@ defmodule Mnemonix.Features.Expiry do
     :: Mnemonix.store | no_return
   def put_and_expire(store, key, value, ttl) do
     case GenServer.call(store, {:put_and_expire, key, value, ttl}) do
-      :ok                  -> store
+      :ok -> store
+      {:warn, message} -> with :ok <- IO.warn(message), do: store
       {:raise, type, args} -> raise type, args
     end
   end

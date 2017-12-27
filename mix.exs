@@ -63,7 +63,6 @@ defmodule Mnemonix.Mixfile do
     groups_for_modules: [
       Functions: [Mnemonix.Builder, Mnemonix.Supervision, ~r<Mnemonix.Features>],
       Integrations: [Plug.Session.MNEMONIX],
-      # Supervision: [Mnemonix.Application, Mnemonix.Supervisor],
       Stores: ~r<Mnemonix.Stores>,
       MetaStores: ~r<Mnemonix.Meta.Stores>,
     ]

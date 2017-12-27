@@ -47,6 +47,7 @@ defmodule Mnemonix.Features.Enumerable do
   def enumerable?(store) do
     case GenServer.call(store, {:enumerable?}) do
       {:ok, enumerable} -> enumerable
+      {:warn, message, enumerable} -> with :ok <- IO.warn(message), do: enumerable
       {:raise, type, args} -> raise type, args
     end
   end
@@ -82,12 +83,17 @@ defmodule Mnemonix.Features.Enumerable do
   """
   @spec equal?(Mnemonix.store(), Mnemonix.store()) :: boolean | no_return
   def equal?(store1, store2) do
-    with {:ok, result1} when not is_tuple(result1) <- GenServer.call(store1, {:to_enumerable}),
-         {:ok, result2} when not is_tuple(result2) <- GenServer.call(store2, {:to_enumerable}) do
-      result1 === result2
-    else
+    result1 = case GenServer.call(store1, {:to_enumerable}) do
+      {:ok, result1} -> result1
+      {:warn, message, result1} -> with :ok <- IO.warn(message), do: result1
       {:raise, type, args} -> raise type, args
     end
+    result2 = case GenServer.call(store2, {:to_enumerable}) do
+      {:ok, result2} -> result2
+      {:warn, message, result2} -> with :ok <- IO.warn(message), do: result2
+      {:raise, type, args} -> raise type, args
+    end
+    result1 === result2
   end
 
   @callback keys(Mnemonix.store()) :: [Mnemonix.key()] | no_return
@@ -114,6 +120,7 @@ defmodule Mnemonix.Features.Enumerable do
   def keys(store) do
     case GenServer.call(store, {:keys}) do
       {:ok, keys} -> keys
+      {:warn, message, keys} -> with :ok <- IO.warn(message), do: keys
       {:raise, type, args} -> raise type, args
     end
   end
@@ -149,6 +156,7 @@ defmodule Mnemonix.Features.Enumerable do
   def to_list(store) do
     case GenServer.call(store, {:to_list}) do
       {:ok, list} -> list
+      {:warn, message, list} -> with :ok <- IO.warn(message), do: list
       {:raise, type, args} -> raise type, args
     end
   end
@@ -176,6 +184,7 @@ defmodule Mnemonix.Features.Enumerable do
   def values(store) do
     case GenServer.call(store, {:values}) do
       {:ok, values} -> values
+      {:warn, message, values} -> with :ok <- IO.warn(message), do: values
       {:raise, type, args} -> raise type, args
     end
   end

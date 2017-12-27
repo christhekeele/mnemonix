@@ -30,6 +30,7 @@ defmodule Mnemonix.Features.Map do
   def delete(store, key) do
     case GenServer.call(store, {:delete, key}) do
       :ok -> store
+      {:warn, message} -> with :ok <- IO.warn(message), do: store
       {:raise, type, args} -> raise type, args
     end
   end
@@ -53,6 +54,7 @@ defmodule Mnemonix.Features.Map do
   def fetch(store, key) do
     case GenServer.call(store, {:fetch, key}) do
       {:ok, value} -> value
+      {:warn, message, value} -> with :ok <- IO.warn(message), do: value
       {:raise, type, args} -> raise type, args
     end
   end
@@ -75,6 +77,7 @@ defmodule Mnemonix.Features.Map do
   def put(store, key, value) do
     case GenServer.call(store, {:put, key, value}) do
       :ok -> store
+      {:warn, message} -> with :ok <- IO.warn(message), do: store
       {:raise, type, args} -> raise type, args
     end
   end
@@ -99,6 +102,7 @@ defmodule Mnemonix.Features.Map do
   def drop(store, keys) do
     case GenServer.call(store, {:drop, keys}) do
       :ok -> store
+      {:warn, message} -> with :ok <- IO.warn(message), do: store
       {:raise, type, args} -> raise type, args
     end
   end
@@ -122,6 +126,7 @@ defmodule Mnemonix.Features.Map do
   def fetch!(store, key) do
     case GenServer.call(store, {:fetch!, key}) do
       {:ok, value} -> value
+      {:warn, message, value} -> with :ok <- IO.warn(message), do: value
       {:raise, type, args} -> raise type, args
     end
   end
@@ -144,6 +149,7 @@ defmodule Mnemonix.Features.Map do
   def get(store, key) do
     case GenServer.call(store, {:get, key}) do
       {:ok, value} -> value
+      {:warn, message, value} -> with :ok <- IO.warn(message), do: value
       {:raise, type, args} -> raise type, args
     end
   end
@@ -167,6 +173,7 @@ defmodule Mnemonix.Features.Map do
   def get(store, key, default) do
     case GenServer.call(store, {:get, key, default}) do
       {:ok, value} -> value
+      {:warn, message, value} -> with :ok <- IO.warn(message), do: value
       {:raise, type, args} -> raise type, args
     end
   end
@@ -233,6 +240,7 @@ defmodule Mnemonix.Features.Map do
   def get_and_update(store, key, fun) do
     case GenServer.call(store, {:get_and_update, key, fun}) do
       {:ok, value} -> {value, store}
+      {:warn, message, value} -> with :ok <- IO.warn(message), do: {value, store}
       {:raise, type, args} -> raise type, args
     end
   end
@@ -291,6 +299,7 @@ defmodule Mnemonix.Features.Map do
   def get_and_update!(store, key, fun) do
     case GenServer.call(store, {:get_and_update!, key, fun}) do
       {:ok, value} -> {value, store}
+      {:warn, message, value} -> with :ok <- IO.warn(message), do: {value, store}
       {:raise, type, args} -> raise type, args
     end
   end
@@ -322,6 +331,7 @@ defmodule Mnemonix.Features.Map do
   def get_lazy(store, key, fun) when is_function(fun, 0) do
     case GenServer.call(store, {:get_lazy, key, fun}) do
       {:ok, value} -> value
+      {:warn, message, value} -> with :ok <- IO.warn(message), do: value
       {:raise, type, args} -> raise type, args
     end
   end
@@ -342,6 +352,7 @@ defmodule Mnemonix.Features.Map do
   def has_key?(store, key) do
     case GenServer.call(store, {:has_key?, key}) do
       {:ok, value} -> value
+      {:warn, message, value} -> with :ok <- IO.warn(message), do: value
       {:raise, type, args} -> raise type, args
     end
   end
@@ -368,6 +379,7 @@ defmodule Mnemonix.Features.Map do
   def pop(store, key) do
     case GenServer.call(store, {:pop, key}) do
       {:ok, value} -> {value, store}
+      {:warn, message, value} -> with :ok <- IO.warn(message), do: {value, store}
       {:raise, type, args} -> raise type, args
     end
   end
@@ -395,6 +407,7 @@ defmodule Mnemonix.Features.Map do
   def pop(store, key, default) do
     case GenServer.call(store, {:pop, key, default}) do
       {:ok, value} -> {value, store}
+      {:warn, message, value} -> with :ok <- IO.warn(message), do: {value, store}
       {:raise, type, args} -> raise type, args
     end
   end
@@ -426,6 +439,7 @@ defmodule Mnemonix.Features.Map do
   def pop_lazy(store, key, fun) when is_function(fun, 0) do
     case GenServer.call(store, {:pop_lazy, key, fun}) do
       {:ok, value} -> {value, store}
+      {:warn, message, value} -> with :ok <- IO.warn(message), do: {value, store}
       {:raise, type, args} -> raise type, args
     end
   end
@@ -448,6 +462,7 @@ defmodule Mnemonix.Features.Map do
   def put_new(store, key, value) do
     case GenServer.call(store, {:put_new, key, value}) do
       :ok -> store
+      {:warn, message} -> with :ok <- IO.warn(message), do: store
       {:raise, type, args} -> raise type, args
     end
   end
@@ -478,6 +493,7 @@ defmodule Mnemonix.Features.Map do
   def put_new_lazy(store, key, fun) when is_function(fun, 0) do
     case GenServer.call(store, {:put_new_lazy, key, fun}) do
       :ok -> store
+      {:warn, message} -> with :ok <- IO.warn(message), do: store
       {:raise, type, args} -> raise type, args
     end
   end
@@ -504,6 +520,7 @@ defmodule Mnemonix.Features.Map do
   def replace(store, key, value) do
     case GenServer.call(store, {:replace, key, value}) do
       :ok -> store
+      {:warn, message} -> with :ok <- IO.warn(message), do: store
       {:raise, type, args} -> raise type, args
     end
   end
@@ -529,6 +546,7 @@ defmodule Mnemonix.Features.Map do
   def replace!(store, key, value) do
     case GenServer.call(store, {:replace!, key, value}) do
       :ok -> store
+      {:warn, message} -> with :ok <- IO.warn(message), do: store
       {:raise, type, args} -> raise type, args
     end
   end
@@ -566,6 +584,7 @@ defmodule Mnemonix.Features.Map do
   def split(store, keys) do
     case GenServer.call(store, {:split, keys}) do
       {:ok, result} -> {result, store}
+      {:warn, message, result} -> with :ok <- IO.warn(message), do: {result, store}
       {:raise, type, args} -> raise type, args
     end
   end
@@ -593,6 +612,7 @@ defmodule Mnemonix.Features.Map do
   def take(store, keys) do
     case GenServer.call(store, {:take, keys}) do
       {:ok, result} -> result
+      {:warn, message, result} -> with :ok <- IO.warn(message), do: result
       {:raise, type, args} -> raise type, args
     end
   end
@@ -627,6 +647,7 @@ defmodule Mnemonix.Features.Map do
   def update(store, key, initial, function) do
     case GenServer.call(store, {:update, key, initial, function}) do
       :ok -> store
+      {:warn, message} -> with :ok <- IO.warn(message), do: store
       {:raise, type, args} -> raise type, args
     end
   end
@@ -652,6 +673,7 @@ defmodule Mnemonix.Features.Map do
   def update!(store, key, function) do
     case GenServer.call(store, {:update!, key, function}) do
       :ok -> store
+      {:warn, message} -> with :ok <- IO.warn(message), do: store
       {:raise, type, args} -> raise type, args
     end
   end

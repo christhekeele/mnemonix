@@ -55,14 +55,15 @@ defmodule Mnemonix do
       iex> Mnemonix.get(store, :fizz)
       1
 
-  / # Expiry Features
-  / `Mnemonix.Features.Expiry` lets you set entries to expire after a given time-to-live on any store.
-  /
-  / iex> store = Mnemonix.new(fizz: 1)
-  / iex> Mnemonix.expire(store, :fizz, 100)
-  / iex> :timer.sleep(1000)
-  / iex> Mnemonix.get(store, :fizz)
-  / nil
+  # Expiry Features
+
+  `Mnemonix.Features.Expiry` lets you set entries to expire after a given time-to-live on any store.
+
+      iex> store = Mnemonix.new(fizz: 1)
+      iex> Mnemonix.expire(store, :fizz, 100)
+      iex> :timer.sleep(1000)
+      iex> Mnemonix.get(store, :fizz)
+      nil
 
   ## Enumerable Features
 

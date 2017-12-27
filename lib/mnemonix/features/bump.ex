@@ -63,6 +63,7 @@ defmodule Mnemonix.Features.Bump do
   def bump(store, key, amount) do
     case GenServer.call(store, {:bump, key, amount}) do
       {:ok, value} -> value
+      {:warn, message, value} -> with :ok <- IO.warn(message), do: value
       {:raise, type, args} -> raise type, args
     end
   end
@@ -101,6 +102,7 @@ defmodule Mnemonix.Features.Bump do
   def bump!(store, key, amount) do
     case GenServer.call(store, {:bump!, key, amount}) do
       :ok -> store
+      {:warn, message} -> with :ok <- IO.warn(message), do: store
       {:raise, type, args} -> raise type, args
     end
   end
@@ -135,6 +137,7 @@ defmodule Mnemonix.Features.Bump do
   def increment(store, key) do
     case GenServer.call(store, {:increment, key}) do
       {:ok, value} -> value
+      {:warn, message, value} -> with :ok <- IO.warn(message), do: value
       {:raise, type, args} -> raise type, args
     end
   end
@@ -177,6 +180,7 @@ defmodule Mnemonix.Features.Bump do
   def increment(store, key, amount) do
     case GenServer.call(store, {:increment, key, amount}) do
       {:ok, value} -> value
+      {:warn, message, value} -> with :ok <- IO.warn(message), do: value
       {:raise, type, args} -> raise type, args
     end
   end
@@ -211,6 +215,7 @@ defmodule Mnemonix.Features.Bump do
   def decrement(store, key) do
     case GenServer.call(store, {:decrement, key}) do
       {:ok, value} -> value
+      {:warn, message, value} -> with :ok <- IO.warn(message), do: value
       {:raise, type, args} -> raise type, args
     end
   end
@@ -253,6 +258,7 @@ defmodule Mnemonix.Features.Bump do
   def decrement(store, key, amount) do
     case GenServer.call(store, {:decrement, key, amount}) do
       {:ok, value} -> value
+      {:warn, message, value} -> with :ok <- IO.warn(message), do: value
       {:raise, type, args} -> raise type, args
     end
   end
