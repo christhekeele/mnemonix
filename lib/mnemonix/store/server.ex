@@ -1,7 +1,6 @@
 defmodule Mnemonix.Store.Server do
-  @moduledoc """
-  Bridges `Mnemonix.Features` with underlying `Mnemonix.Stores`.
-  """
+  @moduledoc false
+  # Bridges `Mnemonix.Features` with underlying `Mnemonix.Stores`.
 
   alias Mnemonix.Store
   alias Mnemonix.Features.Bump

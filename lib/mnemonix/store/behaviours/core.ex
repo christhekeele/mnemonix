@@ -5,7 +5,7 @@ defmodule Mnemonix.Store.Behaviours.Core do
     quote location: :keep do
       @impl unquote(__MODULE__)
       def start_link() do
-        Mnemonix.Store.Server.start_link(__MODULE__, [])
+        start_link([])
       end
 
       @impl unquote(__MODULE__)

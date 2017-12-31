@@ -55,7 +55,7 @@ defmodule Mnemonix do
       iex> Mnemonix.get(store, :fizz)
       1
 
-  # Expiry Features
+  ## Expiry Features
 
   `Mnemonix.Features.Expiry` lets you set entries to expire after a given time-to-live on any store.
 

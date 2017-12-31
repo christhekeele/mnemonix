@@ -16,33 +16,6 @@ defmodule Mnemonix.Features.Expiry do
   """
   @type ttl :: non_neg_integer | nil
 
-  @callback expire(Mnemonix.store, Mnemonix.key)
-    :: Mnemonix.store | no_return
-  @doc """
-  Sets the entry under `key` to expire.
-
-  Uses the `ttl` passed into the store's options.
-  If that was not provided, the entry will not be set to expire.
-
-  ## Examples
-
-      iex> store = Mnemonix.new(%{a: 1})
-      iex> #{@name}.expire(store, :a, 1)
-      iex> :timer.sleep(200)
-      iex> Mnemonix.get(store, :a)
-      nil
-
-      iex> store = Mnemonix.new(%{a: 1})
-      iex> #{@name}.expire(store, :a, 24 * 60 * 60 * 1)
-      iex> #{@name}.expire(store, :a, 1)
-      iex> :timer.sleep(200)
-      iex> Mnemonix.get(store, :a)
-      nil
-  """
-  @spec expire(Mnemonix.store, Mnemonix.key)
-    :: Mnemonix.store | no_return
-  def expire(store, key), do: expire(store, key, nil)
-
   @callback expire(Mnemonix.store, Mnemonix.key, ttl)
     :: Mnemonix.store | no_return
   @doc """
@@ -69,6 +42,13 @@ defmodule Mnemonix.Features.Expiry do
       iex> :timer.sleep(200)
       iex> Mnemonix.get(store, :a)
       nil
+
+      iex> store = Mnemonix.new(%{a: 1})
+      iex> #{@name}.expire(store, :a, 1)
+      iex> #{@name}.expire(store, :a, 24 * 60 * 60 * 1)
+      iex> :timer.sleep(200)
+      iex> Mnemonix.get(store, :a)
+      1
   """
   @spec expire(Mnemonix.store, Mnemonix.key, ttl)
     :: Mnemonix.store | no_return
