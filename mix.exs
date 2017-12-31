@@ -61,10 +61,10 @@ defmodule Mnemonix.Mixfile do
       "CODE_OF_CONDUCT.md",
     ],
     groups_for_modules: [
-      Functions: [Mnemonix.Builder, Mnemonix.Supervision, ~r<Mnemonix.Features>],
+      Functions: [Mnemonix.Builder, Mnemonix.Supervision, ~r<Mnemonix.Features.>],
       Integrations: [Plug.Session.MNEMONIX],
-      Stores: ~r<Mnemonix.Stores>,
-      MetaStores: ~r<Mnemonix.Meta.Stores>,
+      Stores: ~r<Mnemonix.Stores.(?!Meta)>,
+      MetaStores: ~r<Mnemonix.Stores.Meta>,
     ]
   ]
 
