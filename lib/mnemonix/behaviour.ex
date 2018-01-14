@@ -1,48 +1,79 @@
 defmodule Mnemonix.Behaviour do
   @moduledoc false
 
-  def __on_definition__(env, kind, name, params, guards, body) do
-    doc = Module.get_attribute(env.module, :doc)
-    Module.put_attribute(env.module, :__functions__, {doc, kind, name, params, guards, body})
-    callback = Module.get_attribute(env.module, :callback)
+  defmodule Context do
+    @moduledoc false
+    defstruct [:module, :source, :docs, :inline, :singleton]
+  end
 
-    case {kind, callback} do
-      {_kind, []} ->
-        nil
+  defmodule Definition do
+    @moduledoc false
+    defstruct [:module, :kind, :name, :params, :guards, :body, :docs]
 
-      {:def, [callback | _]} ->
-        Module.put_attribute(
-          env.module,
-          :__callbacks__,
-          {callback_signature(env.module, callback)}
-        )
-
-      _ ->
-        nil
+    def new(module, kind, name, params, guards, body) do
+      %__MODULE__{
+        module: module,
+        kind: kind,
+        name: name,
+        params: params,
+        guards: guards,
+        body: body,
+        docs: case Module.get_attribute(module, :doc) do
+          {_line, docs} -> docs
+          nil -> nil
+        end
+      }
     end
+
+    def function?(%__MODULE__{} = definition) do
+      definition.kind in ~w[def defp]a
+    end
+
+    def private?(%__MODULE__{} = definition) do
+      definition.kind in ~w[defp defmacrop]a
+    end
+
+    def hidden?(%__MODULE__{} = definition) do
+      String.starts_with?(Atom.to_string(definition.name), "__")
+    end
+
+    def callback?(%__MODULE__{kind: :def} = definition) do
+      Enum.any?(arity(definition), fn arity ->
+        {definition.name, arity} in definition.module.behaviour_info(:callbacks)
+      end)
+    end
+    def callback?(%__MODULE__{}), do: false
+
+    def arity(%__MODULE__{} = definition) do
+      {arity, defaults} = Enum.reduce(definition.params, {0, 0}, fn
+        {:\\, _, [_arg, _default]}, {arity, defaults} ->
+          {arity, defaults + 1}
+        _ast, {arity, defaults} ->
+          {arity + 1, defaults}
+      end)
+      Range.new(arity, arity + defaults)
+    end
+
+    def docs_with_replacements(%__MODULE__{docs: docs}, find, replace) when is_binary(docs) do
+      replacement_name = Inspect.inspect(replace, %Inspect.Opts{})
+      find_name = Inspect.inspect(find, %Inspect.Opts{})
+      # find all references to this module except where it is being used as a namespace
+      find_regex = ~r{#{find_name}(?!\.[A-Z])}
+      String.replace(docs, find_regex, replacement_name)
+    end
+
+    def docs_with_replacements(%__MODULE__{docs: docs}, _find, _replace), do: docs
   end
 
-  defp callback_signature(module, {:callback, definition, _module_info}) do
-    callback_signature(module, definition)
-  end
-
-  defp callback_signature(module, {:when, _, [node, _names]}) do
-    callback_signature(module, node)
-  end
-
-  defp callback_signature(module, {:::, _, [{name, _, nil}, _return]}) do
-    {module, name, 0}
-  end
-
-  defp callback_signature(module, {:::, _, [{name, _, args}, _return]}) do
-    {module, name, length(args)}
+  def __on_definition__(env, kind, name, params, guards, body) do
+    definition = Definition.new(env.module, kind, name, params, guards, body)
+    Module.put_attribute(env.module, :__definitions__, definition)
   end
 
   defmacro __before_compile__(_env) do
     quote location: :keep do
       @doc false
-      def __functions__, do: @__functions__
-      def __callbacks__, do: @__callbacks__
+      def __definitions__, do: @__definitions__
     end
   end
 
@@ -51,8 +82,7 @@ defmodule Mnemonix.Behaviour do
     source = Keyword.get(opts, :source, __CALLER__.module)
 
     quote location: :keep do
-      Module.register_attribute(__MODULE__, :__functions__, accumulate: true)
-      Module.register_attribute(__MODULE__, :__callbacks__, accumulate: true)
+      Module.register_attribute(__MODULE__, :__definitions__, accumulate: true)
 
       @on_definition Mnemonix.Behaviour
       @before_compile Mnemonix.Behaviour
@@ -65,38 +95,35 @@ defmodule Mnemonix.Behaviour do
         {singleton, opts} =
           Mnemonix.Singleton.Behaviour.establish_singleton(__CALLER__.module, opts)
 
-        defaults =
-          for {_, kind, _, _, _, _} = function when kind in ~w[def defp]a <- source.__functions__ do
-            {doc, kind, name, params, guards, body} = function
+        defaults = source.__definitions__
+        |> Enum.filter(fn definition ->
+          Definition.function?(definition) and not Definition.hidden?(definition)
+        end)
+        |> Enum.map(fn definition ->
+            %Mnemonix.Behaviour.Definition{
+              module: module,
+              kind: kind,
+              name: name,
+              params: params,
+              guards: guards,
+              body: body,
+              docs: doc
+            } = definition
 
-            if String.starts_with?(Atom.to_string(name), "__") do
-              nil
-            else
-              callback = {source, name, length(params)} in source.__callbacks__
+            info = %{
+              module: __MODULE__,
+              source: source,
+              kind: kind,
+              docs: docs,
+              inline: inline,
+              callback: Mnemonix.Behaviour.Definition.callback?(definition),
+              singleton: singleton,
+            }
 
-              info = %{
-                module: __MODULE__,
-                source: source,
-                kind: kind,
-                docs: docs,
-                inline: inline,
-                callback: callback,
-                singleton: singleton
-              }
+            doc = Definition.docs_with_replacements(definition, source, __CALLER__.module)
 
-              doc = case doc do
-                {line, content} when is_binary(content) ->
-                  target_name = Inspect.inspect(__CALLER__.module, %Inspect.Opts{})
-                  source_name = Inspect.inspect(source, %Inspect.Opts{})
-                  source_regex = ~r{#{source_name}(?!\.[A-Z])} # ie. except references to namespaced modules
-                  new_content = String.replace(content, source_regex, target_name)
-                  {line, new_content}
-                _ -> doc
-              end
-
-              Mnemonix.Behaviour.compose_default(info, doc, name, params, guards, body)
-            end
-          end
+            Mnemonix.Behaviour.compose_default(info, doc, name, params, guards, body)
+          end)
 
         [
           quote(location: :keep, do: @behaviour(unquote(__MODULE__))),
@@ -187,8 +214,9 @@ defmodule Mnemonix.Behaviour do
     {call, meta, params}
   end
 
-  def normalize_param({{two, tuple}, i}),
-    do: {normalize_param({two, i}), normalize_param({tuple, i})}
+  def normalize_param({{two, tuple}, i}) do
+    {normalize_param({two, i}), normalize_param({tuple, i})}
+  end
 
   def normalize_param({literal, _}), do: literal
 
@@ -210,7 +238,7 @@ defmodule Mnemonix.Behaviour do
 
   defp compose_docs(%{docs: false} = info, _doc), do: compose_docs(info, false)
 
-  defp compose_docs(_info, {_, doc}) when is_binary(doc) do
+  defp compose_docs(_info, doc) when is_binary(doc) do
     compose_module_attribute(:doc, doc)
   end
 
