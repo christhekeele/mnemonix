@@ -78,7 +78,7 @@ defmodule Mnemonix.Application do
     prepare_supervisor_spec(
       Mnemonix.Store.Supervisor,
       managed_stores(default),
-      strategy: :one_for_one,
+      strategy: :one_for_one
     ),
   ]
 

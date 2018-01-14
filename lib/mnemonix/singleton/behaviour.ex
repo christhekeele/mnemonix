@@ -38,10 +38,18 @@ defmodule Mnemonix.Singleton.Behaviour do
   def establish_singleton(module, opts) do
     singleton = Keyword.get(opts, :singleton, false)
 
-    singleton =
-      if singleton, do: Mnemonix.Singleton.Behaviour.determine_singleton(module, singleton)
+    singleton = if singleton do
+      Mnemonix.Singleton.Behaviour.determine_singleton(module, singleton)
+    else
+      singleton
+    end
 
-    opts = if singleton, do: Keyword.put(opts, :singleton, {module, singleton}), else: opts
+    opts = if singleton do
+      Keyword.put(opts, :singleton, {module, singleton})
+    else
+      opts
+    end
+
     {singleton, opts}
   end
 
